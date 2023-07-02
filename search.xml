@@ -41,6 +41,41 @@
       </tags>
   </entry>
   <entry>
+    <title>浏览器事件循环</title>
+    <url>/2023/07/02/%E5%89%8D%E7%AB%AF/%E6%B5%8F%E8%A7%88%E5%99%A8%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF/</url>
+    <content><![CDATA[<h2 id="事件循环的背景"><a href="#事件循环的背景" class="headerlink" title="事件循环的背景"></a>事件循环的背景</h2><h3 id="浏览器"><a href="#浏览器" class="headerlink" title="浏览器"></a>浏览器</h3><p>浏览器在运行中会开启很多进程，其中最主要的进程有：</p>
+<ol>
+<li>浏览器进程<br> 主要负责界面显示、用户交互、子进程管理等。浏览器进程内部又会启动多个线程处理不同的任务</li>
+<li>网络进程<br> 负责加载网络资源。网络进程内容会启动多个线程来处理不同任务</li>
+<li>渲染进程<br> 渲染进程启动后会开启一个<strong>渲染主线程</strong>，负责执行html、css、js代码。默认情况下，浏览器会为每一个标签页开启一个新的渲染进程，以保证不同的标签页之间互不影响</li>
+</ol>
+<h3 id="JS"><a href="#JS" class="headerlink" title="JS"></a>JS</h3><p>JS 是单线程的语言，这是因为它运行在浏览器的渲染主线程中，而渲染主线程只有一个，且承担诸多工作，如渲染页面、执行JS等，因此如果使用同步的方式，就很容易导致主线程产生阻塞，从而导致消息队列中的其他任务无法执行</p>
+<p>所以浏览器采用异步的方式来避免。具体做法是当某些任务发生时，比如计时器、网络事件监听，主线程将任务交给其他线程去处理，转而执行后续代码。当其他线程完成时，将事先传递的回调函数包装成任务，加入到消息队列的末尾排队，等待主线程调度执行</p>
+<p>在这中异步模式下，最大限度的保证了单线程的流程执行</p>
+<p><u>因此单线程是异步产生的原因，事件循环是异步的实现方式</u></p>
+<h3 id="事件循环"><a href="#事件循环" class="headerlink" title="事件循环"></a>事件循环</h3><p>事件循环也称消息循环，是浏览器渲染主线程的工作方式。</p>
+<p>循环指的是在不同的消息队列中进行循环，每次循环从当前队列中取出第一个任务执行，其他线程只需要在合适的时候将任务加入到队列末尾即可</p>
+<h3 id="队列优先级"><a href="#队列优先级" class="headerlink" title="队列优先级"></a>队列优先级</h3><ul>
+<li>每个任务有不同的类型，同类型的任务必须在同一个队列，不同的任务可以处于不同的队列。不同的队列有不同的优先级，在一次事件循环中，有浏览器决定取哪一个队列的任务。</li>
+<li>浏览器必须有一个微队列，微队列的任务一定具有最高的优先级，必须优先调度执行。</li>
+</ul>
+<p>目前包含以下队列：</p>
+<ul>
+<li>微队列：用户存放需要最快执行的任务，优先级最高</li>
+<li>交互队列：用于存放用户操作后产生的事件处理任务，优先级高</li>
+<li>延时队列：用于存放计时器到达后的回调任务，优先级中</li>
+</ul>
+<p>添加到微队列的方式主要是Promise、MutationObserver和async&#x2F;await<br>例如：</p>
+<figure class="highlight javascript"><figcaption><span>Promise</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="title class_">Promise</span>.<span class="title function_">resolve</span>().<span class="title function_">then</span>(<span class="function">() =&gt;</span> <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Done&#x27;</span>))</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><figcaption><span>MutationObserver</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="comment">// 创建 MutationObserver 实例，并指定回调函数</span></span><br><span class="line"><span class="keyword">const</span> observer = <span class="keyword">new</span> <span class="title class_">MutationObserver</span>(<span class="function">(<span class="params">mutationsList, observer</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="comment">// 处理 DOM 变化的逻辑</span></span><br><span class="line">  mutationsList.<span class="title function_">forEach</span>(<span class="function"><span class="params">mutation</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(mutation.<span class="property">type</span>); <span class="comment">// 打印变化的类型</span></span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(mutation.<span class="property">target</span>); <span class="comment">// 打印发生变化的节点</span></span><br><span class="line">  &#125;);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用 observe 方法指定要监听的 DOM 元素和变化类型</span></span><br><span class="line">observer.<span class="title function_">observe</span>(<span class="variable language_">document</span>.<span class="property">body</span>, &#123; <span class="attr">childList</span>: <span class="literal">true</span>, <span class="attr">subtree</span>: <span class="literal">true</span> &#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 停止监听 DOM 变化</span></span><br><span class="line">observer.<span class="title function_">disconnect</span>();</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><figcaption><span>async/await</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="comment">//当调用 fetchData 函数时，它会立即返回一个 Promise 对象</span></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">fetchData</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Start&#x27;</span>);</span><br><span class="line">  </span><br><span class="line">  <span class="comment">//await 表达式会在执行时创建一个微任务，并将其添加到微任务队列中,同时暂停主线程的执行。</span></span><br><span class="line">  <span class="comment">//这样可以确保 await 后面的代码在前面的异步操作完成后才会执行。</span></span><br><span class="line">  <span class="keyword">const</span> result = <span class="keyword">await</span> <span class="title function_">fetch</span>(<span class="string">&#x27;https://api.example.com/data&#x27;</span>); </span><br><span class="line">  <span class="keyword">const</span> data = <span class="keyword">await</span> result.<span class="title function_">json</span>();</span><br><span class="line"></span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Data:&#x27;</span>, data);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Before&#x27;</span>);</span><br><span class="line"><span class="title function_">fetchData</span>();</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;After&#x27;</span>);</span><br><span class="line"></span><br><span class="line">最后结果：</span><br><span class="line"><span class="title class_">Before</span></span><br><span class="line"><span class="title class_">After</span></span><br><span class="line"><span class="title class_">Start</span></span><br><span class="line"><span class="title class_">Data</span>: &#123;&#125;</span><br></pre></td></tr></table></figure>]]></content>
+      <tags>
+        <tag>前端</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>wx.getUserProfile 不出现弹窗</title>
     <url>/2023/06/23/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F/wx-getUserProfile-%E4%B8%8D%E5%87%BA%E7%8E%B0%E5%BC%B9%E7%AA%97/</url>
     <content><![CDATA[<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>使用wx.getUserProfile 获取用户信息，但是不出现弹窗就直接获取到了用户信息，且返回灰色头像，和“微信用户”昵称</p>
@@ -209,41 +244,6 @@
 ]]></content>
       <tags>
         <tag>职业规划</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>浏览器事件循环</title>
-    <url>/2023/07/02/%E5%89%8D%E7%AB%AF/%E6%B5%8F%E8%A7%88%E5%99%A8%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF/</url>
-    <content><![CDATA[<h2 id="事件循环的背景"><a href="#事件循环的背景" class="headerlink" title="事件循环的背景"></a>事件循环的背景</h2><h3 id="浏览器"><a href="#浏览器" class="headerlink" title="浏览器"></a>浏览器</h3><p>浏览器在运行中会开启很多进程，其中最主要的进程有：</p>
-<ol>
-<li>浏览器进程<br> 主要负责界面显示、用户交互、子进程管理等。浏览器进程内部又会启动多个线程处理不同的任务</li>
-<li>网络进程<br> 负责加载网络资源。网络进程内容会启动多个线程来处理不同任务</li>
-<li>渲染进程<br> 渲染进程启动后会开启一个<strong>渲染主线程</strong>，负责执行html、css、js代码。默认情况下，浏览器会为每一个标签页开启一个新的渲染进程，以保证不同的标签页之间互不影响</li>
-</ol>
-<h3 id="JS"><a href="#JS" class="headerlink" title="JS"></a>JS</h3><p>JS 是单线程的语言，这是因为它运行在浏览器的渲染主线程中，而渲染主线程只有一个，且承担诸多工作，如渲染页面、执行JS等，因此如果使用同步的方式，就很容易导致主线程产生阻塞，从而导致消息队列中的其他任务无法执行</p>
-<p>所以浏览器采用异步的方式来避免。具体做法是当某些任务发生时，比如计时器、网络事件监听，主线程将任务交给其他线程去处理，转而执行后续代码。当其他线程完成时，将事先传递的回调函数包装成任务，加入到消息队列的末尾排队，等待主线程调度执行</p>
-<p>在这中异步模式下，最大限度的保证了单线程的流程执行</p>
-<p><u>因此单线程是异步产生的原因，事件循环是异步的实现方式</u></p>
-<h3 id="事件循环"><a href="#事件循环" class="headerlink" title="事件循环"></a>事件循环</h3><p>事件循环也称消息循环，是浏览器渲染主线程的工作方式。</p>
-<p>循环指的是在不同的消息队列中进行循环，每次循环从当前队列中取出第一个任务执行，其他线程只需要在合适的时候将任务加入到队列末尾即可</p>
-<h3 id="队列优先级"><a href="#队列优先级" class="headerlink" title="队列优先级"></a>队列优先级</h3><ul>
-<li>每个任务有不同的类型，同类型的任务必须在同一个队列，不同的任务可以处于不同的队列。不同的队列有不同的优先级，在一次事件循环中，有浏览器决定取哪一个队列的任务。</li>
-<li>浏览器必须有一个微队列，微队列的任务一定具有最高的优先级，必须优先调度执行。</li>
-</ul>
-<p>目前包含以下队列：</p>
-<ul>
-<li>微队列：用户存放需要最快执行的任务，优先级最高</li>
-<li>交互队列：用于存放用户操作后产生的事件处理任务，优先级高</li>
-<li>延时队列：用于存放计时器到达后的回调任务，优先级中</li>
-</ul>
-<p>添加到微队列的方式主要是Promise、MutationObserver和async&#x2F;await<br>例如：</p>
-<figure class="highlight javascript"><figcaption><span>Promise</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="title class_">Promise</span>.<span class="title function_">resolve</span>().<span class="title function_">then</span>(<span class="function">() =&gt;</span> <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Done&#x27;</span>))</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight javascript"><figcaption><span>MutationObserver</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="comment">// 创建 MutationObserver 实例，并指定回调函数</span></span><br><span class="line"><span class="keyword">const</span> observer = <span class="keyword">new</span> <span class="title class_">MutationObserver</span>(<span class="function">(<span class="params">mutationsList, observer</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="comment">// 处理 DOM 变化的逻辑</span></span><br><span class="line">  mutationsList.<span class="title function_">forEach</span>(<span class="function"><span class="params">mutation</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(mutation.<span class="property">type</span>); <span class="comment">// 打印变化的类型</span></span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(mutation.<span class="property">target</span>); <span class="comment">// 打印发生变化的节点</span></span><br><span class="line">  &#125;);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用 observe 方法指定要监听的 DOM 元素和变化类型</span></span><br><span class="line">observer.<span class="title function_">observe</span>(<span class="variable language_">document</span>.<span class="property">body</span>, &#123; <span class="attr">childList</span>: <span class="literal">true</span>, <span class="attr">subtree</span>: <span class="literal">true</span> &#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 停止监听 DOM 变化</span></span><br><span class="line">observer.<span class="title function_">disconnect</span>();</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight javascript"><figcaption><span>async/await</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="comment">//当调用 fetchData 函数时，它会立即返回一个 Promise 对象</span></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">fetchData</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Start&#x27;</span>);</span><br><span class="line">  </span><br><span class="line">  <span class="comment">//await 表达式会在执行时创建一个微任务，并将其添加到微任务队列中,同时暂停主线程的执行。</span></span><br><span class="line">  <span class="comment">//这样可以确保 await 后面的代码在前面的异步操作完成后才会执行。</span></span><br><span class="line">  <span class="keyword">const</span> result = <span class="keyword">await</span> <span class="title function_">fetch</span>(<span class="string">&#x27;https://api.example.com/data&#x27;</span>); </span><br><span class="line">  <span class="keyword">const</span> data = <span class="keyword">await</span> result.<span class="title function_">json</span>();</span><br><span class="line"></span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Data:&#x27;</span>, data);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Before&#x27;</span>);</span><br><span class="line"><span class="title function_">fetchData</span>();</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;After&#x27;</span>);</span><br><span class="line"></span><br><span class="line">最后结果：</span><br><span class="line"><span class="title class_">Before</span></span><br><span class="line"><span class="title class_">After</span></span><br><span class="line"><span class="title class_">Start</span></span><br><span class="line"><span class="title class_">Data</span>: &#123;&#125;</span><br></pre></td></tr></table></figure>]]></content>
-      <tags>
-        <tag>前端</tag>
       </tags>
   </entry>
 </search>
