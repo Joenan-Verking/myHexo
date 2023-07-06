@@ -100,11 +100,31 @@
 <p>2.使用以下命令将本地仓库的更改推送到远程仓库：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git push origin master</span><br></pre></td></tr></table></figure>
 
+<h1 id="7月6日更新"><a href="#7月6日更新" class="headerlink" title="7月6日更新"></a>7月6日更新</h1><h2 id="查看当前仓库"><a href="#查看当前仓库" class="headerlink" title="查看当前仓库"></a>查看当前仓库</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git remote -v</span><br></pre></td></tr></table></figure>
+
+<h2 id="更改仓库url"><a href="#更改仓库url" class="headerlink" title="更改仓库url"></a>更改仓库url</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git remote set-url origin &lt;new-url&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="列出本地仓库中的分支"><a href="#列出本地仓库中的分支" class="headerlink" title="列出本地仓库中的分支"></a>列出本地仓库中的分支</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ git branch </span><br><span class="line"></span><br><span class="line">$ git branch -v  //可以查看提交信息</span><br></pre></td></tr></table></figure>
+
+<h2 id="切换到不同的分支或恢复文件的状态"><a href="#切换到不同的分支或恢复文件的状态" class="headerlink" title="切换到不同的分支或恢复文件的状态"></a>切换到不同的分支或恢复文件的状态</h2><ol>
+<li><p>切换到已存在的分支：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git checkout &lt;branch-name&gt;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>创建并切换到新分支：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git checkout -b &lt;new-branch-name&gt;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>恢复单个文件到最新提交状态：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git checkout -- &lt;file-name&gt;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>恢复整个目录到最新提交状态：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git checkout -- &lt;directory-name&gt;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<p>注意：在切换分支或恢复文件时，确保没有未提交的更改，否则可能会导致更改的丢失。</p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://exmaple.com/2023/06/23/GitHub/%E6%96%B0%E6%89%8Bgithub%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/" data-id="cljpr5k0600015owo44omb7pu" class="article-share-link">
+      <a data-url="https://exmaple.com/2023/06/23/GitHub/%E6%96%B0%E6%89%8Bgithub%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/" data-id="cljr534wj0001qgwo46ve3esc" class="article-share-link">
         分享
       </a>
       
