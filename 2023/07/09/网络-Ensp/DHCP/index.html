@@ -12,7 +12,7 @@
   <meta name="description" content="学习记录、心得记录">
   
   <title>
-    DHCP |
+    篇一 DHCP |
     
     冰山的成长笔记
   </title>
@@ -45,7 +45,7 @@
       
   
   <h1 class="article-title" itemprop="name">
-    DHCP
+    篇一 DHCP
   </h1>
   
   
@@ -77,8 +77,9 @@
 <p>DHCP的优势在于它能够自动管理IP地址分配，简化了网络管理工作。通过使用DHCP，管理员可以集中管理IP地址的分配和配置，而无需手动为每个设备进行配置。DHCP还支持地址重用和动态更新配置，使得系统资源能够更有效地利用。</p>
 <p>总而言之，DHCP是一个用于自动分配IP地址和相关配置信息的协议，它简化了网络管理工作，并提高了网络资源的利用效率。</p>
 <h2 id="Ensp"><a href="#Ensp" class="headerlink" title="Ensp"></a>Ensp</h2><h3 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h3><p>AR2220路由器一台，S5700三层交换机一台，pc机若干</p>
-<p><img src="../../images/ensp-1.png" style="width:180px"></img></p>
-<h3 id="操作"><a href="#操作" class="headerlink" title="操作"></a>操作</h3><ol>
+<img src="/images/ensp-1.png" class="center" width="400">
+
+<h3 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h3><ol>
 <li><p>输入 <code>sy</code> 进入路由系统视图，然后输入</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dhcp enable</span><br></pre></td></tr></table></figure>
 </li>
@@ -88,13 +89,17 @@
 <li><p>pc机刷新dhcp配置即可</p>
 </li>
 </ol>
-<h3 id="实操记录"><a href="#实操记录" class="headerlink" title="实操记录"></a>实操记录</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;Huawei&gt;sy</span><br><span class="line"></span><br><span class="line">[Huawei]interface g0/0/0</span><br><span class="line"></span><br><span class="line">[Huawei-GigabitEthernet0/0/0]ip address 192.168.1.1 255.255.255.0</span><br><span class="line"></span><br><span class="line">[Huawei-GigabitEthernet0/0/0] quit</span><br><span class="line"></span><br><span class="line">[Huawei]dhcp enable </span><br><span class="line"></span><br><span class="line">[Huawei-GigabitEthernet0/0/0]dhcp select interface</span><br></pre></td></tr></table></figure>
+<h3 id="实操"><a href="#实操" class="headerlink" title="实操"></a>实操</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;Huawei&gt;sy</span><br><span class="line"></span><br><span class="line">[Huawei]interface g0/0/0</span><br><span class="line"></span><br><span class="line">[Huawei-GigabitEthernet0/0/0]ip address 192.168.1.1 255.255.255.0</span><br><span class="line"></span><br><span class="line">[Huawei-GigabitEthernet0/0/0] quit</span><br><span class="line"></span><br><span class="line">[Huawei]dhcp enable </span><br><span class="line"></span><br><span class="line">[Huawei-GigabitEthernet0/0/0]dhcp select interface</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="检验"><a href="#检验" class="headerlink" title="检验"></a>检验</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ipconfig</span></span><br><span class="line"></span><br><span class="line">Link local IPv6 address...........: fe80::5689:98ff:feec:2846</span><br><span class="line">IPv6 address......................: :: / 128</span><br><span class="line">IPv6 gateway......................: ::</span><br><span class="line">IPv4 address......................: 192.168.1.254</span><br><span class="line">Subnet mask.......................: 255.255.255.0</span><br><span class="line">Gateway...........................: 192.168.1.1</span><br><span class="line">Physical address..................: 54-89-98-EC-28-46</span><br><span class="line">DNS server........................: 0.0.0.0</span><br></pre></td></tr></table></figure>
 
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://exmaple.com/2023/07/09/%E7%BD%91%E7%BB%9C-Ensp/DHCP/" data-id="cljvos3sv0007hcwod1fj35fa" class="article-share-link">
+      <a data-url="https://exmaple.com/2023/07/09/%E7%BD%91%E7%BB%9C-Ensp/DHCP/" data-id="cljwjdou8000afowo5j791lqq" class="article-share-link">
         分享
       </a>
       
@@ -107,6 +112,15 @@
   
   
 <nav class="article-nav">
+  
+  <a href="/2023/07/10/%E7%BD%91%E7%BB%9C-Ensp/Dns-%E5%9F%9F%E5%90%8D%E8%A7%A3%E6%9E%90/" class="article-nav-link">
+    <strong class="article-nav-caption">前一篇</strong>
+    <div class="article-nav-title">
+      
+      篇二 Dns 域名解析
+      
+    </div>
+  </a>
   
   
   <a href="/2023/07/05/mysql%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E8%BF%9B%E9%98%B6/" class="article-nav-link">
