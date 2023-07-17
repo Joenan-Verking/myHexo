@@ -77,7 +77,7 @@
 <p>DNS采用分层的结构，由多个DNS服务器组成，分为根域名服务器、顶级域名服务器、权威域名服务器和本地域名服务器等。当本地域名服务器无法解析域名时，会向上级域名服务器查询，直到找到对应的IP地址。 </p>
 <p>简单来说，<u>就是当用户访问某个域名时，会先在域名解析服务器上查找该域名对应的ip地址，找到后再访问该IP地址，用户可以使用易于记忆的域名来访问互联网上的各种资源，而无需记住复杂的IP地址。</u>同时，DNS还支持其他功能，如邮件服务器的查找、反向解析等。</p>
 <h2 id="准备内容"><a href="#准备内容" class="headerlink" title="准备内容"></a>准备内容</h2><p>ar2220路由一台、server服务器一台、s5700三层交换机一台、pc机若干</p>
-<img src="/images/ensp-%E5%9F%9F%E5%90%8D%E8%A7%A3%E6%9E%90.png" class="center" width="400">
+<img src="/images/ensp-%E5%9F%9F%E5%90%8D%E8%A7%A3%E6%9E%90.png" class="center" width="500">
 
 
 <h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><ol>
@@ -85,9 +85,7 @@
 <li>在路由对应接口输入<code>dhcp server dns-list [域名解析服务器ip]</code></li>
 <li>pc机刷新dhcp配置</li>
 </ol>
-<h2 id="实操"><a href="#实操" class="headerlink" title="实操"></a>实操</h2><h3 id="添加域名"><a href="#添加域名" class="headerlink" title="添加域名"></a>添加域名</h3><img src="/images/dns%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%B7%BB%E5%8A%A0ip.png" class="center" width="400">
-
-<img src="/images/ensp-dns%E6%9C%8D%E5%8A%A1%E5%99%A8.png" class="center" width="400">
+<h2 id="实操"><a href="#实操" class="headerlink" title="实操"></a>实操</h2><h3 id="添加域名"><a href="#添加域名" class="headerlink" title="添加域名"></a>添加域名</h3><img src="/images/dns%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%B7%BB%E5%8A%A0ip.png" class="center" width="500" title="%5 {% img center &#x2F;images&#x2F;ensp-dns服务器.png 500">
 
 <h3 id="路由"><a href="#路由" class="headerlink" title="路由"></a>路由</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[Huawei]interface g0/0/0</span><br><span class="line">[Huawei-GigabitEthernet0/0/0]dhcp server dns-list 192.168.1.100</span><br></pre></td></tr></table></figure>
 
@@ -99,7 +97,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://exmaple.com/2023/07/10/%E7%BD%91%E7%BB%9C-Ensp/Dns-%E5%9F%9F%E5%90%8D%E8%A7%A3%E6%9E%90/" data-id="cljwjdou9000bfowo4hu40fbd" class="article-share-link">
+      <a data-url="https://exmaple.com/2023/07/10/%E7%BD%91%E7%BB%9C-Ensp/Dns-%E5%9F%9F%E5%90%8D%E8%A7%A3%E6%9E%90/" data-id="clk6vbc7q000dlowogzuq53ce" class="article-share-link">
         分享
       </a>
       
