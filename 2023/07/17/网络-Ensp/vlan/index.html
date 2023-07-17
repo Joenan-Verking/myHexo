@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  
+  <meta name="keywords" content="冰山的笔记">
+  
+  
+  <meta name="description" content="学习记录、心得记录">
+  
+  <title>
+    篇四 vlan |
+    
+    冰山的笔记
+  </title>
+  <!-- Icon -->
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+    
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<script src="/js/pace.min.js"></script>
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <main class="content">
+    <section class="outer">
+  <article id="post-网络-Ensp/vlan" class="article article-type-post" itemscope
+  itemprop="blogPost" data-scroll-reveal>
+
+  <div class="article-inner">
+    
+    <header class="article-header">
+      
+  
+  <h1 class="article-title" itemprop="name">
+    篇四 vlan
+  </h1>
+  
+  
+
+    </header>
+    
+
+    
+    <div class="article-meta">
+      <a href="/2023/07/17/%E7%BD%91%E7%BB%9C-Ensp/vlan/" class="article-date">
+  <time datetime="2023-07-17T13:12:50.000Z" itemprop="datePublished">2023-07-17</time>
+</a>
+      
+    </div>
+    
+
+    
+    
+<div class="tocbot"></div>
+
+    
+
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+      
+        <h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>VLAN（Virtual Local Area Network）是一种虚拟局域网技术，用于将一个物理网络划分为多个逻辑上独立的虚拟网络。VLAN可以提供更好的网络管理和安全性。</p>
+<h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><img src="/images/vlan%E5%87%86%E5%A4%87.png" class="center" width="500">
+
+<p>三层交换机两台、pc机若干</p>
+<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><ol>
+<li><p>创建vlan —— <code>vlan [vlan号]</code> </p>
+</li>
+<li><p>划分vlan：<br>  （1）进入接口<br>  （2）<code>port link-type access</code> （终端，如电脑、打印机等为access；其他交换机则为trunk）<br>  （3）<code>port default vlan [vlan号]</code></p>
+</li>
+<li><p>交换机之间允许vlan通信<br>  （1）进入接口<br>  （2）<code>port link-type trunk</code><br>  （3）<code>port trunk allow-pass vlan [vlan号]</code></p>
+</li>
+</ol>
+<h2 id="实操"><a href="#实操" class="headerlink" title="实操"></a>实操</h2><ol>
+<li><p>LSW1(第一台交换机)</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">&lt;Huawei&gt;sy</span><br><span class="line">Enter system view, return user view with Ctrl+Z.</span><br><span class="line"></span><br><span class="line">//创建vlan</span><br><span class="line">[Huawei]vlan 10</span><br><span class="line">[Huawei-vlan10]q</span><br><span class="line">[Huawei]vlan 20</span><br><span class="line">[Huawei-vlan20]q</span><br><span class="line"></span><br><span class="line">//划分vlan</span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/1</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]port link-type access </span><br><span class="line">[Huawei-GigabitEthernet0/0/1]port default vlan 10</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]q</span><br><span class="line"></span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/2</span><br><span class="line">[Huawei-GigabitEthernet0/0/2]port link-type access 	</span><br><span class="line">[Huawei-GigabitEthernet0/0/2]port default vlan 20</span><br><span class="line">[Huawei-GigabitEthernet0/0/2]q</span><br><span class="line"></span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/3</span><br><span class="line">[Huawei-GigabitEthernet0/0/3]port link-type access 	</span><br><span class="line">[Huawei-GigabitEthernet0/0/3]port default vlan 20</span><br><span class="line">[Huawei-GigabitEthernet0/0/3]q</span><br><span class="line"></span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/4</span><br><span class="line">[Huawei-GigabitEthernet0/0/4]port link-type trunk</span><br><span class="line">[Huawei-GigabitEthernet0/0/4]port trunk allow-pass vlan 10</span><br><span class="line">[Huawei-GigabitEthernet0/0/4]port trunk allow-pass vlan 20</span><br></pre></td></tr></table></figure>
+
+
+</li>
+<li><p>LSW2(第二台交换机)</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">&lt;Huawei&gt;sy</span><br><span class="line">Enter system view, return user view with Ctrl+Z.</span><br><span class="line"></span><br><span class="line">//创建vlan</span><br><span class="line">[Huawei]vlan 10</span><br><span class="line">[Huawei-vlan10]q</span><br><span class="line">[Huawei]vlan 20</span><br><span class="line">[Huawei-vlan20]q</span><br><span class="line"></span><br><span class="line">//划分vlan</span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/1</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]port link-type access </span><br><span class="line">[Huawei-GigabitEthernet0/0/1]port default vlan 10</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]q</span><br><span class="line"></span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/2</span><br><span class="line">[Huawei-GigabitEthernet0/0/2]port link-type access </span><br><span class="line">[Huawei-GigabitEthernet0/0/2]port default vlan 20</span><br><span class="line">[Huawei-GigabitEthernet0/0/2]q</span><br><span class="line"></span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/3</span><br><span class="line">[Huawei-GigabitEthernet0/0/3]port link-type trunk </span><br><span class="line">[Huawei-GigabitEthernet0/0/3]port trunk allow-pass vlan 10</span><br><span class="line">[Huawei-GigabitEthernet0/0/3]port trunk allow-pass vlan 20</span><br></pre></td></tr></table></figure>
+
+
+</li>
+<li><p>给pc机的ip从左到右依次设为1.1.1.1~1.1.1.5</p>
+</li>
+</ol>
+<h2 id="检验"><a href="#检验" class="headerlink" title="检验"></a>检验</h2><p><strong>pc1 ping pc2，由于不在同一个vlan中，ping操作失败</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 1.1.1.2</span></span><br><span class="line"></span><br><span class="line">Ping 1.1.1.2: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 1.1.1.1: Destination host unreachable</span><br><span class="line">From 1.1.1.1: Destination host unreachable</span><br><span class="line">From 1.1.1.1: Destination host unreachable</span><br><span class="line">From 1.1.1.1: Destination host unreachable</span><br><span class="line">From 1.1.1.1: Destination host unreachable</span><br><span class="line"></span><br><span class="line">--- 1.1.1.2 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  0 packet(s) received</span><br><span class="line">  100.00% packet loss</span><br></pre></td></tr></table></figure>
+
+<p><strong>同样的，pc2 ping pc1 也是失败</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 1.1.1.1</span></span><br><span class="line"></span><br><span class="line">Ping 1.1.1.1: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 1.1.1.2: Destination host unreachable</span><br><span class="line">From 1.1.1.2: Destination host unreachable</span><br><span class="line">From 1.1.1.2: Destination host unreachable</span><br><span class="line">From 1.1.1.2: Destination host unreachable</span><br><span class="line">From 1.1.1.2: Destination host unreachable</span><br><span class="line"></span><br><span class="line">--- 1.1.1.1 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  0 packet(s) received</span><br><span class="line">  100.00% packet loss</span><br></pre></td></tr></table></figure>
+
+<p><strong>pc1 与 pc5 互ping也是失败</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">//pc1 ping pc5</span><br><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 1.1.1.5</span></span><br><span class="line"></span><br><span class="line">Ping 1.1.1.5: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 1.1.1.1: Destination host unreachable</span><br><span class="line">From 1.1.1.1: Destination host unreachable</span><br><span class="line">From 1.1.1.1: Destination host unreachable</span><br><span class="line">From 1.1.1.1: Destination host unreachable</span><br><span class="line">From 1.1.1.1: Destination host unreachable</span><br><span class="line"></span><br><span class="line">--- 1.1.1.5 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  0 packet(s) received</span><br><span class="line">  100.00% packet loss</span><br><span class="line">  </span><br><span class="line">//pc5 ping pc1</span><br><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 1.1.1.1</span></span><br><span class="line"></span><br><span class="line">Ping 1.1.1.1: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 1.1.1.5: Destination host unreachable</span><br><span class="line">From 1.1.1.5: Destination host unreachable</span><br><span class="line">From 1.1.1.5: Destination host unreachable</span><br><span class="line">From 1.1.1.5: Destination host unreachable</span><br><span class="line">From 1.1.1.5: Destination host unreachable</span><br><span class="line"></span><br><span class="line">--- 1.1.1.1 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  0 packet(s) received</span><br><span class="line">  100.00% packet loss</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>相同vlan下互ping不影响</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">//pc1 ping pc4</span><br><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 1.1.1.4</span></span><br><span class="line"></span><br><span class="line">Ping 1.1.1.4: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 1.1.1.4: bytes=32 seq=1 ttl=128 time=47 ms</span><br><span class="line">From 1.1.1.4: bytes=32 seq=2 ttl=128 time=78 ms</span><br><span class="line">From 1.1.1.4: bytes=32 seq=3 ttl=128 time=78 ms</span><br><span class="line">From 1.1.1.4: bytes=32 seq=4 ttl=128 time=79 ms</span><br><span class="line">From 1.1.1.4: bytes=32 seq=5 ttl=128 time=63 ms</span><br><span class="line"></span><br><span class="line">--- 1.1.1.4 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 47/69/79 ms</span><br><span class="line">  </span><br><span class="line">//pc4 ping pc1</span><br><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 1.1.1.1</span></span><br><span class="line"></span><br><span class="line">Ping 1.1.1.1: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 1.1.1.1: bytes=32 seq=1 ttl=128 time=63 ms</span><br><span class="line">From 1.1.1.1: bytes=32 seq=2 ttl=128 time=62 ms</span><br><span class="line">From 1.1.1.1: bytes=32 seq=3 ttl=128 time=78 ms</span><br><span class="line">From 1.1.1.1: bytes=32 seq=4 ttl=128 time=62 ms</span><br><span class="line">From 1.1.1.1: bytes=32 seq=5 ttl=128 time=63 ms</span><br><span class="line"></span><br><span class="line">--- 1.1.1.1 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 62/65/78 ms</span><br><span class="line">  </span><br><span class="line">//pc2 ping pc5</span><br><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 1.1.1.5</span></span><br><span class="line"></span><br><span class="line">Ping 1.1.1.5: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 1.1.1.5: bytes=32 seq=1 ttl=128 time=94 ms</span><br><span class="line">From 1.1.1.5: bytes=32 seq=2 ttl=128 time=78 ms</span><br><span class="line">From 1.1.1.5: bytes=32 seq=3 ttl=128 time=79 ms</span><br><span class="line">From 1.1.1.5: bytes=32 seq=4 ttl=128 time=78 ms</span><br><span class="line">From 1.1.1.5: bytes=32 seq=5 ttl=128 time=78 ms</span><br><span class="line"></span><br><span class="line">--- 1.1.1.5 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 78/81/94 ms</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://exmaple.com/2023/07/17/%E7%BD%91%E7%BB%9C-Ensp/vlan/" data-id="clk6xftl7000b3owo9jc8hu5a" class="article-share-link">
+        分享
+      </a>
+      
+<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%BD%91%E7%BB%9C-Ensp/" rel="tag">网络-Ensp</a></li></ul>
+
+    </footer>
+
+  </div>
+
+  
+  
+<nav class="article-nav">
+  
+  
+  <a href="/2023/07/10/%E7%BD%91%E7%BB%9C-Ensp/%E7%BD%91%E5%85%B3/" class="article-nav-link">
+    <strong class="article-nav-caption">后一篇</strong>
+    <div class="article-nav-title">篇三 网关</div>
+  </a>
+  
+</nav>
+
+  
+
+  
+  
+  
+  
+
+</article>
+</section>
+    <footer class="footer">
+  <div class="outer">
+    <ul class="list-inline">
+      <li>冰山的笔记 &copy; 2023</li>
+      
+        <li>
+          
+            <a href="https://beian.miit.gov.cn/" target="_blank"></a>
+            
+        </li>
+      
+      <li>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></li>
+      <li>theme  <a target="_blank" rel="noopener" href="https://github.com/zhwangart/hexo-theme-ocean">Ocean</a></li>
+    </ul>
+    <p><ul class="list-inline">
+  
+  <li><i class="fe fe-smile-alt tooltip" data-tooltip="UV"></i> <span id="busuanzi_value_site_uv"></span></li>
+  
+  <li><i class="fe fe-bookmark tooltip" data-tooltip="PV"></i> <span id="busuanzi_value_page_pv"></span></li>
+  
+</ul></p>
+  </div>
+</footer>
+  </main>
+  <aside class="sidebar">
+    <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/hexo.svg" alt="冰山的笔记"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">Home</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">Archives</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/gallery">Gallery</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/about">About</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link nav-item-search" title="搜索">
+        <i class="fe fe-search"></i>
+        搜索
+      </a>
+    </li>
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      <div class="totop" id="totop">
+  <i class="fe fe-rocket"></i>
+</div>
+    </li>
+    <li class="nav-item">
+      
+      <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+        <i class="fe fe-feed"></i>
+      </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+  </aside>
+  
+<script src="/js/jquery-2.0.3.min.js"></script>
+
+
+<script src="/js/jquery.justifiedGallery.min.js"></script>
+
+
+<script src="/js/lazyload.min.js"></script>
+
+
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+
+
+
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+
+<script src="/js/tocbot.min.js"></script>
+
+
+<script>
+  // Tocbot_v4.7.0  http://tscanlin.github.io/tocbot/
+  tocbot.init({
+    tocSelector: '.tocbot',
+    contentSelector: '.article-entry',
+    headingSelector: 'h1, h2, h3, h4, h5, h6',
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    positionFixedSelector: '.tocbot',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto',
+  });
+</script>
+
+
+
+<script src="/js/ocean.js"></script>
+
+</body>
+
+</html>
