@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  
+  <meta name="keywords" content="冰山的笔记">
+  
+  
+  <meta name="description" content="学习记录、心得记录">
+  
+  <title>
+    篇五 静态路由 |
+    
+    冰山的笔记
+  </title>
+  <!-- Icon -->
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+    
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<script src="/js/pace.min.js"></script>
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <main class="content">
+    <section class="outer">
+  <article id="post-网络-Ensp/篇五-静态路由" class="article article-type-post" itemscope
+  itemprop="blogPost" data-scroll-reveal>
+
+  <div class="article-inner">
+    
+    <header class="article-header">
+      
+  
+  <h1 class="article-title" itemprop="name">
+    篇五 静态路由
+  </h1>
+  
+  
+
+    </header>
+    
+
+    
+    <div class="article-meta">
+      <a href="/2023/07/20/%E7%BD%91%E7%BB%9C-Ensp/%E7%AF%87%E4%BA%94-%E9%9D%99%E6%80%81%E8%B7%AF%E7%94%B1/" class="article-date">
+  <time datetime="2023-07-20T03:58:47.000Z" itemprop="datePublished">2023-07-20</time>
+</a>
+      
+    </div>
+    
+
+    
+    
+<div class="tocbot"></div>
+
+    
+
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+      
+        <h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>静态路由是网络中使用静态路由表来确定数据包的传输路径的一种路由方式。它是通过手动配置路由器上的路由表来指定目标网络和下一跳路由器的关系，以确定数据包的传输路径。</p>
+<p>在静态路由中，网络管理员手动配置路由器上的路由表，将目标网络的 IP 地址和对应的下一跳路由器的 IP 地址进行映射。当路由器收到一个数据包时，它会根据数据包的目标 IP 地址查找路由表，找到与目标 IP 地址匹配的条目，并将数据包发送到相应的下一跳路由器。下一跳路由器将继续根据路由表将数据包转发到下一个路由器，直到数据包到达目标网络。</p>
+<p>静态路由的主要特点包括：</p>
+<ol>
+<li>静态路由是手动配置的，不会自动适应网络变化。如果网络拓扑发生变化，管理员需要手动更新路由表。</li>
+<li>静态路由是固定的，不会根据网络负载或链路状态进行动态调整。所有数据包都将按照路由表中的配置进行转发。</li>
+<li>静态路由的配置相对简单，适用于小型网络或网络拓扑不经常变化的情况。</li>
+<li>静态路由的优点是稳定性高，因为路由表不会频繁变化，不会产生额外的路由协议开销。</li>
+</ol>
+<p>静态路由适用于简单的网络环境或需要精确控制数据包传输路径的情况。对于复杂的网络环境或需要自动适应网络变化的情况，通常会使用动态路由协议来实现路由功能。</p>
+<h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><p>AR2220 路由两台、交换机一台、PC 机若干</p>
+<img src="/images/%E9%9D%99%E6%80%81%E8%B7%AF%E7%94%B1%E5%AE%9E%E9%AA%8C%E5%87%86%E5%A4%87.png" class="center" width="500">
+
+
+
+<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><p>在路由上输入指令，告诉路由去往目的ip网段应该走的下一跳，<u>下一跳指的是下一个经过的路由的接口所对应的ip</u></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ip route-static [目标ip（通常是网段）] [子网掩码] [下一跳ip]</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="实操"><a href="#实操" class="headerlink" title="实操"></a>实操</h2><h3 id="基础路由配置"><a href="#基础路由配置" class="headerlink" title="基础路由配置"></a>基础路由配置</h3><h4 id="第一台路由"><a href="#第一台路由" class="headerlink" title="第一台路由"></a>第一台路由</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[Huawei]interface GigabitEthernet 0/0/0</span><br><span class="line">[Huawei-GigabitEthernet0/0/0]ip address 192.168.1.1 255.255.255.0</span><br><span class="line"></span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/1</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]ip address 192.168.2.1 255.255.255.0</span><br></pre></td></tr></table></figure>
+
+<h4 id="第二台"><a href="#第二台" class="headerlink" title="第二台"></a>第二台</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[Huawei]interface GigabitEthernet 0/0/0</span><br><span class="line">[Huawei-GigabitEthernet0/0/0]ip address 192.168.2.10 255.255.255.0</span><br><span class="line"></span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/1</span><br><span class="line">[Huawei-GigabitEthernet0/0/0]ip address 192.168.3.1 255.255.255.0</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="配置静态路由"><a href="#配置静态路由" class="headerlink" title="配置静态路由"></a>配置静态路由</h3><h4 id="第一台"><a href="#第一台" class="headerlink" title="第一台"></a>第一台</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[Huawei]ip route-static 192.168.3.0 255.255.255.0 192.168.2.10</span><br></pre></td></tr></table></figure>
+
+<h4 id="第二台-1"><a href="#第二台-1" class="headerlink" title="第二台"></a>第二台</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[Huawei]ip route-static 192.168.1.0 255.255.255.0 192.168.2.1</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="检验"><a href="#检验" class="headerlink" title="检验"></a>检验</h2><h3 id="pc1-ping-服务器和pc2"><a href="#pc1-ping-服务器和pc2" class="headerlink" title="pc1 ping 服务器和pc2"></a>pc1 ping 服务器和pc2</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 192.168.3.100</span></span><br><span class="line"></span><br><span class="line">Ping 192.168.3.100: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 192.168.3.100: bytes=32 seq=1 ttl=126 time=47 ms</span><br><span class="line">From 192.168.3.100: bytes=32 seq=2 ttl=126 time=47 ms</span><br><span class="line">From 192.168.3.100: bytes=32 seq=3 ttl=126 time=47 ms</span><br><span class="line">From 192.168.3.100: bytes=32 seq=4 ttl=126 time=31 ms</span><br><span class="line">From 192.168.3.100: bytes=32 seq=5 ttl=126 time=63 ms</span><br><span class="line"></span><br><span class="line">--- 192.168.3.100 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 31/47/63 ms</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 192.168.3.10</span></span><br><span class="line"></span><br><span class="line">Ping 192.168.3.10: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 192.168.3.10: bytes=32 seq=1 ttl=253 time=31 ms</span><br><span class="line">From 192.168.3.10: bytes=32 seq=2 ttl=253 time=32 ms</span><br><span class="line">From 192.168.3.10: bytes=32 seq=3 ttl=253 time=31 ms</span><br><span class="line">From 192.168.3.10: bytes=32 seq=4 ttl=253 time=31 ms</span><br><span class="line">From 192.168.3.10: bytes=32 seq=5 ttl=253 time=31 ms</span><br><span class="line"></span><br><span class="line">--- 192.168.3.10 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 31/31/32 ms</span><br></pre></td></tr></table></figure>
+
+<h3 id="pc2-ping-pc1"><a href="#pc2-ping-pc1" class="headerlink" title="pc2 ping pc1"></a>pc2 ping pc1</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 192.168.1.10</span></span><br><span class="line"></span><br><span class="line">Ping 192.168.1.10: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">Request timeout!</span><br><span class="line">From 192.168.1.10: bytes=32 seq=2 ttl=126 time=31 ms</span><br><span class="line">From 192.168.1.10: bytes=32 seq=3 ttl=126 time=31 ms</span><br><span class="line">From 192.168.1.10: bytes=32 seq=4 ttl=126 time=47 ms</span><br><span class="line">From 192.168.1.10: bytes=32 seq=5 ttl=126 time=16 ms</span><br><span class="line"></span><br><span class="line">--- 192.168.1.10 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  4 packet(s) received</span><br><span class="line">  20.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 0/31/47 ms</span><br></pre></td></tr></table></figure>
+
+<p>注：配置好静态路由后，首次ping操作出现timeout是正常的</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://exmaple.com/2023/07/20/%E7%BD%91%E7%BB%9C-Ensp/%E7%AF%87%E4%BA%94-%E9%9D%99%E6%80%81%E8%B7%AF%E7%94%B1/" data-id="clkapbui2000bcwwo2fxcegdh" class="article-share-link">
+        分享
+      </a>
+      
+<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%BD%91%E7%BB%9C-Ensp/" rel="tag">网络-Ensp</a></li></ul>
+
+    </footer>
+
+  </div>
+
+  
+  
+<nav class="article-nav">
+  
+  
+  <a href="/2023/07/17/%E7%BD%91%E7%BB%9C-Ensp/vlan/" class="article-nav-link">
+    <strong class="article-nav-caption">后一篇</strong>
+    <div class="article-nav-title">篇四 vlan</div>
+  </a>
+  
+</nav>
+
+  
+
+  
+  
+  
+  
+
+</article>
+</section>
+    <footer class="footer">
+  <div class="outer">
+    <ul class="list-inline">
+      <li>冰山的笔记 &copy; 2023</li>
+      
+        <li>
+          
+            <a href="https://beian.miit.gov.cn/" target="_blank"></a>
+            
+        </li>
+      
+      <li>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></li>
+      <li>theme  <a target="_blank" rel="noopener" href="https://github.com/zhwangart/hexo-theme-ocean">Ocean</a></li>
+    </ul>
+    <p><ul class="list-inline">
+  
+  <li><i class="fe fe-smile-alt tooltip" data-tooltip="UV"></i> <span id="busuanzi_value_site_uv"></span></li>
+  
+  <li><i class="fe fe-bookmark tooltip" data-tooltip="PV"></i> <span id="busuanzi_value_page_pv"></span></li>
+  
+</ul></p>
+  </div>
+</footer>
+  </main>
+  <aside class="sidebar">
+    <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/hexo.svg" alt="冰山的笔记"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">Home</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">Archives</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/gallery">Gallery</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/about">About</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link nav-item-search" title="搜索">
+        <i class="fe fe-search"></i>
+        搜索
+      </a>
+    </li>
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      <div class="totop" id="totop">
+  <i class="fe fe-rocket"></i>
+</div>
+    </li>
+    <li class="nav-item">
+      
+      <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+        <i class="fe fe-feed"></i>
+      </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+  </aside>
+  
+<script src="/js/jquery-2.0.3.min.js"></script>
+
+
+<script src="/js/jquery.justifiedGallery.min.js"></script>
+
+
+<script src="/js/lazyload.min.js"></script>
+
+
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+
+
+
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+
+<script src="/js/tocbot.min.js"></script>
+
+
+<script>
+  // Tocbot_v4.7.0  http://tscanlin.github.io/tocbot/
+  tocbot.init({
+    tocSelector: '.tocbot',
+    contentSelector: '.article-entry',
+    headingSelector: 'h1, h2, h3, h4, h5, h6',
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    positionFixedSelector: '.tocbot',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto',
+  });
+</script>
+
+
+
+<script src="/js/ocean.js"></script>
+
+</body>
+
+</html>

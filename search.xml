@@ -96,338 +96,6 @@
       </tags>
   </entry>
   <entry>
-    <title>微信小程序实现类似qq界面侧滑效果</title>
-    <url>/2023/06/23/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%AE%9E%E7%8E%B0%E7%B1%BB%E4%BC%BCqq%E7%95%8C%E9%9D%A2%E4%BE%A7%E6%BB%91%E6%95%88%E6%9E%9C/</url>
-    <content><![CDATA[<h2 id="效果浏览"><a href="#效果浏览" class="headerlink" title="效果浏览"></a>效果浏览</h2><img src="/images/%E4%BE%A7%E6%BB%91%E7%95%8C%E9%9D%A2.gif" class="center" width="200" title="效果演示" alt="侧滑界面">
-
-<h2 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h2><h3 id="wxml"><a href="#wxml" class="headerlink" title="wxml"></a>wxml</h3><figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">view</span> <span class="attr">class</span>=<span class="string">&quot;outBox&quot;</span> <span class="attr">bindtouchstart</span>=<span class="string">&quot;out_touchStart&quot;</span> <span class="attr">bindtouchmove</span>=<span class="string">&quot;out_touchMove&quot;</span> <span class="attr">bindtouchend</span>=<span class="string">&quot;out_touchEnd&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">text</span> <span class="attr">style</span>=<span class="string">&quot;width: 100vw;text-align: center;&quot;</span>&gt;</span>主界面<span class="tag">&lt;/<span class="name">text</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">view</span> <span class="attr">class</span>=<span class="string">&quot;sliderPage&quot;</span> <span class="attr">style</span>=<span class="string">&quot;transform:translateX(&#123;&#123;moveX&#125;&#125;);&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">text</span>&gt;</span>侧滑界面<span class="tag">&lt;/<span class="name">text</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">view</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">view</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="wxss"><a href="#wxss" class="headerlink" title="wxss"></a>wxss</h3><figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.outBox</span> &#123;</span><br><span class="line">  <span class="attribute">height</span>: <span class="number">100vh</span>;</span><br><span class="line">  <span class="attribute">width</span>: <span class="number">100vw</span>;</span><br><span class="line">  <span class="attribute">background</span>: <span class="built_in">rgba</span>(<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>, <span class="number">0.466</span>);</span><br><span class="line">  <span class="attribute">display</span>: flex;</span><br><span class="line">  <span class="attribute">align-items</span>: center;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="selector-class">.sliderPage</span> &#123;</span><br><span class="line">  <span class="attribute">position</span>: fixed;</span><br><span class="line">  <span class="attribute">height</span>: <span class="number">100vh</span>;</span><br><span class="line">  <span class="attribute">width</span>: <span class="number">80vw</span>;</span><br><span class="line">  <span class="attribute">display</span>: flex;</span><br><span class="line">  <span class="attribute">align-items</span>: center;</span><br><span class="line">  <span class="attribute">justify-content</span>: center;</span><br><span class="line">  <span class="attribute">background-color</span>: <span class="built_in">rgba</span>(<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>, <span class="number">0.842</span>);</span><br><span class="line">  <span class="attribute">box-shadow</span>: <span class="number">2px</span> <span class="number">0px</span> <span class="number">10px</span> <span class="number">0px</span> <span class="number">#00000038</span>;</span><br><span class="line">  <span class="attribute">transform</span>: <span class="built_in">translateX</span>(-<span class="number">80vw</span>);</span><br><span class="line">  <span class="attribute">transition</span>: <span class="number">0.2s</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="ts"><a href="#ts" class="headerlink" title="ts"></a>ts</h3><figure class="highlight typescript"><table><tr><td class="code"><pre><span class="line"><span class="title class_">Page</span>(&#123;</span><br><span class="line"> </span><br><span class="line">  <span class="comment">/**</span></span><br><span class="line"><span class="comment">   * 页面的初始数据</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line">  <span class="attr">data</span>: &#123;</span><br><span class="line">    <span class="attr">fullWidth</span>: <span class="number">0</span>,</span><br><span class="line">    <span class="attr">vw</span>: <span class="number">0</span>,</span><br><span class="line">    <span class="attr">moveX</span>: <span class="string">&#x27;-80vw&#x27;</span>,</span><br><span class="line">    <span class="attr">startX</span>: <span class="number">0</span>,</span><br><span class="line">    <span class="attr">sliderActive</span>: <span class="literal">false</span>,</span><br><span class="line">    <span class="attr">watchMoveX</span>: <span class="number">0</span>,</span><br><span class="line">  &#125;,</span><br><span class="line"> </span><br><span class="line">  <span class="title function_">out_touchStart</span>(<span class="params">e: <span class="built_in">any</span></span>) &#123;</span><br><span class="line">    <span class="keyword">let</span> &#123; touches &#125; = e</span><br><span class="line">    <span class="variable language_">this</span>.<span class="title function_">setData</span>(&#123; <span class="attr">startX</span>: touches[<span class="number">0</span>].<span class="property">clientX</span> &#125;)</span><br><span class="line">  &#125;,</span><br><span class="line"> </span><br><span class="line">  <span class="title function_">out_touchMove</span>(<span class="params">e: <span class="built_in">any</span></span>) &#123;</span><br><span class="line">    <span class="keyword">let</span> &#123; touches &#125; = e</span><br><span class="line">    <span class="keyword">let</span> nowX = touches[<span class="number">0</span>].<span class="property">clientX</span></span><br><span class="line">    <span class="keyword">let</span> moveX = nowX - <span class="variable language_">this</span>.<span class="property">data</span>.<span class="property">startX</span></span><br><span class="line"> </span><br><span class="line">    <span class="keyword">if</span> (<span class="variable language_">this</span>.<span class="property">data</span>.<span class="property">sliderActive</span>) &#123;</span><br><span class="line">      <span class="keyword">if</span> (moveX &gt;= <span class="number">0</span> || moveX &lt; -(<span class="variable language_">this</span>.<span class="property">data</span>.<span class="property">fullWidth</span> * <span class="number">0.8</span>)) <span class="keyword">return</span></span><br><span class="line">      <span class="variable language_">this</span>.<span class="title function_">setData</span>(&#123;</span><br><span class="line">        <span class="attr">moveX</span>: <span class="string">`<span class="subst">$&#123;moveX&#125;</span>px`</span>,</span><br><span class="line">        <span class="attr">watchMoveX</span>: moveX</span><br><span class="line">      &#125;)</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="keyword">if</span> (moveX &lt;= <span class="number">0</span> || moveX &gt; (<span class="variable language_">this</span>.<span class="property">data</span>.<span class="property">fullWidth</span> * <span class="number">0.8</span>)) <span class="keyword">return</span></span><br><span class="line">      <span class="variable language_">this</span>.<span class="title function_">setData</span>(&#123;</span><br><span class="line">        <span class="attr">moveX</span>: <span class="string">`<span class="subst">$&#123;-<span class="number">80</span> * <span class="variable language_">this</span>.data.vw + moveX&#125;</span>px`</span>,</span><br><span class="line">        <span class="attr">watchMoveX</span>: moveX</span><br><span class="line">      &#125;)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line"> </span><br><span class="line">  <span class="title function_">out_touchEnd</span>(<span class="params">e: <span class="built_in">any</span></span>) &#123;</span><br><span class="line">    <span class="keyword">if</span> (!<span class="variable language_">this</span>.<span class="property">data</span>.<span class="property">sliderActive</span>) &#123;</span><br><span class="line">      <span class="keyword">if</span> (<span class="variable language_">this</span>.<span class="property">data</span>.<span class="property">watchMoveX</span> &gt; (<span class="variable language_">this</span>.<span class="property">data</span>.<span class="property">fullWidth</span> / <span class="number">4</span>)) &#123;</span><br><span class="line">        <span class="variable language_">this</span>.<span class="title function_">setData</span>(&#123;</span><br><span class="line">          <span class="attr">moveX</span>: <span class="string">`<span class="subst">$&#123;<span class="number">0</span>&#125;</span>vw`</span>,</span><br><span class="line">          <span class="attr">sliderActive</span>: <span class="literal">true</span>,</span><br><span class="line">          <span class="attr">watchMoveX</span>: <span class="number">0</span></span><br><span class="line">        &#125;)</span><br><span class="line">      &#125; <span class="keyword">else</span> <span class="variable language_">this</span>.<span class="title function_">setData</span>(&#123; <span class="attr">moveX</span>: <span class="string">`<span class="subst">$&#123;-<span class="number">80</span>&#125;</span>vw`</span> &#125;)</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="keyword">if</span> (<span class="variable language_">this</span>.<span class="property">data</span>.<span class="property">watchMoveX</span> &lt; -(<span class="variable language_">this</span>.<span class="property">data</span>.<span class="property">fullWidth</span> / <span class="number">4</span>)) &#123;</span><br><span class="line">        <span class="variable language_">this</span>.<span class="title function_">setData</span>(&#123;</span><br><span class="line">          <span class="attr">moveX</span>: <span class="string">`<span class="subst">$&#123;-<span class="number">80</span>&#125;</span>vw`</span>,</span><br><span class="line">          <span class="attr">sliderActive</span>: <span class="literal">false</span>,</span><br><span class="line">          <span class="attr">watchMoveX</span>: <span class="number">0</span></span><br><span class="line">        &#125;)</span><br><span class="line">      &#125; <span class="keyword">else</span> <span class="variable language_">this</span>.<span class="title function_">setData</span>(&#123; <span class="attr">moveX</span>: <span class="string">&#x27;0vw&#x27;</span> &#125;)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line"> </span><br><span class="line">  <span class="comment">// ------------------------------</span></span><br><span class="line"> </span><br><span class="line">  <span class="comment">/**</span></span><br><span class="line"><span class="comment">   * 生命周期函数--监听页面加载</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line">  <span class="title function_">onLoad</span>(<span class="params"></span>) &#123;</span><br><span class="line">    wx.<span class="title function_">createSelectorQuery</span>().<span class="title function_">select</span>(<span class="string">&quot;.outBox&quot;</span>).<span class="title function_">boundingClientRect</span>().<span class="title function_">exec</span>(<span class="function"><span class="params">res</span> =&gt;</span> &#123;</span><br><span class="line">      <span class="variable language_">this</span>.<span class="title function_">setData</span>(&#123;</span><br><span class="line">        <span class="attr">vw</span>: res[<span class="number">0</span>].<span class="property">width</span> / <span class="number">100</span>,</span><br><span class="line">        <span class="attr">fullWidth</span>: res[<span class="number">0</span>].<span class="property">width</span></span><br><span class="line">      &#125;)</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;,</span><br><span class="line">  ....<span class="comment">//省略其他周期函数</span></span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-
-<h2 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h2><p>实现这种侧滑效果的方法有很多，这只是其中一种<br>两个界面是嵌套关系，因此可以只通过外部元素节点，也就是主界面的touch控制来实现滑动效果</p>
-]]></content>
-      <tags>
-        <tag>微信小程序</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>篇一 DHCP</title>
-    <url>/2023/07/09/%E7%BD%91%E7%BB%9C-Ensp/DHCP/</url>
-    <content><![CDATA[<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>DHCP（Dynamic Host Configuration Protocol）是一个网络协议，用于自动分配IP地址和其他相关配置信息给网络设备。</p>
-<p>在一个局域网中，DHCP服务器负责管理并分配IP地址给网络上的设备。当一台设备加入局域网或者需要更新自己的IP地址时，它会向DHCP服务器发送一个请求，并在服务器上进行IP地址分配。DHCP服务器收到请求后，会从预定义的IP地址池中选择一个可用的IP地址，并将其分配给设备。此外，DHCP服务器还可以为设备分配其他网络配置，如子网掩码、网关、DNS服务器等。</p>
-<p>DHCP的优势在于它能够自动管理IP地址分配，简化了网络管理工作。通过使用DHCP，管理员可以集中管理IP地址的分配和配置，而无需手动为每个设备进行配置。DHCP还支持地址重用和动态更新配置，使得系统资源能够更有效地利用。</p>
-<p>总而言之，DHCP是一个用于自动分配IP地址和相关配置信息的协议，它简化了网络管理工作，并提高了网络资源的利用效率。</p>
-<h2 id="Ensp"><a href="#Ensp" class="headerlink" title="Ensp"></a>Ensp</h2><h3 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h3><p>AR2220路由器一台，S5700三层交换机一台，pc机若干</p>
-<img src="/images/ensp-1.png" class="center" width="500">
-
-<h3 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h3><ol>
-<li><p>输入 <code>sy</code> 进入路由系统视图，然后输入</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">dhcp enable</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>进入路由器对应接口，开启接口DHCP服务</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">interface g0/0/0</span><br><span class="line"></span><br><span class="line">dhcp select interface</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>pc机刷新dhcp配置即可</p>
-</li>
-</ol>
-<h3 id="实操"><a href="#实操" class="headerlink" title="实操"></a>实操</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">&lt;Huawei&gt;sy</span><br><span class="line"></span><br><span class="line">[Huawei]interface g0/0/0</span><br><span class="line"></span><br><span class="line">[Huawei-GigabitEthernet0/0/0]ip address 192.168.1.1 255.255.255.0</span><br><span class="line"></span><br><span class="line">[Huawei-GigabitEthernet0/0/0] quit</span><br><span class="line"></span><br><span class="line">[Huawei]dhcp enable </span><br><span class="line"></span><br><span class="line">[Huawei-GigabitEthernet0/0/0]dhcp select interface</span><br></pre></td></tr></table></figure>
-
-
-
-<h3 id="检验"><a href="#检验" class="headerlink" title="检验"></a>检验</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ipconfig</span></span><br><span class="line"></span><br><span class="line">Link local IPv6 address...........: fe80::5689:98ff:feec:2846</span><br><span class="line">IPv6 address......................: :: / 128</span><br><span class="line">IPv6 gateway......................: ::</span><br><span class="line">IPv4 address......................: 192.168.1.254</span><br><span class="line">Subnet mask.......................: 255.255.255.0</span><br><span class="line">Gateway...........................: 192.168.1.1</span><br><span class="line">Physical address..................: 54-89-98-EC-28-46</span><br><span class="line">DNS server........................: 0.0.0.0</span><br></pre></td></tr></table></figure>
-
-]]></content>
-      <tags>
-        <tag>网络-Ensp</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>wx.getUserProfile 不出现弹窗</title>
-    <url>/2023/06/23/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F/wx-getUserProfile-%E4%B8%8D%E5%87%BA%E7%8E%B0%E5%BC%B9%E7%AA%97/</url>
-    <content><![CDATA[<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>使用wx.getUserProfile 获取用户信息，但是不出现弹窗就直接获取到了用户信息，且返回灰色头像，和“微信用户”昵称</p>
-<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><p>原来这个接口在22年5月的时候被回收了，低版本调试库才会正常显示，高版本则会返回灰色头像和默认的“微信用户”昵称<br>官方的解释是：实践中发现有部分小程序，在用户刚打开小程序时就要求收集用户的微信昵称头像，或者在支付前等不合理路径上要求授权。如果用户拒绝授权，则无法使用小程序或相关功能。在已经获取用户的 openId 与 unionId 信息情况下，用户的微信昵称与头像并不是用户使用小程序的必要条件。</p>
-<h2 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h2><p>我的解决方法是手动加一个权限弹窗</p>
-<img src="/images/%E6%89%8B%E5%8A%A8%E5%BC%B9%E7%AA%97.gif" class="center" width="200" title="权限弹窗">
-
-<h3 id="授权弹窗"><a href="#授权弹窗" class="headerlink" title="授权弹窗"></a>授权弹窗</h3><figure class="highlight typescript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="title function_">signupAndLogin</span>(<span class="params"></span>) &#123;            <span class="comment">//bindtap事件</span></span><br><span class="line">    wx.<span class="title function_">showModal</span>(&#123;                     <span class="comment">//手动授权弹窗</span></span><br><span class="line">      <span class="attr">title</span>: <span class="string">&#x27;授权登录提示&#x27;</span>,</span><br><span class="line">      <span class="attr">content</span>: <span class="string">&#x27;是否允许授权？&#x27;</span>,</span><br><span class="line">      <span class="attr">showCancel</span>: <span class="literal">true</span>,</span><br><span class="line">      <span class="attr">confirmText</span>: <span class="string">&#x27;允许&#x27;</span>,</span><br><span class="line">      <span class="attr">confirmColor</span>: <span class="string">&#x27;#669F76&#x27;</span>,</span><br><span class="line">      <span class="attr">cancelColor</span>: <span class="string">&#x27;#CC463D&#x27;</span>,</span><br><span class="line">      <span class="attr">success</span>: <span class="keyword">async</span> res =&gt; &#123;</span><br><span class="line">        <span class="keyword">if</span> (res.<span class="property">confirm</span>) &#123;     <span class="comment">//用户确认</span></span><br><span class="line">          <span class="keyword">const</span> &#123; <span class="attr">userInfo</span>: &#123; nickName, avatarUrl &#125; &#125; = <span class="keyword">await</span></span><br><span class="line">            wx.<span class="title function_">getUserProfile</span>(&#123;    <span class="comment">//获取用户信息，最新版本已不支持弹窗</span></span><br><span class="line">              <span class="attr">desc</span>: <span class="string">&#x27;用户授权&#x27;</span>,</span><br><span class="line">            &#125;)</span><br><span class="line"> </span><br><span class="line">          <span class="keyword">let</span> &#123; result &#125; = <span class="keyword">await</span> wx.<span class="property">cloud</span>.<span class="title function_">callFunction</span>(&#123;  <span class="comment">// 调用云函数</span></span><br><span class="line">            <span class="attr">name</span>: <span class="string">&#x27;loginOrSignup&#x27;</span>,</span><br><span class="line">            <span class="attr">data</span>: &#123;</span><br><span class="line">              nickName,</span><br><span class="line">              avatarUrl</span><br><span class="line">            &#125;</span><br><span class="line">          &#125;)</span><br><span class="line">          <span class="variable language_">this</span>.<span class="title function_">setData</span>(&#123; <span class="attr">userInfo</span>: result &#125;)</span><br><span class="line">          <span class="title function_">getApp</span>().<span class="property">globalData</span>.<span class="property">userStatus</span> = <span class="literal">true</span>   <span class="comment">//用于检查用户是否登录的全局变量</span></span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (res.<span class="property">cancel</span>) &#123;     <span class="comment">//用户取消</span></span><br><span class="line">          wx.<span class="title function_">showToast</span>(&#123;</span><br><span class="line">            <span class="attr">title</span>: <span class="string">&#x27;取消授权&#x27;</span>,</span><br><span class="line">            <span class="attr">mask</span>: <span class="literal">true</span>,</span><br><span class="line">            <span class="attr">icon</span>: <span class="string">&#x27;error&#x27;</span></span><br><span class="line">          &#125;)</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
-<h1 id=""><a href="#" class="headerlink" title=""></a></h1><h3 id="loginOrSignup云函数"><a href="#loginOrSignup云函数" class="headerlink" title="loginOrSignup云函数"></a>loginOrSignup云函数</h3><figure class="highlight typescript"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 云函数入口文件</span></span><br><span class="line"><span class="keyword">const</span> cloud = <span class="built_in">require</span>(<span class="string">&#x27;wx-server-sdk&#x27;</span>)</span><br><span class="line"> </span><br><span class="line">cloud.<span class="title function_">init</span>(&#123; <span class="attr">env</span>: cloud.<span class="property">DYNAMIC_CURRENT_ENV</span> &#125;) <span class="comment">// 使用当前云环境</span></span><br><span class="line"><span class="keyword">const</span> db = cloud.<span class="title function_">database</span>()</span><br><span class="line"><span class="comment">// 云函数入口函数</span></span><br><span class="line"><span class="built_in">exports</span>.<span class="property">main</span> = <span class="keyword">async</span> (event, context) =&gt; &#123;</span><br><span class="line">  <span class="keyword">const</span> &#123; <span class="variable constant_">OPENID</span> &#125; = cloud.<span class="title function_">getWXContext</span>()</span><br><span class="line">  <span class="keyword">const</span> &#123; nickName, avatarUrl &#125; = event</span><br><span class="line">  <span class="keyword">const</span> user_clct = db.<span class="title function_">collection</span>(<span class="string">&#x27;user&#x27;</span>)</span><br><span class="line"> </span><br><span class="line">  <span class="keyword">const</span> &#123; data &#125; = <span class="keyword">await</span> user_clct.<span class="title function_">where</span>(&#123;    <span class="comment">//查询用户是否存在</span></span><br><span class="line">    <span class="attr">_openId</span>: <span class="variable constant_">OPENID</span></span><br><span class="line">  &#125;).<span class="title function_">get</span>()</span><br><span class="line"> </span><br><span class="line">  <span class="keyword">if</span> (data.<span class="property">length</span> === <span class="number">0</span>) &#123;                     <span class="comment">//如果用户不存在，添加用户</span></span><br><span class="line">    <span class="keyword">let</span> user = <span class="keyword">await</span> user_clct.<span class="title function_">add</span>(&#123;</span><br><span class="line">      <span class="attr">data</span>: &#123;</span><br><span class="line">        nickName,</span><br><span class="line">        avatarUrl,</span><br><span class="line">        <span class="attr">_openId</span>: <span class="variable constant_">OPENID</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      nickName,</span><br><span class="line">      avatarUrl,</span><br><span class="line">      <span class="attr">_openId</span>: <span class="variable constant_">OPENID</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> data[<span class="number">0</span>]       <span class="comment">//如果用户存在，返回该用户信息</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="选择头像"><a href="#选择头像" class="headerlink" title="选择头像"></a>选择头像</h3><img src="/images/%E9%80%89%E6%8B%A9%E5%A4%B4%E5%83%8F.gif" class="center" width="200" title="权限弹窗">
-<h1 id="-1"><a href="#-1" class="headerlink" title=""></a></h1><figure class="highlight html"><figcaption><span>wxml</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">button</span> <span class="attr">class</span>=<span class="string">&quot;chooseAvatar&quot;</span> <span class="attr">open-type</span>=<span class="string">&quot;chooseAvatar&quot;</span> <span class="attr">bindchooseavatar</span>=<span class="string">&quot;chooseAvatar&quot;</span> <span class="attr">plain</span>=<span class="string">&quot;ture&quot;</span> <span class="attr">style</span>=<span class="string">&quot;width: 160rpx; border: none;color: #6e6e6e;&quot;</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">image</span> <span class="attr">class</span>=<span class="string">&quot;userAvatar&quot;</span> <span class="attr">src</span>=<span class="string">&quot;&#123;&#123;userInfo.avatarUrl&#125;&#125;&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">image</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br></pre></td></tr></table></figure>
-<h1 id="-2"><a href="#-2" class="headerlink" title=""></a></h1><figure class="highlight typescript"><figcaption><span>typescript</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="title function_">chooseAvatar</span>(<span class="params">e: <span class="built_in">any</span></span>) &#123;                <span class="comment">//用户更换头像</span></span><br><span class="line">    <span class="comment">//e.detail 已经是 avatarUrl：&quot;...&quot;的格式</span></span><br><span class="line">    <span class="keyword">let</span> &#123; avatarUrl &#125; = e.<span class="property">detail</span></span><br><span class="line"> </span><br><span class="line">    wx.<span class="property">cloud</span>.<span class="title function_">callFunction</span>(&#123;</span><br><span class="line">      <span class="attr">name</span>: <span class="string">&#x27;uploadAvatar&#x27;</span>,</span><br><span class="line">      <span class="attr">data</span>: &#123;</span><br><span class="line">        avatarUrl</span><br><span class="line">      &#125;,</span><br><span class="line">      <span class="attr">success</span>: <span class="keyword">async</span> res =&gt; &#123;</span><br><span class="line">        <span class="keyword">let</span> &#123; result &#125; = <span class="keyword">await</span> wx.<span class="property">cloud</span>.<span class="title function_">callFunction</span>(&#123;  <span class="comment">// 调用登录云函数，不传参，用以更新页面中的用户信息</span></span><br><span class="line">          <span class="attr">name</span>: <span class="string">&#x27;loginOrSignup&#x27;</span>,</span><br><span class="line">        &#125;)</span><br><span class="line">        <span class="variable language_">this</span>.<span class="title function_">setData</span>(&#123; <span class="attr">userInfo</span>: result &#125;)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;,</span><br></pre></td></tr></table></figure>
-
-<h3 id="uploadAvatar，更新头像"><a href="#uploadAvatar，更新头像" class="headerlink" title="uploadAvatar，更新头像"></a>uploadAvatar，更新头像</h3><figure class="highlight typescript"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 云函数入口文件</span></span><br><span class="line"><span class="keyword">const</span> cloud = <span class="built_in">require</span>(<span class="string">&#x27;wx-server-sdk&#x27;</span>)</span><br><span class="line"> </span><br><span class="line">cloud.<span class="title function_">init</span>(&#123; <span class="attr">env</span>: cloud.<span class="property">DYNAMIC_CURRENT_ENV</span> &#125;) <span class="comment">// 使用当前云环境</span></span><br><span class="line"><span class="keyword">const</span> db = cloud.<span class="title function_">database</span>()</span><br><span class="line"><span class="comment">// 云函数入口函数</span></span><br><span class="line"><span class="built_in">exports</span>.<span class="property">main</span> = <span class="keyword">async</span> (event, context) =&gt; &#123;</span><br><span class="line">  <span class="keyword">const</span> &#123; <span class="variable constant_">OPENID</span> &#125; = cloud.<span class="title function_">getWXContext</span>()</span><br><span class="line">  <span class="keyword">const</span> &#123; avatarUrl &#125; = event</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    db.<span class="title function_">collection</span>(<span class="string">&#x27;user&#x27;</span>).<span class="title function_">where</span>(&#123;</span><br><span class="line">      <span class="attr">_openId</span>: <span class="variable constant_">OPENID</span></span><br><span class="line">    &#125;).<span class="title function_">update</span>(&#123;</span><br><span class="line">      <span class="attr">data</span>: &#123;</span><br><span class="line">        avatarUrl</span><br><span class="line">      &#125;,</span><br><span class="line">      <span class="attr">success</span>:<span class="function"><span class="params">res</span>=&gt;</span>&#123;</span><br><span class="line">        <span class="keyword">return</span> avatarUrl</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125; <span class="keyword">catch</span> (err) &#123;</span><br><span class="line">    <span class="keyword">return</span> err</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-]]></content>
-      <tags>
-        <tag>微信小程序</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>篇二 Dns 域名解析</title>
-    <url>/2023/07/10/%E7%BD%91%E7%BB%9C-Ensp/Dns-%E5%9F%9F%E5%90%8D%E8%A7%A3%E6%9E%90/</url>
-    <content><![CDATA[<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>DNS（Domain Name System，域名系统）是互联网中用于将域名转换为对应IP地址的系统。它充当了互联网上的“电话簿”，将易于记忆的域名（如<a href="http://www.example.com)映射到对应的ip地址(如192.0.2.1)./">www.example.com）映射到对应的IP地址（如192.0.2.1）。</a></p>
-<p>DNS的主要功能包括域名解析、域名注册和域名管理。 域名解析是DNS的核心功能，当用户在浏览器中输入一个域名时，DNS系统会将该域名解析为对应的IP地址，以便建立与目标服务器的连接。域名注册是指将一个域名注册到DNS系统中，以确保该域名在互联网上的唯一性。域名管理则涉及到对域名的配置、修改和管理，包括设置域名的DNS记录、子域名管理等。 </p>
-<p>DNS采用分层的结构，由多个DNS服务器组成，分为根域名服务器、顶级域名服务器、权威域名服务器和本地域名服务器等。当本地域名服务器无法解析域名时，会向上级域名服务器查询，直到找到对应的IP地址。 </p>
-<p>简单来说，<u>就是当用户访问某个域名时，会先在域名解析服务器上查找该域名对应的ip地址，找到后再访问该IP地址，用户可以使用易于记忆的域名来访问互联网上的各种资源，而无需记住复杂的IP地址。</u>同时，DNS还支持其他功能，如邮件服务器的查找、反向解析等。</p>
-<h2 id="准备内容"><a href="#准备内容" class="headerlink" title="准备内容"></a>准备内容</h2><p>ar2220路由一台、server服务器一台、s5700三层交换机一台、pc机若干</p>
-<img src="/images/ensp-%E5%9F%9F%E5%90%8D%E8%A7%A3%E6%9E%90.png" class="center" width="500">
-
-
-<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><ol>
-<li>给服务器添加自身ip地址，在服务器中的dns解析服务添加域名列表，并启动服务</li>
-<li>在路由对应接口输入<code>dhcp server dns-list [域名解析服务器ip]</code></li>
-<li>pc机刷新dhcp配置</li>
-</ol>
-<h2 id="实操"><a href="#实操" class="headerlink" title="实操"></a>实操</h2><h3 id="添加域名"><a href="#添加域名" class="headerlink" title="添加域名"></a>添加域名</h3><img src="/images/dns%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%B7%BB%E5%8A%A0ip.png" class="center" width="500" title="%5 {% img center &#x2F;images&#x2F;ensp-dns服务器.png 500">
-
-<h3 id="路由"><a href="#路由" class="headerlink" title="路由"></a>路由</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[Huawei]interface g0/0/0</span><br><span class="line">[Huawei-GigabitEthernet0/0/0]dhcp server dns-list 192.168.1.100</span><br></pre></td></tr></table></figure>
-
-
-
-<h3 id="刷新并检验"><a href="#刷新并检验" class="headerlink" title="刷新并检验"></a>刷新并检验</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ipconfig</span></span><br><span class="line"></span><br><span class="line">Link local IPv6 address...........: fe80::5689:98ff:feec:2846</span><br><span class="line">IPv6 address......................: :: / 128</span><br><span class="line">IPv6 gateway......................: ::</span><br><span class="line">IPv4 address......................: 192.168.1.254</span><br><span class="line">Subnet mask.......................: 255.255.255.0</span><br><span class="line">Gateway...........................: 192.168.1.1</span><br><span class="line">Physical address..................: 54-89-98-EC-28-46</span><br><span class="line">DNS server........................: 192.168.1.100</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping www.example.com</span></span><br><span class="line"></span><br><span class="line">Ping www.example.com [192.168.1.253]: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 192.168.1.253: bytes=32 seq=1 ttl=128 time=47 ms</span><br><span class="line">From 192.168.1.253: bytes=32 seq=2 ttl=128 time=15 ms</span><br><span class="line">From 192.168.1.253: bytes=32 seq=3 ttl=128 time=47 ms</span><br><span class="line">From 192.168.1.253: bytes=32 seq=4 ttl=128 time=47 ms</span><br><span class="line">From 192.168.1.253: bytes=32 seq=5 ttl=128 time=31 ms</span><br><span class="line"></span><br><span class="line">--- 192.168.1.253 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 15/37/47 ms</span><br></pre></td></tr></table></figure>
-
-]]></content>
-      <tags>
-        <tag>网络-Ensp</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>篇四 vlan</title>
-    <url>/2023/07/17/%E7%BD%91%E7%BB%9C-Ensp/vlan/</url>
-    <content><![CDATA[<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>VLAN（Virtual Local Area Network）是一种虚拟局域网技术，用于将一个物理网络划分为多个逻辑上独立的虚拟网络。VLAN可以提供更好的网络管理和安全性。</p>
-<h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><img src="/images/vlan%E5%87%86%E5%A4%87.png" class="center" width="500">
-
-<p>三层交换机两台、pc机若干</p>
-<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><ol>
-<li><p>创建vlan —— <code>vlan [vlan号]</code> </p>
-</li>
-<li><p>划分vlan：<br>  （1）进入接口<br>  （2）<code>port link-type access</code> （终端，如电脑、打印机等为access；其他交换机则为trunk）<br>  （3）<code>port default vlan [vlan号]</code></p>
-</li>
-<li><p>交换机之间允许vlan通信<br>  （1）进入接口<br>  （2）<code>port link-type trunk</code><br>  （3）<code>port trunk allow-pass vlan [vlan号]</code></p>
-</li>
-</ol>
-<h2 id="实操"><a href="#实操" class="headerlink" title="实操"></a>实操</h2><ol>
-<li><p>LSW1(第一台交换机)</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">&lt;Huawei&gt;sy</span><br><span class="line">Enter system view, return user view with Ctrl+Z.</span><br><span class="line"></span><br><span class="line">//创建vlan</span><br><span class="line">[Huawei]vlan 10</span><br><span class="line">[Huawei-vlan10]q</span><br><span class="line">[Huawei]vlan 20</span><br><span class="line">[Huawei-vlan20]q</span><br><span class="line"></span><br><span class="line">//划分vlan</span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/1</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]port link-type access </span><br><span class="line">[Huawei-GigabitEthernet0/0/1]port default vlan 10</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]q</span><br><span class="line"></span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/2</span><br><span class="line">[Huawei-GigabitEthernet0/0/2]port link-type access 	</span><br><span class="line">[Huawei-GigabitEthernet0/0/2]port default vlan 20</span><br><span class="line">[Huawei-GigabitEthernet0/0/2]q</span><br><span class="line"></span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/3</span><br><span class="line">[Huawei-GigabitEthernet0/0/3]port link-type access 	</span><br><span class="line">[Huawei-GigabitEthernet0/0/3]port default vlan 20</span><br><span class="line">[Huawei-GigabitEthernet0/0/3]q</span><br><span class="line"></span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/4</span><br><span class="line">[Huawei-GigabitEthernet0/0/4]port link-type trunk</span><br><span class="line">[Huawei-GigabitEthernet0/0/4]port trunk allow-pass vlan 10</span><br><span class="line">[Huawei-GigabitEthernet0/0/4]port trunk allow-pass vlan 20</span><br></pre></td></tr></table></figure>
-
-
-</li>
-<li><p>LSW2(第二台交换机)</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">&lt;Huawei&gt;sy</span><br><span class="line">Enter system view, return user view with Ctrl+Z.</span><br><span class="line"></span><br><span class="line">//创建vlan</span><br><span class="line">[Huawei]vlan 10</span><br><span class="line">[Huawei-vlan10]q</span><br><span class="line">[Huawei]vlan 20</span><br><span class="line">[Huawei-vlan20]q</span><br><span class="line"></span><br><span class="line">//划分vlan</span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/1</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]port link-type access </span><br><span class="line">[Huawei-GigabitEthernet0/0/1]port default vlan 10</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]q</span><br><span class="line"></span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/2</span><br><span class="line">[Huawei-GigabitEthernet0/0/2]port link-type access </span><br><span class="line">[Huawei-GigabitEthernet0/0/2]port default vlan 20</span><br><span class="line">[Huawei-GigabitEthernet0/0/2]q</span><br><span class="line"></span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/3</span><br><span class="line">[Huawei-GigabitEthernet0/0/3]port link-type trunk </span><br><span class="line">[Huawei-GigabitEthernet0/0/3]port trunk allow-pass vlan 10</span><br><span class="line">[Huawei-GigabitEthernet0/0/3]port trunk allow-pass vlan 20</span><br></pre></td></tr></table></figure>
-
-
-</li>
-<li><p>给pc机的ip从左到右依次设为1.1.1.1~1.1.1.5</p>
-</li>
-</ol>
-<h2 id="检验"><a href="#检验" class="headerlink" title="检验"></a>检验</h2><p><strong>pc1 ping pc2，由于不在同一个vlan中，ping操作失败</strong></p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 1.1.1.2</span></span><br><span class="line"></span><br><span class="line">Ping 1.1.1.2: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 1.1.1.1: Destination host unreachable</span><br><span class="line">From 1.1.1.1: Destination host unreachable</span><br><span class="line">From 1.1.1.1: Destination host unreachable</span><br><span class="line">From 1.1.1.1: Destination host unreachable</span><br><span class="line">From 1.1.1.1: Destination host unreachable</span><br><span class="line"></span><br><span class="line">--- 1.1.1.2 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  0 packet(s) received</span><br><span class="line">  100.00% packet loss</span><br></pre></td></tr></table></figure>
-
-<p><strong>同样的，pc2 ping pc1 也是失败</strong></p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 1.1.1.1</span></span><br><span class="line"></span><br><span class="line">Ping 1.1.1.1: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 1.1.1.2: Destination host unreachable</span><br><span class="line">From 1.1.1.2: Destination host unreachable</span><br><span class="line">From 1.1.1.2: Destination host unreachable</span><br><span class="line">From 1.1.1.2: Destination host unreachable</span><br><span class="line">From 1.1.1.2: Destination host unreachable</span><br><span class="line"></span><br><span class="line">--- 1.1.1.1 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  0 packet(s) received</span><br><span class="line">  100.00% packet loss</span><br></pre></td></tr></table></figure>
-
-<p><strong>pc1 与 pc5 互ping也是失败</strong></p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">//pc1 ping pc5</span><br><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 1.1.1.5</span></span><br><span class="line"></span><br><span class="line">Ping 1.1.1.5: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 1.1.1.1: Destination host unreachable</span><br><span class="line">From 1.1.1.1: Destination host unreachable</span><br><span class="line">From 1.1.1.1: Destination host unreachable</span><br><span class="line">From 1.1.1.1: Destination host unreachable</span><br><span class="line">From 1.1.1.1: Destination host unreachable</span><br><span class="line"></span><br><span class="line">--- 1.1.1.5 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  0 packet(s) received</span><br><span class="line">  100.00% packet loss</span><br><span class="line">  </span><br><span class="line">//pc5 ping pc1</span><br><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 1.1.1.1</span></span><br><span class="line"></span><br><span class="line">Ping 1.1.1.1: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 1.1.1.5: Destination host unreachable</span><br><span class="line">From 1.1.1.5: Destination host unreachable</span><br><span class="line">From 1.1.1.5: Destination host unreachable</span><br><span class="line">From 1.1.1.5: Destination host unreachable</span><br><span class="line">From 1.1.1.5: Destination host unreachable</span><br><span class="line"></span><br><span class="line">--- 1.1.1.1 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  0 packet(s) received</span><br><span class="line">  100.00% packet loss</span><br></pre></td></tr></table></figure>
-
-
-
-<p><strong>相同vlan下互ping不影响</strong></p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">//pc1 ping pc4</span><br><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 1.1.1.4</span></span><br><span class="line"></span><br><span class="line">Ping 1.1.1.4: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 1.1.1.4: bytes=32 seq=1 ttl=128 time=47 ms</span><br><span class="line">From 1.1.1.4: bytes=32 seq=2 ttl=128 time=78 ms</span><br><span class="line">From 1.1.1.4: bytes=32 seq=3 ttl=128 time=78 ms</span><br><span class="line">From 1.1.1.4: bytes=32 seq=4 ttl=128 time=79 ms</span><br><span class="line">From 1.1.1.4: bytes=32 seq=5 ttl=128 time=63 ms</span><br><span class="line"></span><br><span class="line">--- 1.1.1.4 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 47/69/79 ms</span><br><span class="line">  </span><br><span class="line">//pc4 ping pc1</span><br><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 1.1.1.1</span></span><br><span class="line"></span><br><span class="line">Ping 1.1.1.1: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 1.1.1.1: bytes=32 seq=1 ttl=128 time=63 ms</span><br><span class="line">From 1.1.1.1: bytes=32 seq=2 ttl=128 time=62 ms</span><br><span class="line">From 1.1.1.1: bytes=32 seq=3 ttl=128 time=78 ms</span><br><span class="line">From 1.1.1.1: bytes=32 seq=4 ttl=128 time=62 ms</span><br><span class="line">From 1.1.1.1: bytes=32 seq=5 ttl=128 time=63 ms</span><br><span class="line"></span><br><span class="line">--- 1.1.1.1 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 62/65/78 ms</span><br><span class="line">  </span><br><span class="line">//pc2 ping pc5</span><br><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 1.1.1.5</span></span><br><span class="line"></span><br><span class="line">Ping 1.1.1.5: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 1.1.1.5: bytes=32 seq=1 ttl=128 time=94 ms</span><br><span class="line">From 1.1.1.5: bytes=32 seq=2 ttl=128 time=78 ms</span><br><span class="line">From 1.1.1.5: bytes=32 seq=3 ttl=128 time=79 ms</span><br><span class="line">From 1.1.1.5: bytes=32 seq=4 ttl=128 time=78 ms</span><br><span class="line">From 1.1.1.5: bytes=32 seq=5 ttl=128 time=78 ms</span><br><span class="line"></span><br><span class="line">--- 1.1.1.5 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 78/81/94 ms</span><br></pre></td></tr></table></figure>
-
-]]></content>
-      <tags>
-        <tag>网络-Ensp</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>篇三 网关</title>
-    <url>/2023/07/10/%E7%BD%91%E7%BB%9C-Ensp/%E7%BD%91%E5%85%B3/</url>
-    <content><![CDATA[<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>网关（Gateway）是在计算机网络中连接不同网络的设备或软件。它充当了网络中不同协议、不同网络体系结构之间的桥梁，负责转发数据包、协议转换和数据格式转换等功能。</p>
-<p>网关可以连接不同类型的网络，如将局域网（LAN）连接到广域网（WAN），或将不同的协议（如TCP&#x2F;IP和IPX&#x2F;SPX）进行转换。<u>它可以是硬件设备，如路由器、交换机或防火墙，也可以是软件程序，如网络代理服务器或应用层网关。</u></p>
-<p>网关在网络通信中扮演重要角色，它能够实现以下功能：</p>
-<ol>
-<li><p>数据包转发：网关接收来自源网络的数据包，并将其转发到目标网络上的正确目的地。</p>
-</li>
-<li><p>协议转换：网关可以将来自一个协议的数据包转换为另一个协议的数据包，以便不同类型的网络能够进行通信。</p>
-</li>
-<li><p>数据格式转换：网关可以将数据包的格式从一种形式转换为另一种形式，以便目标网络能够正确解析和处理数据。</p>
-</li>
-<li><p>安全性控制：网关可以实施安全策略，如防火墙功能，对网络流量进行过滤和检查，保护网络免受恶意攻击和未经授权的访问。</p>
-</li>
-</ol>
-<p>总之，网关在网络中起到了连接不同网络、协议转换和数据转发等重要作用，使得不同网络能够互相通信和交换数据。</p>
-<h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><p>在篇二的基础上增加一台pc4,与路由相连</p>
-<img src="/images/%E7%BD%91%E5%85%B3%E5%AE%9E%E9%AA%8C%E5%87%86%E5%A4%87.png" class="center" width="500">
-
-
-
-
-<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><ol>
-<li>为路由与pc4相连端口添加ip</li>
-<li>为pc1和pc4添加静态ip和网关</li>
-</ol>
-<h2 id="实操"><a href="#实操" class="headerlink" title="实操"></a>实操</h2><p>pc1</p>
-<img src="/images/pc1%E8%AE%BE%E7%BD%AE%E7%BD%91%E5%85%B3.png" class="center" width="500">
-
-<p>pc4</p>
-<img src="/images/pc4%E8%AE%BE%E7%BD%AE%E7%BD%91%E5%85%B3.png" class="center" width="500">
-
-
-
-<h2 id="检验"><a href="#检验" class="headerlink" title="检验"></a>检验</h2><p><strong>pc1 ping pc4</strong></p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 100.100.100.100</span></span><br><span class="line"></span><br><span class="line">Ping 100.100.100.100: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">Request timeout!</span><br><span class="line">From 100.100.100.100: bytes=32 seq=2 ttl=127 time=47 ms</span><br><span class="line">From 100.100.100.100: bytes=32 seq=3 ttl=127 time=31 ms</span><br><span class="line">From 100.100.100.100: bytes=32 seq=4 ttl=127 time=32 ms</span><br><span class="line">From 100.100.100.100: bytes=32 seq=5 ttl=127 time=47 ms</span><br><span class="line"></span><br><span class="line">--- 100.100.100.100 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  4 packet(s) received</span><br><span class="line">  20.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 0/39/47 ms</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-
-
-<p><strong>pc4 ping pc1</strong></p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 192.168.1.168</span></span><br><span class="line"></span><br><span class="line">Ping 192.168.1.168: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">Request timeout!</span><br><span class="line">Request timeout!</span><br><span class="line">From 192.168.1.168: bytes=32 seq=3 ttl=127 time=32 ms</span><br><span class="line">From 192.168.1.168: bytes=32 seq=4 ttl=127 time=47 ms</span><br><span class="line">From 192.168.1.168: bytes=32 seq=5 ttl=127 time=47 ms</span><br><span class="line"></span><br><span class="line">--- 192.168.1.168 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  3 packet(s) received</span><br><span class="line">  40.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 0/42/47 ms</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-
-
-<p><strong>pc4 访问篇二中的域名</strong></p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping www.example.com</span></span><br><span class="line"></span><br><span class="line">Ping www.example.com [192.168.1.253]: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">Request timeout!</span><br><span class="line">From 192.168.1.253: bytes=32 seq=2 ttl=127 time=31 ms</span><br><span class="line">From 192.168.1.253: bytes=32 seq=3 ttl=127 time=47 ms</span><br><span class="line">From 192.168.1.253: bytes=32 seq=4 ttl=127 time=31 ms</span><br><span class="line">From 192.168.1.253: bytes=32 seq=5 ttl=127 time=47 ms</span><br><span class="line"></span><br><span class="line">--- 192.168.1.253 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  4 packet(s) received</span><br><span class="line">  20.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 0/39/47 ms</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-]]></content>
-      <tags>
-        <tag>网络-Ensp</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>前端工程师职业规划参考</title>
-    <url>/2023/07/02/%E8%81%8C%E4%B8%9A%E8%A7%84%E5%88%92/%E5%89%8D%E7%AB%AF%E5%B7%A5%E7%A8%8B%E5%B8%88%E8%81%8C%E4%B8%9A%E8%A7%84%E5%88%92%E5%8F%82%E8%80%83/</url>
-    <content><![CDATA[<h3 id="1-初级前端工程师（1-2年）："><a href="#1-初级前端工程师（1-2年）：" class="headerlink" title="1. 初级前端工程师（1-2年）："></a>1. 初级前端工程师（1-2年）：</h3><ul>
-<li>学习HTML、CSS和JavaScript等基础知识，并熟练运用它们进行网页开发。</li>
-<li>参与项目团队，积累实际项目经验。</li>
-<li>学习和掌握常用的前端框架和工具，如React、Vue.js、Webpack等。</li>
-<li>参与培训课程和技术社区，不断学习和提升技能。</li>
-</ul>
-<h3 id="2-中级前端工程师（3-5年）："><a href="#2-中级前端工程师（3-5年）：" class="headerlink" title="2. 中级前端工程师（3-5年）："></a>2. 中级前端工程师（3-5年）：</h3><ul>
-<li>在项目中承担更复杂的前端开发任务，如开发响应式网站、移动端应用等。</li>
-<li>深入学习和掌握前端框架和库的原理和使用技巧。</li>
-<li>学习和应用前端最佳实践，如性能优化、代码规范等。</li>
-<li>参与团队协作和项目管理，提升沟通和领导能力。</li>
-</ul>
-<h3 id="3-高级前端工程师（5年以上）："><a href="#3-高级前端工程师（5年以上）：" class="headerlink" title="3. 高级前端工程师（5年以上）："></a>3. 高级前端工程师（5年以上）：</h3><ul>
-<li>在复杂项目中担任技术负责人或架构师角色，负责前端架构设计和技术选型。</li>
-<li>深入研究前端领域的新技术和趋势，并引领团队进行技术创新和实践。</li>
-<li>参与开源项目和技术社区，分享经验和贡献代码。</li>
-<li>建立自己的技术品牌和影响力，如通过博客、演讲等方式分享经验和见解。</li>
-</ul>
-<h3 id="4-职业发展方向："><a href="#4-职业发展方向：" class="headerlink" title="4. 职业发展方向："></a>4. 职业发展方向：</h3><ul>
-<li>前端架构师：专注于前端架构设计和技术选型，负责复杂项目的技术规划和架构设计。</li>
-<li>前端团队管理：发展管理和领导能力，负责前端团队的招聘、培训和项目管理。</li>
-<li>UX&#x2F;UI设计师：学习和掌握用户体验和界面设计的知识，负责前端界面设计和交互优化。</li>
-<li>技术顾问：通过积累丰富的经验和知识，为企业提供前端技术咨询和解决方案。</li>
-</ul>
-<p>这只是一个参考，可以根据自己的兴趣和职业目标进行调整和补充。重要的是制定一个明确的职业规划，并不断学习和发展自己的技能，以实现职业的持续成长和发展。</p>
-]]></content>
-      <tags>
-        <tag>职业规划</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>后端工程师职业规划参考</title>
-    <url>/2023/07/02/%E8%81%8C%E4%B8%9A%E8%A7%84%E5%88%92/%E5%90%8E%E7%AB%AF%E5%B7%A5%E7%A8%8B%E5%B8%88%E8%81%8C%E4%B8%9A%E8%A7%84%E5%88%92%E5%8F%82%E8%80%83/</url>
-    <content><![CDATA[<h3 id="1-初级后端工程师（1-3年）："><a href="#1-初级后端工程师（1-3年）：" class="headerlink" title="1. 初级后端工程师（1-3年）："></a>1. 初级后端工程师（1-3年）：</h3><ul>
-<li>掌握一门主流后端开发语言，如Java、Python或Node.js。</li>
-<li>学习并应用常见的后端开发框架和技术，如Spring、Django或Express.js。</li>
-<li>参与项目开发，负责后端功能的实现和数据库设计。</li>
-<li>学习和应用基本的软件工程原则和最佳实践。</li>
-<li>持续学习和提升编程和问题解决能力。</li>
-</ul>
-<h3 id="2-中级后端工程师（3-5年）："><a href="#2-中级后端工程师（3-5年）：" class="headerlink" title="2. 中级后端工程师（3-5年）："></a>2. 中级后端工程师（3-5年）：</h3><ul>
-<li>深入研究和应用后端开发技术栈，如数据库优化、性能调优、缓存等。</li>
-<li>参与设计和开发复杂的后端系统，包括分布式系统和微服务架构。</li>
-<li>学习和应用设计模式和架构原则，提高系统的可扩展性和可维护性。</li>
-<li>参与团队的技术选型和架构设计，负责解决技术难题和挑战。</li>
-<li>培养团队合作和沟通能力，开始指导和培养初级工程师。</li>
-</ul>
-<h3 id="3-高级后端工程师（5年以上）："><a href="#3-高级后端工程师（5年以上）：" class="headerlink" title="3. 高级后端工程师（5年以上）："></a>3. 高级后端工程师（5年以上）：</h3><ul>
-<li>深入研究和应用领域专有的后端技术，如金融领域的支付系统、电子商务领域的订单处理系统等。</li>
-<li>参与大型项目的架构设计和技术规划，负责解决复杂的技术挑战。</li>
-<li>深入理解和应用云计算和容器化技术，如Docker和Kubernetes。</li>
-<li>参与行业内的研究和交流，提升自己在该领域的专业影响力。</li>
-<li>培养和指导团队成员的技术能力和职业发展。</li>
-</ul>
-<h3 id="4-技术管理者："><a href="#4-技术管理者：" class="headerlink" title="4. 技术管理者："></a>4. 技术管理者：</h3><ul>
-<li>学习项目管理和团队管理知识，培养领导力和沟通能力。</li>
-<li>担任技术团队的领导角色，负责项目的规划和执行。</li>
-<li>帮助团队成员制定个人的职业规划，并提供指导和支持。</li>
-<li>参与公司的技术战略规划和决策，推动团队的技术创新和发展。</li>
-</ul>
-]]></content>
-      <tags>
-        <tag>职业规划</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>网络工程师职业规划参考</title>
-    <url>/2023/07/02/%E8%81%8C%E4%B8%9A%E8%A7%84%E5%88%92/%E7%BD%91%E7%BB%9C%E5%B7%A5%E7%A8%8B%E5%B8%88%E8%81%8C%E4%B8%9A%E8%A7%84%E5%88%92%E5%8F%82%E8%80%83/</url>
-    <content><![CDATA[<h3 id="1-初级网络工程师（1-2年）："><a href="#1-初级网络工程师（1-2年）：" class="headerlink" title="1. 初级网络工程师（1-2年）："></a>1. 初级网络工程师（1-2年）：</h3><ul>
-<li>学习和掌握计算机网络的基础知识，如TCP&#x2F;IP协议、网络拓扑等。</li>
-<li>熟悉常用的网络设备和工具，如交换机、路由器、网络监控软件等。</li>
-<li>参与网络设备的配置和维护工作，解决常见的网络故障和问题。</li>
-<li>学习和掌握网络安全的基础知识，如防火墙、VPN等。</li>
-</ul>
-<h3 id="2-中级网络工程师（3-5年）："><a href="#2-中级网络工程师（3-5年）：" class="headerlink" title="2. 中级网络工程师（3-5年）："></a>2. 中级网络工程师（3-5年）：</h3><ul>
-<li>参与大型网络项目的规划和实施，如企业网络升级、数据中心建设等。</li>
-<li>深入学习和掌握网络技术的高级知识，如VLAN、路由协议、负载均衡等。</li>
-<li>学习和应用网络性能优化的技术和方法，提高网络的稳定性和响应速度。</li>
-<li>参与网络安全方面的工作，如网络漏洞扫描、入侵检测等。</li>
-</ul>
-<h3 id="3-高级网络工程师（5年以上）："><a href="#3-高级网络工程师（5年以上）：" class="headerlink" title="3. 高级网络工程师（5年以上）："></a>3. 高级网络工程师（5年以上）：</h3><ul>
-<li>在复杂网络环境下担任技术负责人或架构师角色，负责网络架构设计和规划。</li>
-<li>深入研究网络领域的新技术和趋势，并引领团队进行技术创新和实践。</li>
-<li>参与网络安全的高级工作，如安全策略制定、事件响应等。</li>
-<li>建立自己的技术品牌和影响力，如通过博客、演讲等方式分享经验和见解。</li>
-</ul>
-<h3 id="4-职业发展方向："><a href="#4-职业发展方向：" class="headerlink" title="4. 职业发展方向："></a>4. 职业发展方向：</h3><ul>
-<li>网络架构师：专注于网络架构设计和规划，负责复杂网络项目的技术规划和架构设计。</li>
-<li>网络安全专家：深入研究网络安全领域，负责企业的网络安全策略和漏洞修复。</li>
-<li>云计算工程师：学习和掌握云计算和虚拟化技术，负责企业的云平台建设和管理。</li>
-<li>网络运维经理：发展管理和领导能力，负责网络团队的招聘、培训和运维管理。</li>
-</ul>
-<p>这只是一个参考，可以根据自己的兴趣和职业目标进行调整和补充。重要的是制定一个明确的职业规划，并不断学习和发展自己的技能，以实现职业的持续成长和发展。</p>
-]]></content>
-      <tags>
-        <tag>职业规划</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>软件测试工程师职业规划参考</title>
-    <url>/2023/07/02/%E8%81%8C%E4%B8%9A%E8%A7%84%E5%88%92/%E8%BD%AF%E4%BB%B6%E5%B7%A5%E7%A8%8B%E5%B8%88%E8%81%8C%E4%B8%9A%E8%A7%84%E5%88%92/</url>
-    <content><![CDATA[<h3 id="1-初级软件测试工程师（1-2年）："><a href="#1-初级软件测试工程师（1-2年）：" class="headerlink" title="1. 初级软件测试工程师（1-2年）："></a>1. 初级软件测试工程师（1-2年）：</h3><ul>
-<li>学习和掌握软件测试的基础知识，如测试方法、测试文档编写等。</li>
-<li>熟悉常用的测试工具和技术，如自动化测试工具、性能测试工具等。</li>
-<li>参与软件测试项目，执行测试计划、编写测试用例、执行测试并记录缺陷。</li>
-</ul>
-<h3 id="2-中级软件测试工程师（3-5年）："><a href="#2-中级软件测试工程师（3-5年）：" class="headerlink" title="2. 中级软件测试工程师（3-5年）："></a>2. 中级软件测试工程师（3-5年）：</h3><ul>
-<li>深入学习和掌握软件测试的高级知识，如测试策略、测试环境配置等。</li>
-<li>参与复杂软件项目的测试规划和设计，提出测试方案和策略。</li>
-<li>掌握自动化测试技术，编写和执行自动化测试脚本，提高测试效率和质量。</li>
-<li>学习和应用性能测试和安全测试的技术，提高软件的性能和安全性。</li>
-</ul>
-<h3 id="3-高级软件测试工程师（5年以上）："><a href="#3-高级软件测试工程师（5年以上）：" class="headerlink" title="3. 高级软件测试工程师（5年以上）："></a>3. 高级软件测试工程师（5年以上）：</h3><ul>
-<li>在复杂项目中担任测试团队的技术负责人或测试架构师角色。</li>
-<li>深入研究软件测试领域的新技术和趋势，并引领团队进行技术创新和实践。</li>
-<li>参与软件质量管理方面的工作，如质量度量、过程改进等。</li>
-<li>建立自己的技术品牌和影响力，如通过博客、演讲等方式分享经验和见解。</li>
-</ul>
-<h3 id="4-职业发展方向："><a href="#4-职业发展方向：" class="headerlink" title="4. 职业发展方向："></a>4. 职业发展方向：</h3><ul>
-<li>质量保证经理：发展管理和领导能力，负责整个软件质量保证流程的管理和改进。</li>
-<li>自动化测试专家：深入研究自动化测试技术和工具，负责团队的自动化测试实施。</li>
-<li>安全测试专家：学习和掌握安全测试的知识和技术，负责软件安全测试和漏洞修复。</li>
-<li>敏捷测试专家：学习和掌握敏捷开发和测试方法，负责敏捷团队的测试工作。</li>
-</ul>
-]]></content>
-      <tags>
-        <tag>职业规划</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>mysql进阶篇 一</title>
     <url>/2023/07/05/mysql%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E8%BF%9B%E9%98%B6/</url>
     <content><![CDATA[<h2 id="1-索引"><a href="#1-索引" class="headerlink" title="1.索引"></a>1.索引</h2><h3 id="1-基础语法"><a href="#1-基础语法" class="headerlink" title="1.基础语法"></a>1.基础语法</h3><p>索引是一种数据结构，用于加快数据的检索速度。常见的索引类型包括B树索引和哈希索引。在创建表时，可以为某些列添加索引来提高查询效率。</p>
@@ -597,6 +265,383 @@
 ]]></content>
       <tags>
         <tag>mysql</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>篇一 DHCP</title>
+    <url>/2023/07/09/%E7%BD%91%E7%BB%9C-Ensp/DHCP/</url>
+    <content><![CDATA[<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>DHCP（Dynamic Host Configuration Protocol）是一个网络协议，用于自动分配IP地址和其他相关配置信息给网络设备。</p>
+<p>在一个局域网中，DHCP服务器负责管理并分配IP地址给网络上的设备。当一台设备加入局域网或者需要更新自己的IP地址时，它会向DHCP服务器发送一个请求，并在服务器上进行IP地址分配。DHCP服务器收到请求后，会从预定义的IP地址池中选择一个可用的IP地址，并将其分配给设备。此外，DHCP服务器还可以为设备分配其他网络配置，如子网掩码、网关、DNS服务器等。</p>
+<p>DHCP的优势在于它能够自动管理IP地址分配，简化了网络管理工作。通过使用DHCP，管理员可以集中管理IP地址的分配和配置，而无需手动为每个设备进行配置。DHCP还支持地址重用和动态更新配置，使得系统资源能够更有效地利用。</p>
+<p>总而言之，DHCP是一个用于自动分配IP地址和相关配置信息的协议，它简化了网络管理工作，并提高了网络资源的利用效率。</p>
+<h2 id="Ensp"><a href="#Ensp" class="headerlink" title="Ensp"></a>Ensp</h2><h3 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h3><p>AR2220路由器一台，S5700三层交换机一台，pc机若干</p>
+<img src="/images/ensp-1.png" class="center" width="500">
+
+<h3 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h3><ol>
+<li><p>输入 <code>sy</code> 进入路由系统视图，然后输入</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">dhcp enable</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>进入路由器对应接口，开启接口DHCP服务</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">interface g0/0/0</span><br><span class="line"></span><br><span class="line">dhcp select interface</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>pc机刷新dhcp配置即可</p>
+</li>
+</ol>
+<h3 id="实操"><a href="#实操" class="headerlink" title="实操"></a>实操</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">&lt;Huawei&gt;sy</span><br><span class="line"></span><br><span class="line">[Huawei]interface g0/0/0</span><br><span class="line"></span><br><span class="line">[Huawei-GigabitEthernet0/0/0]ip address 192.168.1.1 255.255.255.0</span><br><span class="line"></span><br><span class="line">[Huawei-GigabitEthernet0/0/0] quit</span><br><span class="line"></span><br><span class="line">[Huawei]dhcp enable </span><br><span class="line"></span><br><span class="line">[Huawei-GigabitEthernet0/0/0]dhcp select interface</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="检验"><a href="#检验" class="headerlink" title="检验"></a>检验</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ipconfig</span></span><br><span class="line"></span><br><span class="line">Link local IPv6 address...........: fe80::5689:98ff:feec:2846</span><br><span class="line">IPv6 address......................: :: / 128</span><br><span class="line">IPv6 gateway......................: ::</span><br><span class="line">IPv4 address......................: 192.168.1.254</span><br><span class="line">Subnet mask.......................: 255.255.255.0</span><br><span class="line">Gateway...........................: 192.168.1.1</span><br><span class="line">Physical address..................: 54-89-98-EC-28-46</span><br><span class="line">DNS server........................: 0.0.0.0</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <tags>
+        <tag>网络-Ensp</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>篇二 Dns 域名解析</title>
+    <url>/2023/07/10/%E7%BD%91%E7%BB%9C-Ensp/Dns-%E5%9F%9F%E5%90%8D%E8%A7%A3%E6%9E%90/</url>
+    <content><![CDATA[<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>DNS（Domain Name System，域名系统）是互联网中用于将域名转换为对应IP地址的系统。它充当了互联网上的“电话簿”，将易于记忆的域名（如<a href="http://www.example.com)映射到对应的ip地址(如192.0.2.1)./">www.example.com）映射到对应的IP地址（如192.0.2.1）。</a></p>
+<p>DNS的主要功能包括域名解析、域名注册和域名管理。 域名解析是DNS的核心功能，当用户在浏览器中输入一个域名时，DNS系统会将该域名解析为对应的IP地址，以便建立与目标服务器的连接。域名注册是指将一个域名注册到DNS系统中，以确保该域名在互联网上的唯一性。域名管理则涉及到对域名的配置、修改和管理，包括设置域名的DNS记录、子域名管理等。 </p>
+<p>DNS采用分层的结构，由多个DNS服务器组成，分为根域名服务器、顶级域名服务器、权威域名服务器和本地域名服务器等。当本地域名服务器无法解析域名时，会向上级域名服务器查询，直到找到对应的IP地址。 </p>
+<p>简单来说，<u>就是当用户访问某个域名时，会先在域名解析服务器上查找该域名对应的ip地址，找到后再访问该IP地址，用户可以使用易于记忆的域名来访问互联网上的各种资源，而无需记住复杂的IP地址。</u>同时，DNS还支持其他功能，如邮件服务器的查找、反向解析等。</p>
+<h2 id="准备内容"><a href="#准备内容" class="headerlink" title="准备内容"></a>准备内容</h2><p>ar2220路由一台、server服务器一台、s5700三层交换机一台、pc机若干</p>
+<img src="/images/ensp-%E5%9F%9F%E5%90%8D%E8%A7%A3%E6%9E%90.png" class="center" width="500">
+
+
+<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><ol>
+<li>给服务器添加自身ip地址，在服务器中的dns解析服务添加域名列表，并启动服务</li>
+<li>在路由对应接口输入<code>dhcp server dns-list [域名解析服务器ip]</code></li>
+<li>pc机刷新dhcp配置</li>
+</ol>
+<h2 id="实操"><a href="#实操" class="headerlink" title="实操"></a>实操</h2><h3 id="添加域名"><a href="#添加域名" class="headerlink" title="添加域名"></a>添加域名</h3><img src="/images/dns%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%B7%BB%E5%8A%A0ip.png" class="center" width="500" title="%5 {% img center &#x2F;images&#x2F;ensp-dns服务器.png 500">
+
+<h3 id="路由"><a href="#路由" class="headerlink" title="路由"></a>路由</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[Huawei]interface g0/0/0</span><br><span class="line">[Huawei-GigabitEthernet0/0/0]dhcp server dns-list 192.168.1.100</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="刷新并检验"><a href="#刷新并检验" class="headerlink" title="刷新并检验"></a>刷新并检验</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ipconfig</span></span><br><span class="line"></span><br><span class="line">Link local IPv6 address...........: fe80::5689:98ff:feec:2846</span><br><span class="line">IPv6 address......................: :: / 128</span><br><span class="line">IPv6 gateway......................: ::</span><br><span class="line">IPv4 address......................: 192.168.1.254</span><br><span class="line">Subnet mask.......................: 255.255.255.0</span><br><span class="line">Gateway...........................: 192.168.1.1</span><br><span class="line">Physical address..................: 54-89-98-EC-28-46</span><br><span class="line">DNS server........................: 192.168.1.100</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping www.example.com</span></span><br><span class="line"></span><br><span class="line">Ping www.example.com [192.168.1.253]: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 192.168.1.253: bytes=32 seq=1 ttl=128 time=47 ms</span><br><span class="line">From 192.168.1.253: bytes=32 seq=2 ttl=128 time=15 ms</span><br><span class="line">From 192.168.1.253: bytes=32 seq=3 ttl=128 time=47 ms</span><br><span class="line">From 192.168.1.253: bytes=32 seq=4 ttl=128 time=47 ms</span><br><span class="line">From 192.168.1.253: bytes=32 seq=5 ttl=128 time=31 ms</span><br><span class="line"></span><br><span class="line">--- 192.168.1.253 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 15/37/47 ms</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <tags>
+        <tag>网络-Ensp</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>篇四 vlan</title>
+    <url>/2023/07/17/%E7%BD%91%E7%BB%9C-Ensp/vlan/</url>
+    <content><![CDATA[<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>VLAN（Virtual Local Area Network）是一种虚拟局域网技术，用于将一个物理网络划分为多个逻辑上独立的虚拟网络。VLAN可以提供更好的网络管理和安全性。</p>
+<h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><img src="/images/vlan%E5%87%86%E5%A4%87.png" class="center" width="500">
+
+<p>三层交换机两台、pc机若干</p>
+<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><ol>
+<li><p>创建vlan —— <code>vlan [vlan号]</code> </p>
+</li>
+<li><p>划分vlan：<br>  （1）进入接口<br>  （2）<code>port link-type access</code> （终端，如电脑、打印机等为access；其他交换机则为trunk）<br>  （3）<code>port default vlan [vlan号]</code></p>
+</li>
+<li><p>交换机之间允许vlan通信<br>  （1）进入接口<br>  （2）<code>port link-type trunk</code><br>  （3）<code>port trunk allow-pass vlan [vlan号]</code></p>
+</li>
+</ol>
+<h2 id="实操"><a href="#实操" class="headerlink" title="实操"></a>实操</h2><ol>
+<li><p>LSW1(第一台交换机)</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">&lt;Huawei&gt;sy</span><br><span class="line">Enter system view, return user view with Ctrl+Z.</span><br><span class="line"></span><br><span class="line">//创建vlan</span><br><span class="line">[Huawei]vlan 10</span><br><span class="line">[Huawei-vlan10]q</span><br><span class="line">[Huawei]vlan 20</span><br><span class="line">[Huawei-vlan20]q</span><br><span class="line"></span><br><span class="line">//划分vlan</span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/1</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]port link-type access </span><br><span class="line">[Huawei-GigabitEthernet0/0/1]port default vlan 10</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]q</span><br><span class="line"></span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/2</span><br><span class="line">[Huawei-GigabitEthernet0/0/2]port link-type access 	</span><br><span class="line">[Huawei-GigabitEthernet0/0/2]port default vlan 20</span><br><span class="line">[Huawei-GigabitEthernet0/0/2]q</span><br><span class="line"></span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/3</span><br><span class="line">[Huawei-GigabitEthernet0/0/3]port link-type access 	</span><br><span class="line">[Huawei-GigabitEthernet0/0/3]port default vlan 20</span><br><span class="line">[Huawei-GigabitEthernet0/0/3]q</span><br><span class="line"></span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/4</span><br><span class="line">[Huawei-GigabitEthernet0/0/4]port link-type trunk</span><br><span class="line">[Huawei-GigabitEthernet0/0/4]port trunk allow-pass vlan 10</span><br><span class="line">[Huawei-GigabitEthernet0/0/4]port trunk allow-pass vlan 20</span><br></pre></td></tr></table></figure>
+
+
+</li>
+<li><p>LSW2(第二台交换机)</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">&lt;Huawei&gt;sy</span><br><span class="line">Enter system view, return user view with Ctrl+Z.</span><br><span class="line"></span><br><span class="line">//创建vlan</span><br><span class="line">[Huawei]vlan 10</span><br><span class="line">[Huawei-vlan10]q</span><br><span class="line">[Huawei]vlan 20</span><br><span class="line">[Huawei-vlan20]q</span><br><span class="line"></span><br><span class="line">//划分vlan</span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/1</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]port link-type access </span><br><span class="line">[Huawei-GigabitEthernet0/0/1]port default vlan 10</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]q</span><br><span class="line"></span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/2</span><br><span class="line">[Huawei-GigabitEthernet0/0/2]port link-type access </span><br><span class="line">[Huawei-GigabitEthernet0/0/2]port default vlan 20</span><br><span class="line">[Huawei-GigabitEthernet0/0/2]q</span><br><span class="line"></span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/3</span><br><span class="line">[Huawei-GigabitEthernet0/0/3]port link-type trunk </span><br><span class="line">[Huawei-GigabitEthernet0/0/3]port trunk allow-pass vlan 10</span><br><span class="line">[Huawei-GigabitEthernet0/0/3]port trunk allow-pass vlan 20</span><br></pre></td></tr></table></figure>
+
+
+</li>
+<li><p>给pc机的ip从左到右依次设为1.1.1.1~1.1.1.5</p>
+</li>
+</ol>
+<h2 id="检验"><a href="#检验" class="headerlink" title="检验"></a>检验</h2><p><strong>pc1 ping pc2，由于不在同一个vlan中，ping操作失败</strong></p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 1.1.1.2</span></span><br><span class="line"></span><br><span class="line">Ping 1.1.1.2: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 1.1.1.1: Destination host unreachable</span><br><span class="line">From 1.1.1.1: Destination host unreachable</span><br><span class="line">From 1.1.1.1: Destination host unreachable</span><br><span class="line">From 1.1.1.1: Destination host unreachable</span><br><span class="line">From 1.1.1.1: Destination host unreachable</span><br><span class="line"></span><br><span class="line">--- 1.1.1.2 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  0 packet(s) received</span><br><span class="line">  100.00% packet loss</span><br></pre></td></tr></table></figure>
+
+<p><strong>同样的，pc2 ping pc1 也是失败</strong></p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 1.1.1.1</span></span><br><span class="line"></span><br><span class="line">Ping 1.1.1.1: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 1.1.1.2: Destination host unreachable</span><br><span class="line">From 1.1.1.2: Destination host unreachable</span><br><span class="line">From 1.1.1.2: Destination host unreachable</span><br><span class="line">From 1.1.1.2: Destination host unreachable</span><br><span class="line">From 1.1.1.2: Destination host unreachable</span><br><span class="line"></span><br><span class="line">--- 1.1.1.1 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  0 packet(s) received</span><br><span class="line">  100.00% packet loss</span><br></pre></td></tr></table></figure>
+
+<p><strong>pc1 与 pc5 互ping也是失败</strong></p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">//pc1 ping pc5</span><br><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 1.1.1.5</span></span><br><span class="line"></span><br><span class="line">Ping 1.1.1.5: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 1.1.1.1: Destination host unreachable</span><br><span class="line">From 1.1.1.1: Destination host unreachable</span><br><span class="line">From 1.1.1.1: Destination host unreachable</span><br><span class="line">From 1.1.1.1: Destination host unreachable</span><br><span class="line">From 1.1.1.1: Destination host unreachable</span><br><span class="line"></span><br><span class="line">--- 1.1.1.5 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  0 packet(s) received</span><br><span class="line">  100.00% packet loss</span><br><span class="line">  </span><br><span class="line">//pc5 ping pc1</span><br><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 1.1.1.1</span></span><br><span class="line"></span><br><span class="line">Ping 1.1.1.1: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 1.1.1.5: Destination host unreachable</span><br><span class="line">From 1.1.1.5: Destination host unreachable</span><br><span class="line">From 1.1.1.5: Destination host unreachable</span><br><span class="line">From 1.1.1.5: Destination host unreachable</span><br><span class="line">From 1.1.1.5: Destination host unreachable</span><br><span class="line"></span><br><span class="line">--- 1.1.1.1 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  0 packet(s) received</span><br><span class="line">  100.00% packet loss</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>相同vlan下互ping不影响</strong></p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">//pc1 ping pc4</span><br><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 1.1.1.4</span></span><br><span class="line"></span><br><span class="line">Ping 1.1.1.4: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 1.1.1.4: bytes=32 seq=1 ttl=128 time=47 ms</span><br><span class="line">From 1.1.1.4: bytes=32 seq=2 ttl=128 time=78 ms</span><br><span class="line">From 1.1.1.4: bytes=32 seq=3 ttl=128 time=78 ms</span><br><span class="line">From 1.1.1.4: bytes=32 seq=4 ttl=128 time=79 ms</span><br><span class="line">From 1.1.1.4: bytes=32 seq=5 ttl=128 time=63 ms</span><br><span class="line"></span><br><span class="line">--- 1.1.1.4 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 47/69/79 ms</span><br><span class="line">  </span><br><span class="line">//pc4 ping pc1</span><br><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 1.1.1.1</span></span><br><span class="line"></span><br><span class="line">Ping 1.1.1.1: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 1.1.1.1: bytes=32 seq=1 ttl=128 time=63 ms</span><br><span class="line">From 1.1.1.1: bytes=32 seq=2 ttl=128 time=62 ms</span><br><span class="line">From 1.1.1.1: bytes=32 seq=3 ttl=128 time=78 ms</span><br><span class="line">From 1.1.1.1: bytes=32 seq=4 ttl=128 time=62 ms</span><br><span class="line">From 1.1.1.1: bytes=32 seq=5 ttl=128 time=63 ms</span><br><span class="line"></span><br><span class="line">--- 1.1.1.1 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 62/65/78 ms</span><br><span class="line">  </span><br><span class="line">//pc2 ping pc5</span><br><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 1.1.1.5</span></span><br><span class="line"></span><br><span class="line">Ping 1.1.1.5: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 1.1.1.5: bytes=32 seq=1 ttl=128 time=94 ms</span><br><span class="line">From 1.1.1.5: bytes=32 seq=2 ttl=128 time=78 ms</span><br><span class="line">From 1.1.1.5: bytes=32 seq=3 ttl=128 time=79 ms</span><br><span class="line">From 1.1.1.5: bytes=32 seq=4 ttl=128 time=78 ms</span><br><span class="line">From 1.1.1.5: bytes=32 seq=5 ttl=128 time=78 ms</span><br><span class="line"></span><br><span class="line">--- 1.1.1.5 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 78/81/94 ms</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <tags>
+        <tag>网络-Ensp</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>篇五 静态路由</title>
+    <url>/2023/07/20/%E7%BD%91%E7%BB%9C-Ensp/%E7%AF%87%E4%BA%94-%E9%9D%99%E6%80%81%E8%B7%AF%E7%94%B1/</url>
+    <content><![CDATA[<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>静态路由是网络中使用静态路由表来确定数据包的传输路径的一种路由方式。它是通过手动配置路由器上的路由表来指定目标网络和下一跳路由器的关系，以确定数据包的传输路径。</p>
+<p>在静态路由中，网络管理员手动配置路由器上的路由表，将目标网络的 IP 地址和对应的下一跳路由器的 IP 地址进行映射。当路由器收到一个数据包时，它会根据数据包的目标 IP 地址查找路由表，找到与目标 IP 地址匹配的条目，并将数据包发送到相应的下一跳路由器。下一跳路由器将继续根据路由表将数据包转发到下一个路由器，直到数据包到达目标网络。</p>
+<p>静态路由的主要特点包括：</p>
+<ol>
+<li>静态路由是手动配置的，不会自动适应网络变化。如果网络拓扑发生变化，管理员需要手动更新路由表。</li>
+<li>静态路由是固定的，不会根据网络负载或链路状态进行动态调整。所有数据包都将按照路由表中的配置进行转发。</li>
+<li>静态路由的配置相对简单，适用于小型网络或网络拓扑不经常变化的情况。</li>
+<li>静态路由的优点是稳定性高，因为路由表不会频繁变化，不会产生额外的路由协议开销。</li>
+</ol>
+<p>静态路由适用于简单的网络环境或需要精确控制数据包传输路径的情况。对于复杂的网络环境或需要自动适应网络变化的情况，通常会使用动态路由协议来实现路由功能。</p>
+<h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><p>AR2220 路由两台、交换机一台、PC 机若干</p>
+<img src="/images/%E9%9D%99%E6%80%81%E8%B7%AF%E7%94%B1%E5%AE%9E%E9%AA%8C%E5%87%86%E5%A4%87.png" class="center" width="500">
+
+
+
+<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><p>在路由上输入指令，告诉路由去往目的ip网段应该走的下一跳，<u>下一跳指的是下一个经过的路由的接口所对应的ip</u></p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">ip route-static [目标ip（通常是网段）] [子网掩码] [下一跳ip]</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="实操"><a href="#实操" class="headerlink" title="实操"></a>实操</h2><h3 id="基础路由配置"><a href="#基础路由配置" class="headerlink" title="基础路由配置"></a>基础路由配置</h3><h4 id="第一台路由"><a href="#第一台路由" class="headerlink" title="第一台路由"></a>第一台路由</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[Huawei]interface GigabitEthernet 0/0/0</span><br><span class="line">[Huawei-GigabitEthernet0/0/0]ip address 192.168.1.1 255.255.255.0</span><br><span class="line"></span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/1</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]ip address 192.168.2.1 255.255.255.0</span><br></pre></td></tr></table></figure>
+
+<h4 id="第二台"><a href="#第二台" class="headerlink" title="第二台"></a>第二台</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[Huawei]interface GigabitEthernet 0/0/0</span><br><span class="line">[Huawei-GigabitEthernet0/0/0]ip address 192.168.2.10 255.255.255.0</span><br><span class="line"></span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/1</span><br><span class="line">[Huawei-GigabitEthernet0/0/0]ip address 192.168.3.1 255.255.255.0</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="配置静态路由"><a href="#配置静态路由" class="headerlink" title="配置静态路由"></a>配置静态路由</h3><h4 id="第一台"><a href="#第一台" class="headerlink" title="第一台"></a>第一台</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[Huawei]ip route-static 192.168.3.0 255.255.255.0 192.168.2.10</span><br></pre></td></tr></table></figure>
+
+<h4 id="第二台-1"><a href="#第二台-1" class="headerlink" title="第二台"></a>第二台</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[Huawei]ip route-static 192.168.1.0 255.255.255.0 192.168.2.1</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="检验"><a href="#检验" class="headerlink" title="检验"></a>检验</h2><h3 id="pc1-ping-服务器和pc2"><a href="#pc1-ping-服务器和pc2" class="headerlink" title="pc1 ping 服务器和pc2"></a>pc1 ping 服务器和pc2</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 192.168.3.100</span></span><br><span class="line"></span><br><span class="line">Ping 192.168.3.100: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 192.168.3.100: bytes=32 seq=1 ttl=126 time=47 ms</span><br><span class="line">From 192.168.3.100: bytes=32 seq=2 ttl=126 time=47 ms</span><br><span class="line">From 192.168.3.100: bytes=32 seq=3 ttl=126 time=47 ms</span><br><span class="line">From 192.168.3.100: bytes=32 seq=4 ttl=126 time=31 ms</span><br><span class="line">From 192.168.3.100: bytes=32 seq=5 ttl=126 time=63 ms</span><br><span class="line"></span><br><span class="line">--- 192.168.3.100 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 31/47/63 ms</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 192.168.3.10</span></span><br><span class="line"></span><br><span class="line">Ping 192.168.3.10: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 192.168.3.10: bytes=32 seq=1 ttl=253 time=31 ms</span><br><span class="line">From 192.168.3.10: bytes=32 seq=2 ttl=253 time=32 ms</span><br><span class="line">From 192.168.3.10: bytes=32 seq=3 ttl=253 time=31 ms</span><br><span class="line">From 192.168.3.10: bytes=32 seq=4 ttl=253 time=31 ms</span><br><span class="line">From 192.168.3.10: bytes=32 seq=5 ttl=253 time=31 ms</span><br><span class="line"></span><br><span class="line">--- 192.168.3.10 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 31/31/32 ms</span><br></pre></td></tr></table></figure>
+
+<h3 id="pc2-ping-pc1"><a href="#pc2-ping-pc1" class="headerlink" title="pc2 ping pc1"></a>pc2 ping pc1</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 192.168.1.10</span></span><br><span class="line"></span><br><span class="line">Ping 192.168.1.10: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">Request timeout!</span><br><span class="line">From 192.168.1.10: bytes=32 seq=2 ttl=126 time=31 ms</span><br><span class="line">From 192.168.1.10: bytes=32 seq=3 ttl=126 time=31 ms</span><br><span class="line">From 192.168.1.10: bytes=32 seq=4 ttl=126 time=47 ms</span><br><span class="line">From 192.168.1.10: bytes=32 seq=5 ttl=126 time=16 ms</span><br><span class="line"></span><br><span class="line">--- 192.168.1.10 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  4 packet(s) received</span><br><span class="line">  20.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 0/31/47 ms</span><br></pre></td></tr></table></figure>
+
+<p>注：配置好静态路由后，首次ping操作出现timeout是正常的</p>
+]]></content>
+      <tags>
+        <tag>网络-Ensp</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>篇三 网关</title>
+    <url>/2023/07/10/%E7%BD%91%E7%BB%9C-Ensp/%E7%BD%91%E5%85%B3/</url>
+    <content><![CDATA[<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>网关（Gateway）是在计算机网络中连接不同网络的设备或软件。它充当了网络中不同协议、不同网络体系结构之间的桥梁，负责转发数据包、协议转换和数据格式转换等功能。</p>
+<p>网关可以连接不同类型的网络，如将局域网（LAN）连接到广域网（WAN），或将不同的协议（如TCP&#x2F;IP和IPX&#x2F;SPX）进行转换。<u>它可以是硬件设备，如路由器、交换机或防火墙，也可以是软件程序，如网络代理服务器或应用层网关。</u></p>
+<p>网关在网络通信中扮演重要角色，它能够实现以下功能：</p>
+<ol>
+<li><p>数据包转发：网关接收来自源网络的数据包，并将其转发到目标网络上的正确目的地。</p>
+</li>
+<li><p>协议转换：网关可以将来自一个协议的数据包转换为另一个协议的数据包，以便不同类型的网络能够进行通信。</p>
+</li>
+<li><p>数据格式转换：网关可以将数据包的格式从一种形式转换为另一种形式，以便目标网络能够正确解析和处理数据。</p>
+</li>
+<li><p>安全性控制：网关可以实施安全策略，如防火墙功能，对网络流量进行过滤和检查，保护网络免受恶意攻击和未经授权的访问。</p>
+</li>
+</ol>
+<p>总之，网关在网络中起到了连接不同网络、协议转换和数据转发等重要作用，使得不同网络能够互相通信和交换数据。</p>
+<h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><p>在篇二的基础上增加一台pc4,与路由相连</p>
+<img src="/images/%E7%BD%91%E5%85%B3%E5%AE%9E%E9%AA%8C%E5%87%86%E5%A4%87.png" class="center" width="500">
+
+
+
+
+<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><ol>
+<li>为路由与pc4相连端口添加ip</li>
+<li>为pc1和pc4添加静态ip和网关</li>
+</ol>
+<h2 id="实操"><a href="#实操" class="headerlink" title="实操"></a>实操</h2><p>pc1</p>
+<img src="/images/pc1%E8%AE%BE%E7%BD%AE%E7%BD%91%E5%85%B3.png" class="center" width="500">
+
+<p>pc4</p>
+<img src="/images/pc4%E8%AE%BE%E7%BD%AE%E7%BD%91%E5%85%B3.png" class="center" width="500">
+
+
+
+<h2 id="检验"><a href="#检验" class="headerlink" title="检验"></a>检验</h2><p><strong>pc1 ping pc4</strong></p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 100.100.100.100</span></span><br><span class="line"></span><br><span class="line">Ping 100.100.100.100: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">Request timeout!</span><br><span class="line">From 100.100.100.100: bytes=32 seq=2 ttl=127 time=47 ms</span><br><span class="line">From 100.100.100.100: bytes=32 seq=3 ttl=127 time=31 ms</span><br><span class="line">From 100.100.100.100: bytes=32 seq=4 ttl=127 time=32 ms</span><br><span class="line">From 100.100.100.100: bytes=32 seq=5 ttl=127 time=47 ms</span><br><span class="line"></span><br><span class="line">--- 100.100.100.100 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  4 packet(s) received</span><br><span class="line">  20.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 0/39/47 ms</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>pc4 ping pc1</strong></p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 192.168.1.168</span></span><br><span class="line"></span><br><span class="line">Ping 192.168.1.168: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">Request timeout!</span><br><span class="line">Request timeout!</span><br><span class="line">From 192.168.1.168: bytes=32 seq=3 ttl=127 time=32 ms</span><br><span class="line">From 192.168.1.168: bytes=32 seq=4 ttl=127 time=47 ms</span><br><span class="line">From 192.168.1.168: bytes=32 seq=5 ttl=127 time=47 ms</span><br><span class="line"></span><br><span class="line">--- 192.168.1.168 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  3 packet(s) received</span><br><span class="line">  40.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 0/42/47 ms</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>pc4 访问篇二中的域名</strong></p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping www.example.com</span></span><br><span class="line"></span><br><span class="line">Ping www.example.com [192.168.1.253]: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">Request timeout!</span><br><span class="line">From 192.168.1.253: bytes=32 seq=2 ttl=127 time=31 ms</span><br><span class="line">From 192.168.1.253: bytes=32 seq=3 ttl=127 time=47 ms</span><br><span class="line">From 192.168.1.253: bytes=32 seq=4 ttl=127 time=31 ms</span><br><span class="line">From 192.168.1.253: bytes=32 seq=5 ttl=127 time=47 ms</span><br><span class="line"></span><br><span class="line">--- 192.168.1.253 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  4 packet(s) received</span><br><span class="line">  20.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 0/39/47 ms</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <tags>
+        <tag>网络-Ensp</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>wx.getUserProfile 不出现弹窗</title>
+    <url>/2023/06/23/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F/wx-getUserProfile-%E4%B8%8D%E5%87%BA%E7%8E%B0%E5%BC%B9%E7%AA%97/</url>
+    <content><![CDATA[<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>使用wx.getUserProfile 获取用户信息，但是不出现弹窗就直接获取到了用户信息，且返回灰色头像，和“微信用户”昵称</p>
+<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><p>原来这个接口在22年5月的时候被回收了，低版本调试库才会正常显示，高版本则会返回灰色头像和默认的“微信用户”昵称<br>官方的解释是：实践中发现有部分小程序，在用户刚打开小程序时就要求收集用户的微信昵称头像，或者在支付前等不合理路径上要求授权。如果用户拒绝授权，则无法使用小程序或相关功能。在已经获取用户的 openId 与 unionId 信息情况下，用户的微信昵称与头像并不是用户使用小程序的必要条件。</p>
+<h2 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h2><p>我的解决方法是手动加一个权限弹窗</p>
+<img src="/images/%E6%89%8B%E5%8A%A8%E5%BC%B9%E7%AA%97.gif" class="center" width="200" title="权限弹窗">
+
+<h3 id="授权弹窗"><a href="#授权弹窗" class="headerlink" title="授权弹窗"></a>授权弹窗</h3><figure class="highlight typescript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="title function_">signupAndLogin</span>(<span class="params"></span>) &#123;            <span class="comment">//bindtap事件</span></span><br><span class="line">    wx.<span class="title function_">showModal</span>(&#123;                     <span class="comment">//手动授权弹窗</span></span><br><span class="line">      <span class="attr">title</span>: <span class="string">&#x27;授权登录提示&#x27;</span>,</span><br><span class="line">      <span class="attr">content</span>: <span class="string">&#x27;是否允许授权？&#x27;</span>,</span><br><span class="line">      <span class="attr">showCancel</span>: <span class="literal">true</span>,</span><br><span class="line">      <span class="attr">confirmText</span>: <span class="string">&#x27;允许&#x27;</span>,</span><br><span class="line">      <span class="attr">confirmColor</span>: <span class="string">&#x27;#669F76&#x27;</span>,</span><br><span class="line">      <span class="attr">cancelColor</span>: <span class="string">&#x27;#CC463D&#x27;</span>,</span><br><span class="line">      <span class="attr">success</span>: <span class="keyword">async</span> res =&gt; &#123;</span><br><span class="line">        <span class="keyword">if</span> (res.<span class="property">confirm</span>) &#123;     <span class="comment">//用户确认</span></span><br><span class="line">          <span class="keyword">const</span> &#123; <span class="attr">userInfo</span>: &#123; nickName, avatarUrl &#125; &#125; = <span class="keyword">await</span></span><br><span class="line">            wx.<span class="title function_">getUserProfile</span>(&#123;    <span class="comment">//获取用户信息，最新版本已不支持弹窗</span></span><br><span class="line">              <span class="attr">desc</span>: <span class="string">&#x27;用户授权&#x27;</span>,</span><br><span class="line">            &#125;)</span><br><span class="line"> </span><br><span class="line">          <span class="keyword">let</span> &#123; result &#125; = <span class="keyword">await</span> wx.<span class="property">cloud</span>.<span class="title function_">callFunction</span>(&#123;  <span class="comment">// 调用云函数</span></span><br><span class="line">            <span class="attr">name</span>: <span class="string">&#x27;loginOrSignup&#x27;</span>,</span><br><span class="line">            <span class="attr">data</span>: &#123;</span><br><span class="line">              nickName,</span><br><span class="line">              avatarUrl</span><br><span class="line">            &#125;</span><br><span class="line">          &#125;)</span><br><span class="line">          <span class="variable language_">this</span>.<span class="title function_">setData</span>(&#123; <span class="attr">userInfo</span>: result &#125;)</span><br><span class="line">          <span class="title function_">getApp</span>().<span class="property">globalData</span>.<span class="property">userStatus</span> = <span class="literal">true</span>   <span class="comment">//用于检查用户是否登录的全局变量</span></span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (res.<span class="property">cancel</span>) &#123;     <span class="comment">//用户取消</span></span><br><span class="line">          wx.<span class="title function_">showToast</span>(&#123;</span><br><span class="line">            <span class="attr">title</span>: <span class="string">&#x27;取消授权&#x27;</span>,</span><br><span class="line">            <span class="attr">mask</span>: <span class="literal">true</span>,</span><br><span class="line">            <span class="attr">icon</span>: <span class="string">&#x27;error&#x27;</span></span><br><span class="line">          &#125;)</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<h1 id=""><a href="#" class="headerlink" title=""></a></h1><h3 id="loginOrSignup云函数"><a href="#loginOrSignup云函数" class="headerlink" title="loginOrSignup云函数"></a>loginOrSignup云函数</h3><figure class="highlight typescript"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 云函数入口文件</span></span><br><span class="line"><span class="keyword">const</span> cloud = <span class="built_in">require</span>(<span class="string">&#x27;wx-server-sdk&#x27;</span>)</span><br><span class="line"> </span><br><span class="line">cloud.<span class="title function_">init</span>(&#123; <span class="attr">env</span>: cloud.<span class="property">DYNAMIC_CURRENT_ENV</span> &#125;) <span class="comment">// 使用当前云环境</span></span><br><span class="line"><span class="keyword">const</span> db = cloud.<span class="title function_">database</span>()</span><br><span class="line"><span class="comment">// 云函数入口函数</span></span><br><span class="line"><span class="built_in">exports</span>.<span class="property">main</span> = <span class="keyword">async</span> (event, context) =&gt; &#123;</span><br><span class="line">  <span class="keyword">const</span> &#123; <span class="variable constant_">OPENID</span> &#125; = cloud.<span class="title function_">getWXContext</span>()</span><br><span class="line">  <span class="keyword">const</span> &#123; nickName, avatarUrl &#125; = event</span><br><span class="line">  <span class="keyword">const</span> user_clct = db.<span class="title function_">collection</span>(<span class="string">&#x27;user&#x27;</span>)</span><br><span class="line"> </span><br><span class="line">  <span class="keyword">const</span> &#123; data &#125; = <span class="keyword">await</span> user_clct.<span class="title function_">where</span>(&#123;    <span class="comment">//查询用户是否存在</span></span><br><span class="line">    <span class="attr">_openId</span>: <span class="variable constant_">OPENID</span></span><br><span class="line">  &#125;).<span class="title function_">get</span>()</span><br><span class="line"> </span><br><span class="line">  <span class="keyword">if</span> (data.<span class="property">length</span> === <span class="number">0</span>) &#123;                     <span class="comment">//如果用户不存在，添加用户</span></span><br><span class="line">    <span class="keyword">let</span> user = <span class="keyword">await</span> user_clct.<span class="title function_">add</span>(&#123;</span><br><span class="line">      <span class="attr">data</span>: &#123;</span><br><span class="line">        nickName,</span><br><span class="line">        avatarUrl,</span><br><span class="line">        <span class="attr">_openId</span>: <span class="variable constant_">OPENID</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      nickName,</span><br><span class="line">      avatarUrl,</span><br><span class="line">      <span class="attr">_openId</span>: <span class="variable constant_">OPENID</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> data[<span class="number">0</span>]       <span class="comment">//如果用户存在，返回该用户信息</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="选择头像"><a href="#选择头像" class="headerlink" title="选择头像"></a>选择头像</h3><img src="/images/%E9%80%89%E6%8B%A9%E5%A4%B4%E5%83%8F.gif" class="center" width="200" title="权限弹窗">
+<h1 id="-1"><a href="#-1" class="headerlink" title=""></a></h1><figure class="highlight html"><figcaption><span>wxml</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">button</span> <span class="attr">class</span>=<span class="string">&quot;chooseAvatar&quot;</span> <span class="attr">open-type</span>=<span class="string">&quot;chooseAvatar&quot;</span> <span class="attr">bindchooseavatar</span>=<span class="string">&quot;chooseAvatar&quot;</span> <span class="attr">plain</span>=<span class="string">&quot;ture&quot;</span> <span class="attr">style</span>=<span class="string">&quot;width: 160rpx; border: none;color: #6e6e6e;&quot;</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">image</span> <span class="attr">class</span>=<span class="string">&quot;userAvatar&quot;</span> <span class="attr">src</span>=<span class="string">&quot;&#123;&#123;userInfo.avatarUrl&#125;&#125;&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">image</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h1 id="-2"><a href="#-2" class="headerlink" title=""></a></h1><figure class="highlight typescript"><figcaption><span>typescript</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="title function_">chooseAvatar</span>(<span class="params">e: <span class="built_in">any</span></span>) &#123;                <span class="comment">//用户更换头像</span></span><br><span class="line">    <span class="comment">//e.detail 已经是 avatarUrl：&quot;...&quot;的格式</span></span><br><span class="line">    <span class="keyword">let</span> &#123; avatarUrl &#125; = e.<span class="property">detail</span></span><br><span class="line"> </span><br><span class="line">    wx.<span class="property">cloud</span>.<span class="title function_">callFunction</span>(&#123;</span><br><span class="line">      <span class="attr">name</span>: <span class="string">&#x27;uploadAvatar&#x27;</span>,</span><br><span class="line">      <span class="attr">data</span>: &#123;</span><br><span class="line">        avatarUrl</span><br><span class="line">      &#125;,</span><br><span class="line">      <span class="attr">success</span>: <span class="keyword">async</span> res =&gt; &#123;</span><br><span class="line">        <span class="keyword">let</span> &#123; result &#125; = <span class="keyword">await</span> wx.<span class="property">cloud</span>.<span class="title function_">callFunction</span>(&#123;  <span class="comment">// 调用登录云函数，不传参，用以更新页面中的用户信息</span></span><br><span class="line">          <span class="attr">name</span>: <span class="string">&#x27;loginOrSignup&#x27;</span>,</span><br><span class="line">        &#125;)</span><br><span class="line">        <span class="variable language_">this</span>.<span class="title function_">setData</span>(&#123; <span class="attr">userInfo</span>: result &#125;)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;,</span><br></pre></td></tr></table></figure>
+
+<h3 id="uploadAvatar，更新头像"><a href="#uploadAvatar，更新头像" class="headerlink" title="uploadAvatar，更新头像"></a>uploadAvatar，更新头像</h3><figure class="highlight typescript"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 云函数入口文件</span></span><br><span class="line"><span class="keyword">const</span> cloud = <span class="built_in">require</span>(<span class="string">&#x27;wx-server-sdk&#x27;</span>)</span><br><span class="line"> </span><br><span class="line">cloud.<span class="title function_">init</span>(&#123; <span class="attr">env</span>: cloud.<span class="property">DYNAMIC_CURRENT_ENV</span> &#125;) <span class="comment">// 使用当前云环境</span></span><br><span class="line"><span class="keyword">const</span> db = cloud.<span class="title function_">database</span>()</span><br><span class="line"><span class="comment">// 云函数入口函数</span></span><br><span class="line"><span class="built_in">exports</span>.<span class="property">main</span> = <span class="keyword">async</span> (event, context) =&gt; &#123;</span><br><span class="line">  <span class="keyword">const</span> &#123; <span class="variable constant_">OPENID</span> &#125; = cloud.<span class="title function_">getWXContext</span>()</span><br><span class="line">  <span class="keyword">const</span> &#123; avatarUrl &#125; = event</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    db.<span class="title function_">collection</span>(<span class="string">&#x27;user&#x27;</span>).<span class="title function_">where</span>(&#123;</span><br><span class="line">      <span class="attr">_openId</span>: <span class="variable constant_">OPENID</span></span><br><span class="line">    &#125;).<span class="title function_">update</span>(&#123;</span><br><span class="line">      <span class="attr">data</span>: &#123;</span><br><span class="line">        avatarUrl</span><br><span class="line">      &#125;,</span><br><span class="line">      <span class="attr">success</span>:<span class="function"><span class="params">res</span>=&gt;</span>&#123;</span><br><span class="line">        <span class="keyword">return</span> avatarUrl</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125; <span class="keyword">catch</span> (err) &#123;</span><br><span class="line">    <span class="keyword">return</span> err</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <tags>
+        <tag>微信小程序</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>微信小程序实现类似qq界面侧滑效果</title>
+    <url>/2023/06/23/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%AE%9E%E7%8E%B0%E7%B1%BB%E4%BC%BCqq%E7%95%8C%E9%9D%A2%E4%BE%A7%E6%BB%91%E6%95%88%E6%9E%9C/</url>
+    <content><![CDATA[<h2 id="效果浏览"><a href="#效果浏览" class="headerlink" title="效果浏览"></a>效果浏览</h2><img src="/images/%E4%BE%A7%E6%BB%91%E7%95%8C%E9%9D%A2.gif" class="center" width="200" title="效果演示" alt="侧滑界面">
+
+<h2 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h2><h3 id="wxml"><a href="#wxml" class="headerlink" title="wxml"></a>wxml</h3><figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">view</span> <span class="attr">class</span>=<span class="string">&quot;outBox&quot;</span> <span class="attr">bindtouchstart</span>=<span class="string">&quot;out_touchStart&quot;</span> <span class="attr">bindtouchmove</span>=<span class="string">&quot;out_touchMove&quot;</span> <span class="attr">bindtouchend</span>=<span class="string">&quot;out_touchEnd&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">text</span> <span class="attr">style</span>=<span class="string">&quot;width: 100vw;text-align: center;&quot;</span>&gt;</span>主界面<span class="tag">&lt;/<span class="name">text</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">view</span> <span class="attr">class</span>=<span class="string">&quot;sliderPage&quot;</span> <span class="attr">style</span>=<span class="string">&quot;transform:translateX(&#123;&#123;moveX&#125;&#125;);&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">text</span>&gt;</span>侧滑界面<span class="tag">&lt;/<span class="name">text</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">view</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">view</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="wxss"><a href="#wxss" class="headerlink" title="wxss"></a>wxss</h3><figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-class">.outBox</span> &#123;</span><br><span class="line">  <span class="attribute">height</span>: <span class="number">100vh</span>;</span><br><span class="line">  <span class="attribute">width</span>: <span class="number">100vw</span>;</span><br><span class="line">  <span class="attribute">background</span>: <span class="built_in">rgba</span>(<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>, <span class="number">0.466</span>);</span><br><span class="line">  <span class="attribute">display</span>: flex;</span><br><span class="line">  <span class="attribute">align-items</span>: center;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="selector-class">.sliderPage</span> &#123;</span><br><span class="line">  <span class="attribute">position</span>: fixed;</span><br><span class="line">  <span class="attribute">height</span>: <span class="number">100vh</span>;</span><br><span class="line">  <span class="attribute">width</span>: <span class="number">80vw</span>;</span><br><span class="line">  <span class="attribute">display</span>: flex;</span><br><span class="line">  <span class="attribute">align-items</span>: center;</span><br><span class="line">  <span class="attribute">justify-content</span>: center;</span><br><span class="line">  <span class="attribute">background-color</span>: <span class="built_in">rgba</span>(<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>, <span class="number">0.842</span>);</span><br><span class="line">  <span class="attribute">box-shadow</span>: <span class="number">2px</span> <span class="number">0px</span> <span class="number">10px</span> <span class="number">0px</span> <span class="number">#00000038</span>;</span><br><span class="line">  <span class="attribute">transform</span>: <span class="built_in">translateX</span>(-<span class="number">80vw</span>);</span><br><span class="line">  <span class="attribute">transition</span>: <span class="number">0.2s</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="ts"><a href="#ts" class="headerlink" title="ts"></a>ts</h3><figure class="highlight typescript"><table><tr><td class="code"><pre><span class="line"><span class="title class_">Page</span>(&#123;</span><br><span class="line"> </span><br><span class="line">  <span class="comment">/**</span></span><br><span class="line"><span class="comment">   * 页面的初始数据</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line">  <span class="attr">data</span>: &#123;</span><br><span class="line">    <span class="attr">fullWidth</span>: <span class="number">0</span>,</span><br><span class="line">    <span class="attr">vw</span>: <span class="number">0</span>,</span><br><span class="line">    <span class="attr">moveX</span>: <span class="string">&#x27;-80vw&#x27;</span>,</span><br><span class="line">    <span class="attr">startX</span>: <span class="number">0</span>,</span><br><span class="line">    <span class="attr">sliderActive</span>: <span class="literal">false</span>,</span><br><span class="line">    <span class="attr">watchMoveX</span>: <span class="number">0</span>,</span><br><span class="line">  &#125;,</span><br><span class="line"> </span><br><span class="line">  <span class="title function_">out_touchStart</span>(<span class="params">e: <span class="built_in">any</span></span>) &#123;</span><br><span class="line">    <span class="keyword">let</span> &#123; touches &#125; = e</span><br><span class="line">    <span class="variable language_">this</span>.<span class="title function_">setData</span>(&#123; <span class="attr">startX</span>: touches[<span class="number">0</span>].<span class="property">clientX</span> &#125;)</span><br><span class="line">  &#125;,</span><br><span class="line"> </span><br><span class="line">  <span class="title function_">out_touchMove</span>(<span class="params">e: <span class="built_in">any</span></span>) &#123;</span><br><span class="line">    <span class="keyword">let</span> &#123; touches &#125; = e</span><br><span class="line">    <span class="keyword">let</span> nowX = touches[<span class="number">0</span>].<span class="property">clientX</span></span><br><span class="line">    <span class="keyword">let</span> moveX = nowX - <span class="variable language_">this</span>.<span class="property">data</span>.<span class="property">startX</span></span><br><span class="line"> </span><br><span class="line">    <span class="keyword">if</span> (<span class="variable language_">this</span>.<span class="property">data</span>.<span class="property">sliderActive</span>) &#123;</span><br><span class="line">      <span class="keyword">if</span> (moveX &gt;= <span class="number">0</span> || moveX &lt; -(<span class="variable language_">this</span>.<span class="property">data</span>.<span class="property">fullWidth</span> * <span class="number">0.8</span>)) <span class="keyword">return</span></span><br><span class="line">      <span class="variable language_">this</span>.<span class="title function_">setData</span>(&#123;</span><br><span class="line">        <span class="attr">moveX</span>: <span class="string">`<span class="subst">$&#123;moveX&#125;</span>px`</span>,</span><br><span class="line">        <span class="attr">watchMoveX</span>: moveX</span><br><span class="line">      &#125;)</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="keyword">if</span> (moveX &lt;= <span class="number">0</span> || moveX &gt; (<span class="variable language_">this</span>.<span class="property">data</span>.<span class="property">fullWidth</span> * <span class="number">0.8</span>)) <span class="keyword">return</span></span><br><span class="line">      <span class="variable language_">this</span>.<span class="title function_">setData</span>(&#123;</span><br><span class="line">        <span class="attr">moveX</span>: <span class="string">`<span class="subst">$&#123;-<span class="number">80</span> * <span class="variable language_">this</span>.data.vw + moveX&#125;</span>px`</span>,</span><br><span class="line">        <span class="attr">watchMoveX</span>: moveX</span><br><span class="line">      &#125;)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line"> </span><br><span class="line">  <span class="title function_">out_touchEnd</span>(<span class="params">e: <span class="built_in">any</span></span>) &#123;</span><br><span class="line">    <span class="keyword">if</span> (!<span class="variable language_">this</span>.<span class="property">data</span>.<span class="property">sliderActive</span>) &#123;</span><br><span class="line">      <span class="keyword">if</span> (<span class="variable language_">this</span>.<span class="property">data</span>.<span class="property">watchMoveX</span> &gt; (<span class="variable language_">this</span>.<span class="property">data</span>.<span class="property">fullWidth</span> / <span class="number">4</span>)) &#123;</span><br><span class="line">        <span class="variable language_">this</span>.<span class="title function_">setData</span>(&#123;</span><br><span class="line">          <span class="attr">moveX</span>: <span class="string">`<span class="subst">$&#123;<span class="number">0</span>&#125;</span>vw`</span>,</span><br><span class="line">          <span class="attr">sliderActive</span>: <span class="literal">true</span>,</span><br><span class="line">          <span class="attr">watchMoveX</span>: <span class="number">0</span></span><br><span class="line">        &#125;)</span><br><span class="line">      &#125; <span class="keyword">else</span> <span class="variable language_">this</span>.<span class="title function_">setData</span>(&#123; <span class="attr">moveX</span>: <span class="string">`<span class="subst">$&#123;-<span class="number">80</span>&#125;</span>vw`</span> &#125;)</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="keyword">if</span> (<span class="variable language_">this</span>.<span class="property">data</span>.<span class="property">watchMoveX</span> &lt; -(<span class="variable language_">this</span>.<span class="property">data</span>.<span class="property">fullWidth</span> / <span class="number">4</span>)) &#123;</span><br><span class="line">        <span class="variable language_">this</span>.<span class="title function_">setData</span>(&#123;</span><br><span class="line">          <span class="attr">moveX</span>: <span class="string">`<span class="subst">$&#123;-<span class="number">80</span>&#125;</span>vw`</span>,</span><br><span class="line">          <span class="attr">sliderActive</span>: <span class="literal">false</span>,</span><br><span class="line">          <span class="attr">watchMoveX</span>: <span class="number">0</span></span><br><span class="line">        &#125;)</span><br><span class="line">      &#125; <span class="keyword">else</span> <span class="variable language_">this</span>.<span class="title function_">setData</span>(&#123; <span class="attr">moveX</span>: <span class="string">&#x27;0vw&#x27;</span> &#125;)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line"> </span><br><span class="line">  <span class="comment">// ------------------------------</span></span><br><span class="line"> </span><br><span class="line">  <span class="comment">/**</span></span><br><span class="line"><span class="comment">   * 生命周期函数--监听页面加载</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line">  <span class="title function_">onLoad</span>(<span class="params"></span>) &#123;</span><br><span class="line">    wx.<span class="title function_">createSelectorQuery</span>().<span class="title function_">select</span>(<span class="string">&quot;.outBox&quot;</span>).<span class="title function_">boundingClientRect</span>().<span class="title function_">exec</span>(<span class="function"><span class="params">res</span> =&gt;</span> &#123;</span><br><span class="line">      <span class="variable language_">this</span>.<span class="title function_">setData</span>(&#123;</span><br><span class="line">        <span class="attr">vw</span>: res[<span class="number">0</span>].<span class="property">width</span> / <span class="number">100</span>,</span><br><span class="line">        <span class="attr">fullWidth</span>: res[<span class="number">0</span>].<span class="property">width</span></span><br><span class="line">      &#125;)</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;,</span><br><span class="line">  ....<span class="comment">//省略其他周期函数</span></span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<h2 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h2><p>实现这种侧滑效果的方法有很多，这只是其中一种<br>两个界面是嵌套关系，因此可以只通过外部元素节点，也就是主界面的touch控制来实现滑动效果</p>
+]]></content>
+      <tags>
+        <tag>微信小程序</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>前端工程师职业规划参考</title>
+    <url>/2023/07/02/%E8%81%8C%E4%B8%9A%E8%A7%84%E5%88%92/%E5%89%8D%E7%AB%AF%E5%B7%A5%E7%A8%8B%E5%B8%88%E8%81%8C%E4%B8%9A%E8%A7%84%E5%88%92%E5%8F%82%E8%80%83/</url>
+    <content><![CDATA[<h3 id="1-初级前端工程师（1-2年）："><a href="#1-初级前端工程师（1-2年）：" class="headerlink" title="1. 初级前端工程师（1-2年）："></a>1. 初级前端工程师（1-2年）：</h3><ul>
+<li>学习HTML、CSS和JavaScript等基础知识，并熟练运用它们进行网页开发。</li>
+<li>参与项目团队，积累实际项目经验。</li>
+<li>学习和掌握常用的前端框架和工具，如React、Vue.js、Webpack等。</li>
+<li>参与培训课程和技术社区，不断学习和提升技能。</li>
+</ul>
+<h3 id="2-中级前端工程师（3-5年）："><a href="#2-中级前端工程师（3-5年）：" class="headerlink" title="2. 中级前端工程师（3-5年）："></a>2. 中级前端工程师（3-5年）：</h3><ul>
+<li>在项目中承担更复杂的前端开发任务，如开发响应式网站、移动端应用等。</li>
+<li>深入学习和掌握前端框架和库的原理和使用技巧。</li>
+<li>学习和应用前端最佳实践，如性能优化、代码规范等。</li>
+<li>参与团队协作和项目管理，提升沟通和领导能力。</li>
+</ul>
+<h3 id="3-高级前端工程师（5年以上）："><a href="#3-高级前端工程师（5年以上）：" class="headerlink" title="3. 高级前端工程师（5年以上）："></a>3. 高级前端工程师（5年以上）：</h3><ul>
+<li>在复杂项目中担任技术负责人或架构师角色，负责前端架构设计和技术选型。</li>
+<li>深入研究前端领域的新技术和趋势，并引领团队进行技术创新和实践。</li>
+<li>参与开源项目和技术社区，分享经验和贡献代码。</li>
+<li>建立自己的技术品牌和影响力，如通过博客、演讲等方式分享经验和见解。</li>
+</ul>
+<h3 id="4-职业发展方向："><a href="#4-职业发展方向：" class="headerlink" title="4. 职业发展方向："></a>4. 职业发展方向：</h3><ul>
+<li>前端架构师：专注于前端架构设计和技术选型，负责复杂项目的技术规划和架构设计。</li>
+<li>前端团队管理：发展管理和领导能力，负责前端团队的招聘、培训和项目管理。</li>
+<li>UX&#x2F;UI设计师：学习和掌握用户体验和界面设计的知识，负责前端界面设计和交互优化。</li>
+<li>技术顾问：通过积累丰富的经验和知识，为企业提供前端技术咨询和解决方案。</li>
+</ul>
+<p>这只是一个参考，可以根据自己的兴趣和职业目标进行调整和补充。重要的是制定一个明确的职业规划，并不断学习和发展自己的技能，以实现职业的持续成长和发展。</p>
+]]></content>
+      <tags>
+        <tag>职业规划</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>网络工程师职业规划参考</title>
+    <url>/2023/07/02/%E8%81%8C%E4%B8%9A%E8%A7%84%E5%88%92/%E7%BD%91%E7%BB%9C%E5%B7%A5%E7%A8%8B%E5%B8%88%E8%81%8C%E4%B8%9A%E8%A7%84%E5%88%92%E5%8F%82%E8%80%83/</url>
+    <content><![CDATA[<h3 id="1-初级网络工程师（1-2年）："><a href="#1-初级网络工程师（1-2年）：" class="headerlink" title="1. 初级网络工程师（1-2年）："></a>1. 初级网络工程师（1-2年）：</h3><ul>
+<li>学习和掌握计算机网络的基础知识，如TCP&#x2F;IP协议、网络拓扑等。</li>
+<li>熟悉常用的网络设备和工具，如交换机、路由器、网络监控软件等。</li>
+<li>参与网络设备的配置和维护工作，解决常见的网络故障和问题。</li>
+<li>学习和掌握网络安全的基础知识，如防火墙、VPN等。</li>
+</ul>
+<h3 id="2-中级网络工程师（3-5年）："><a href="#2-中级网络工程师（3-5年）：" class="headerlink" title="2. 中级网络工程师（3-5年）："></a>2. 中级网络工程师（3-5年）：</h3><ul>
+<li>参与大型网络项目的规划和实施，如企业网络升级、数据中心建设等。</li>
+<li>深入学习和掌握网络技术的高级知识，如VLAN、路由协议、负载均衡等。</li>
+<li>学习和应用网络性能优化的技术和方法，提高网络的稳定性和响应速度。</li>
+<li>参与网络安全方面的工作，如网络漏洞扫描、入侵检测等。</li>
+</ul>
+<h3 id="3-高级网络工程师（5年以上）："><a href="#3-高级网络工程师（5年以上）：" class="headerlink" title="3. 高级网络工程师（5年以上）："></a>3. 高级网络工程师（5年以上）：</h3><ul>
+<li>在复杂网络环境下担任技术负责人或架构师角色，负责网络架构设计和规划。</li>
+<li>深入研究网络领域的新技术和趋势，并引领团队进行技术创新和实践。</li>
+<li>参与网络安全的高级工作，如安全策略制定、事件响应等。</li>
+<li>建立自己的技术品牌和影响力，如通过博客、演讲等方式分享经验和见解。</li>
+</ul>
+<h3 id="4-职业发展方向："><a href="#4-职业发展方向：" class="headerlink" title="4. 职业发展方向："></a>4. 职业发展方向：</h3><ul>
+<li>网络架构师：专注于网络架构设计和规划，负责复杂网络项目的技术规划和架构设计。</li>
+<li>网络安全专家：深入研究网络安全领域，负责企业的网络安全策略和漏洞修复。</li>
+<li>云计算工程师：学习和掌握云计算和虚拟化技术，负责企业的云平台建设和管理。</li>
+<li>网络运维经理：发展管理和领导能力，负责网络团队的招聘、培训和运维管理。</li>
+</ul>
+<p>这只是一个参考，可以根据自己的兴趣和职业目标进行调整和补充。重要的是制定一个明确的职业规划，并不断学习和发展自己的技能，以实现职业的持续成长和发展。</p>
+]]></content>
+      <tags>
+        <tag>职业规划</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>后端工程师职业规划参考</title>
+    <url>/2023/07/02/%E8%81%8C%E4%B8%9A%E8%A7%84%E5%88%92/%E5%90%8E%E7%AB%AF%E5%B7%A5%E7%A8%8B%E5%B8%88%E8%81%8C%E4%B8%9A%E8%A7%84%E5%88%92%E5%8F%82%E8%80%83/</url>
+    <content><![CDATA[<h3 id="1-初级后端工程师（1-3年）："><a href="#1-初级后端工程师（1-3年）：" class="headerlink" title="1. 初级后端工程师（1-3年）："></a>1. 初级后端工程师（1-3年）：</h3><ul>
+<li>掌握一门主流后端开发语言，如Java、Python或Node.js。</li>
+<li>学习并应用常见的后端开发框架和技术，如Spring、Django或Express.js。</li>
+<li>参与项目开发，负责后端功能的实现和数据库设计。</li>
+<li>学习和应用基本的软件工程原则和最佳实践。</li>
+<li>持续学习和提升编程和问题解决能力。</li>
+</ul>
+<h3 id="2-中级后端工程师（3-5年）："><a href="#2-中级后端工程师（3-5年）：" class="headerlink" title="2. 中级后端工程师（3-5年）："></a>2. 中级后端工程师（3-5年）：</h3><ul>
+<li>深入研究和应用后端开发技术栈，如数据库优化、性能调优、缓存等。</li>
+<li>参与设计和开发复杂的后端系统，包括分布式系统和微服务架构。</li>
+<li>学习和应用设计模式和架构原则，提高系统的可扩展性和可维护性。</li>
+<li>参与团队的技术选型和架构设计，负责解决技术难题和挑战。</li>
+<li>培养团队合作和沟通能力，开始指导和培养初级工程师。</li>
+</ul>
+<h3 id="3-高级后端工程师（5年以上）："><a href="#3-高级后端工程师（5年以上）：" class="headerlink" title="3. 高级后端工程师（5年以上）："></a>3. 高级后端工程师（5年以上）：</h3><ul>
+<li>深入研究和应用领域专有的后端技术，如金融领域的支付系统、电子商务领域的订单处理系统等。</li>
+<li>参与大型项目的架构设计和技术规划，负责解决复杂的技术挑战。</li>
+<li>深入理解和应用云计算和容器化技术，如Docker和Kubernetes。</li>
+<li>参与行业内的研究和交流，提升自己在该领域的专业影响力。</li>
+<li>培养和指导团队成员的技术能力和职业发展。</li>
+</ul>
+<h3 id="4-技术管理者："><a href="#4-技术管理者：" class="headerlink" title="4. 技术管理者："></a>4. 技术管理者：</h3><ul>
+<li>学习项目管理和团队管理知识，培养领导力和沟通能力。</li>
+<li>担任技术团队的领导角色，负责项目的规划和执行。</li>
+<li>帮助团队成员制定个人的职业规划，并提供指导和支持。</li>
+<li>参与公司的技术战略规划和决策，推动团队的技术创新和发展。</li>
+</ul>
+]]></content>
+      <tags>
+        <tag>职业规划</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>软件测试工程师职业规划参考</title>
+    <url>/2023/07/02/%E8%81%8C%E4%B8%9A%E8%A7%84%E5%88%92/%E8%BD%AF%E4%BB%B6%E5%B7%A5%E7%A8%8B%E5%B8%88%E8%81%8C%E4%B8%9A%E8%A7%84%E5%88%92/</url>
+    <content><![CDATA[<h3 id="1-初级软件测试工程师（1-2年）："><a href="#1-初级软件测试工程师（1-2年）：" class="headerlink" title="1. 初级软件测试工程师（1-2年）："></a>1. 初级软件测试工程师（1-2年）：</h3><ul>
+<li>学习和掌握软件测试的基础知识，如测试方法、测试文档编写等。</li>
+<li>熟悉常用的测试工具和技术，如自动化测试工具、性能测试工具等。</li>
+<li>参与软件测试项目，执行测试计划、编写测试用例、执行测试并记录缺陷。</li>
+</ul>
+<h3 id="2-中级软件测试工程师（3-5年）："><a href="#2-中级软件测试工程师（3-5年）：" class="headerlink" title="2. 中级软件测试工程师（3-5年）："></a>2. 中级软件测试工程师（3-5年）：</h3><ul>
+<li>深入学习和掌握软件测试的高级知识，如测试策略、测试环境配置等。</li>
+<li>参与复杂软件项目的测试规划和设计，提出测试方案和策略。</li>
+<li>掌握自动化测试技术，编写和执行自动化测试脚本，提高测试效率和质量。</li>
+<li>学习和应用性能测试和安全测试的技术，提高软件的性能和安全性。</li>
+</ul>
+<h3 id="3-高级软件测试工程师（5年以上）："><a href="#3-高级软件测试工程师（5年以上）：" class="headerlink" title="3. 高级软件测试工程师（5年以上）："></a>3. 高级软件测试工程师（5年以上）：</h3><ul>
+<li>在复杂项目中担任测试团队的技术负责人或测试架构师角色。</li>
+<li>深入研究软件测试领域的新技术和趋势，并引领团队进行技术创新和实践。</li>
+<li>参与软件质量管理方面的工作，如质量度量、过程改进等。</li>
+<li>建立自己的技术品牌和影响力，如通过博客、演讲等方式分享经验和见解。</li>
+</ul>
+<h3 id="4-职业发展方向："><a href="#4-职业发展方向：" class="headerlink" title="4. 职业发展方向："></a>4. 职业发展方向：</h3><ul>
+<li>质量保证经理：发展管理和领导能力，负责整个软件质量保证流程的管理和改进。</li>
+<li>自动化测试专家：深入研究自动化测试技术和工具，负责团队的自动化测试实施。</li>
+<li>安全测试专家：学习和掌握安全测试的知识和技术，负责软件安全测试和漏洞修复。</li>
+<li>敏捷测试专家：学习和掌握敏捷开发和测试方法，负责敏捷团队的测试工作。</li>
+</ul>
+]]></content>
+      <tags>
+        <tag>职业规划</tag>
       </tags>
   </entry>
 </search>
