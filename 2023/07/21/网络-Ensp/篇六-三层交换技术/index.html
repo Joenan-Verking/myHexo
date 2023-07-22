@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  
+  <meta name="keywords" content="冰山的笔记">
+  
+  
+  <meta name="description" content="学习记录、心得记录">
+  
+  <title>
+    篇六 三层交换技术 |
+    
+    冰山的笔记
+  </title>
+  <!-- Icon -->
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+    
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<script src="/js/pace.min.js"></script>
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <main class="content">
+    <section class="outer">
+  <article id="post-网络-Ensp/篇六-三层交换技术" class="article article-type-post" itemscope
+  itemprop="blogPost" data-scroll-reveal>
+
+  <div class="article-inner">
+    
+    <header class="article-header">
+      
+  
+  <h1 class="article-title" itemprop="name">
+    篇六 三层交换技术
+  </h1>
+  
+  
+
+    </header>
+    
+
+    
+    <div class="article-meta">
+      <a href="/2023/07/21/%E7%BD%91%E7%BB%9C-Ensp/%E7%AF%87%E5%85%AD-%E4%B8%89%E5%B1%82%E4%BA%A4%E6%8D%A2%E6%8A%80%E6%9C%AF/" class="article-date">
+  <time datetime="2023-07-21T01:28:10.000Z" itemprop="datePublished">2023-07-21</time>
+</a>
+      
+    </div>
+    
+
+    
+    
+<div class="tocbot"></div>
+
+    
+
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+      
+        <h1 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h1><p>三层交换技术是指将网络交换机与路由器的功能结合起来，使交换机能够进行基于网络层（第三层）的转发和路由功能。它在传统二层交换机的基础上增加了路由功能，从而能够更高效地处理大规模网络中的数据流量和转发需求。</p>
+<p>三层交换技术的主要特点如下：</p>
+<ol>
+<li>路由能力：<u>三层交换机具备路由器的基本功能，能够在不同的子网之间进行数据包的转发和路由决策</u>。它能够识别目标IP地址，并根据路由表进行转发决策，使数据能够跨越不同的子网进行传输。</li>
+<li>VLAN支持：三层交换机支持虚拟局域网（VLAN）技术，可以将物理网络划分为多个逻辑上独立的虚拟网络。通过VLAN的配置，可以实现更好的网络隔离和安全性。</li>
+<li>高性能转发：三层交换机采用硬件加速和快速转发技术，能够高效处理数据包的路由和转发。它可以进行流量控制、负载均衡和快速转发等功能，以提供更快的数据传输速度和更高的性能。</li>
+<li>动态路由协议支持：三层交换机一般支持主要的动态路由协议，如OSPF、BGP和RIP等，能够与其他路由器进行动态路由协议的交互和学习，以实现更智能的网络路径选择和故障恢复能力。</li>
+</ol>
+<p>通过三层交换技术，可以在较大的网络中实现更高效、可靠和有灵活性的数据转发和路由功能，并提供更好的网络性能和管理能力。这对于大型企业、数据中心和服务提供商等具有重要意义。</p>
+<h1 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h1><p>交换机两台（其中不与pc相连的交换机必须为三层交换机）、pc若干</p>
+<img src="/images/%E4%B8%89%E5%B1%82%E4%BA%A4%E6%8D%A2%E6%8A%80%E6%9C%AF%E5%AE%9E%E9%AA%8C%E5%87%86%E5%A4%87.png" class="center" width="500">
+
+
+
+<h1 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h1><ol>
+<li>近端交换机为两台pc划分不同的vlan，并为vlan放行</li>
+<li>在远端交换机的逻辑接口上添加两台pc的网关ip，即远端交换机在此处起到了网关的作用</li>
+</ol>
+<h1 id="实操"><a href="#实操" class="headerlink" title="实操"></a>实操</h1><ol>
+<li><p>近端交换机划分vlan，并放行</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[Huawei]vlan batch 10 20</span><br><span class="line">[Huawei]int g0/0/1</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]port link-type access 	</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]port de vlan 10</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]int g0/0/2</span><br><span class="line">[Huawei-GigabitEthernet0/0/2]port link-type access</span><br><span class="line">[Huawei-GigabitEthernet0/0/2]port de vlan 20</span><br><span class="line">[Huawei-GigabitEthernet0/0/2]int g0/0/3</span><br><span class="line">[Huawei-GigabitEthernet0/0/3]port link-type trunk </span><br><span class="line">[Huawei-GigabitEthernet0/0/3]port trunk allow-pass vlan all </span><br></pre></td></tr></table></figure>
+</li>
+<li><p>远端交换机配置vlan，并在vlan逻辑接口添加ip</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[Huawei]int g0/0/1</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]port link-type trunk //此处居然不用放行</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]q</span><br><span class="line">[Huawei]int Vlanif 10</span><br><span class="line">[Huawei-Vlanif10]ip address 1.1.1.1 255.255.255.0</span><br><span class="line">[Huawei-Vlanif10]int Vlanif 20</span><br><span class="line">[Huawei-Vlanif20]ip address 2.2.2.1 255.255.255.0</span><br><span class="line"></span><br></pre></td></tr></table></figure></li>
+</ol>
+<h1 id="检验"><a href="#检验" class="headerlink" title="检验"></a>检验</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 1.1.1.254</span></span><br><span class="line"></span><br><span class="line">Ping 1.1.1.254: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 1.1.1.254: bytes=32 seq=1 ttl=127 time=109 ms</span><br><span class="line">From 1.1.1.254: bytes=32 seq=2 ttl=127 time=63 ms</span><br><span class="line">From 1.1.1.254: bytes=32 seq=3 ttl=127 time=93 ms</span><br><span class="line">From 1.1.1.254: bytes=32 seq=4 ttl=127 time=94 ms</span><br><span class="line">From 1.1.1.254: bytes=32 seq=5 ttl=127 time=78 ms</span><br><span class="line"></span><br><span class="line">--- 1.1.1.254 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 63/87/109 ms</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 2.2.2.254</span></span><br><span class="line"></span><br><span class="line">Ping 2.2.2.254: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 2.2.2.254: bytes=32 seq=1 ttl=127 time=156 ms</span><br><span class="line">From 2.2.2.254: bytes=32 seq=2 ttl=127 time=94 ms</span><br><span class="line">From 2.2.2.254: bytes=32 seq=3 ttl=127 time=78 ms</span><br><span class="line">From 2.2.2.254: bytes=32 seq=4 ttl=127 time=62 ms</span><br><span class="line">From 2.2.2.254: bytes=32 seq=5 ttl=127 time=94 ms</span><br><span class="line"></span><br><span class="line">--- 2.2.2.254 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 62/96/156 ms</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://exmaple.com/2023/07/21/%E7%BD%91%E7%BB%9C-Ensp/%E7%AF%87%E5%85%AD-%E4%B8%89%E5%B1%82%E4%BA%A4%E6%8D%A2%E6%8A%80%E6%9C%AF/" data-id="clke85ram000j88wo0tuj03tg" class="article-share-link">
+        分享
+      </a>
+      
+<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%BD%91%E7%BB%9C-Ensp/" rel="tag">网络-Ensp</a></li></ul>
+
+    </footer>
+
+  </div>
+
+  
+  
+<nav class="article-nav">
+  
+  <a href="/2023/07/21/%E7%BD%91%E7%BB%9C-Ensp/%E7%AF%87%E4%B8%83-%E5%8D%95%E8%87%82%E8%B7%AF%E7%94%B1/" class="article-nav-link">
+    <strong class="article-nav-caption">前一篇</strong>
+    <div class="article-nav-title">
+      
+      篇七 单臂路由
+      
+    </div>
+  </a>
+  
+  
+  <a href="/2023/07/20/%E7%BD%91%E7%BB%9C-Ensp/%E7%AF%87%E4%BA%94-vlan/" class="article-nav-link">
+    <strong class="article-nav-caption">后一篇</strong>
+    <div class="article-nav-title">篇五 vlan</div>
+  </a>
+  
+</nav>
+
+  
+
+  
+  
+  
+  
+
+</article>
+</section>
+    <footer class="footer">
+  <div class="outer">
+    <ul class="list-inline">
+      <li>冰山的笔记 &copy; 2023</li>
+      
+        <li>
+          
+            <a href="https://beian.miit.gov.cn/" target="_blank"></a>
+            
+        </li>
+      
+      <li>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></li>
+      <li>theme  <a target="_blank" rel="noopener" href="https://github.com/zhwangart/hexo-theme-ocean">Ocean</a></li>
+    </ul>
+    <p><ul class="list-inline">
+  
+  <li><i class="fe fe-smile-alt tooltip" data-tooltip="UV"></i> <span id="busuanzi_value_site_uv"></span></li>
+  
+  <li><i class="fe fe-bookmark tooltip" data-tooltip="PV"></i> <span id="busuanzi_value_page_pv"></span></li>
+  
+</ul></p>
+  </div>
+</footer>
+  </main>
+  <aside class="sidebar">
+    <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/hexo.svg" alt="冰山的笔记"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">Home</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">Archives</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/gallery">Gallery</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/about">About</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link nav-item-search" title="搜索">
+        <i class="fe fe-search"></i>
+        搜索
+      </a>
+    </li>
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      <div class="totop" id="totop">
+  <i class="fe fe-rocket"></i>
+</div>
+    </li>
+    <li class="nav-item">
+      
+      <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+        <i class="fe fe-feed"></i>
+      </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+  </aside>
+  
+<script src="/js/jquery-2.0.3.min.js"></script>
+
+
+<script src="/js/jquery.justifiedGallery.min.js"></script>
+
+
+<script src="/js/lazyload.min.js"></script>
+
+
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+
+
+
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+
+<script src="/js/tocbot.min.js"></script>
+
+
+<script>
+  // Tocbot_v4.7.0  http://tscanlin.github.io/tocbot/
+  tocbot.init({
+    tocSelector: '.tocbot',
+    contentSelector: '.article-entry',
+    headingSelector: 'h1, h2, h3, h4, h5, h6',
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    positionFixedSelector: '.tocbot',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto',
+  });
+</script>
+
+
+
+<script src="/js/ocean.js"></script>
+
+</body>
+
+</html>
