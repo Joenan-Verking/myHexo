@@ -12,7 +12,7 @@
   <meta name="description" content="学习记录、心得记录">
   
   <title>
-    篇七 单臂路由 |
+    篇7 单臂路由 |
     
     冰山的笔记
   </title>
@@ -36,7 +36,7 @@
 <body>
   <main class="content">
     <section class="outer">
-  <article id="post-网络-Ensp/篇七-单臂路由" class="article article-type-post" itemscope
+  <article id="post-网络-Ensp/篇7-单臂路由" class="article article-type-post" itemscope
   itemprop="blogPost" data-scroll-reveal>
 
   <div class="article-inner">
@@ -45,7 +45,7 @@
       
   
   <h1 class="article-title" itemprop="name">
-    篇七 单臂路由
+    篇7 单臂路由
   </h1>
   
   
@@ -55,7 +55,7 @@
 
     
     <div class="article-meta">
-      <a href="/2023/07/21/%E7%BD%91%E7%BB%9C-Ensp/%E7%AF%87%E4%B8%83-%E5%8D%95%E8%87%82%E8%B7%AF%E7%94%B1/" class="article-date">
+      <a href="/2023/07/21/%E7%BD%91%E7%BB%9C-Ensp/%E7%AF%877-%E5%8D%95%E8%87%82%E8%B7%AF%E7%94%B1/" class="article-date">
   <time datetime="2023-07-21T03:00:28.000Z" itemprop="datePublished">2023-07-21</time>
 </a>
       
@@ -75,6 +75,17 @@
         <h1 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h1><h2 id="单臂路由"><a href="#单臂路由" class="headerlink" title="单臂路由"></a>单臂路由</h2><p>单臂路由（One-Arm Routing）是一种特定的网络部署架构，其中路由器通过一个接口与源网络相连，并通过同一个接口与目标网络相连。在这种架构中，单个物理接口用于连接不同的网络，并处理流量的转发和路由。</p>
 <p>常见的场景是将单臂路由用于网络地址转换（NAT）或实施访问控制列表（ACL）。使用单臂路由，可以将所有流量引导到路由器上，然后根据配置的规则和策略，将流量转发到目标网络或执行其他操作。这种部署方式可以在较小的网络环境中实现较灵活的流量控制和转发。</p>
 <p>单臂路由在某些情况下会带来一些问题，例如可能导致网络拥塞、延迟增加以及安全性降低。因此，在部署单臂路由时需要考虑网络负载、带宽需求以及安全性需求等方面的因素。</p>
+<h2 id="子接口终结"><a href="#子接口终结" class="headerlink" title="子接口终结"></a>子接口终结</h2><p>子接口终结（Subinterface Termination）是一种在路由器或三层交换机上实现虚拟接口的方法，用于实现不同VLAN之间的互联和通信。它允许将单个物理接口划分为多个逻辑接口，每个逻辑接口都与一个特定的VLAN相关联。</p>
+<p>在以太网中，每个接口通常只能属于一个VLAN。但是，通过使用子接口终结技术，可以将单个物理接口划分为多个逻辑接口，每个逻辑接口都可以属于不同的VLAN。这样，可以在单个物理接口上同时传输和处理来自不同VLAN的数据。</p>
+<p>子接口终结通常与802.1Q VLAN标记一起使用。每个子接口都与一个特定的VLAN ID相关联，并且可以配置相应的IP地址和子网掩码。通过这种方式，不同VLAN之间的通信可以通过路由器或三层交换机上的子接口进行转发。</p>
+<p>子接口终结的概念在虚拟局域网（VLAN）的划分和互联中起着重要的作用。它提供了一种灵活的方式来管理和隔离不同的网络流量，并实现不同VLAN之间的通信。子接口终结还可以用于实现虚拟专用网（VPN）和其他网络隔离和分割的需求。</p>
+<p>在ensp上<code>dot1q termination vid 10</code>命令用于在交换机上配置VLAN 10的802.1Q标记终结（termination）功能。当交换机接收到带有802.1Q VLAN标记的数据帧时，该命令会将数据帧从标记中解析出VLAN ID，并将数据帧发送到相应的VLAN。</p>
+<p>具体而言，<code>dot1q termination vid 10</code>命令的作用如下：</p>
+<ol>
+<li><u>使交换机能够识别和处理带有802.1Q VLAN标记的数据帧。</u></li>
+<li><u>将接收到的带有VLAN 10的数据帧发送到VLAN 10，以便在VLAN 10内进行交换和转发。</u></li>
+<li><u>允许交换机与其他支持802.1Q VLAN标记的设备进行互联和通信。</u></li>
+</ol>
 <h2 id="arp"><a href="#arp" class="headerlink" title="arp"></a>arp</h2><p>ARP（Address Resolution Protocol）是一种用于将IP地址解析为MAC地址的网络协议。它在局域网中起到了重要的作用，帮助主机在通信过程中确定目标主机的物理地址。</p>
 <p>在TCP&#x2F;IP协议中，每个主机都有一个唯一的IP地址用于网络通信。然而，在以太网等物理网络中，通信需要通过MAC地址来实现。因此，当主机需要与目标主机通信时，它需要知道目标主机的MAC地址。</p>
 <p>这时候就需要使用ARP协议来进行地址解析。主机通过广播一个ARP请求消息来询问网络中的其他主机，询问某个IP地址对应的MAC地址。其他主机收到该请求后，如果它们拥有该IP地址，就会回复一个ARP响应消息，告知请求主机对应的MAC地址。</p>
@@ -121,7 +132,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://exmaple.com/2023/07/21/%E7%BD%91%E7%BB%9C-Ensp/%E7%AF%87%E4%B8%83-%E5%8D%95%E8%87%82%E8%B7%AF%E7%94%B1/" data-id="clklas5cj000awwwoe0747f9g" class="article-share-link">
+      <a data-url="https://exmaple.com/2023/07/21/%E7%BD%91%E7%BB%9C-Ensp/%E7%AF%877-%E5%8D%95%E8%87%82%E8%B7%AF%E7%94%B1/" data-id="clkph4gdg000lccwo5ufu1yau" class="article-share-link">
         分享
       </a>
       
@@ -135,7 +146,7 @@
   
 <nav class="article-nav">
   
-  <a href="/2023/07/27/%E7%BD%91%E7%BB%9C-Ensp/%E7%AF%87%E5%A4%96%EF%BC%88%E4%B8%80%EF%BC%89%E5%85%89%E7%BA%A4%E6%8E%A5%E5%85%A5%E6%8A%80%E6%9C%AF%E4%B8%8EPON/" class="article-nav-link">
+  <a href="/2023/07/27/%E7%BD%91%E7%BB%9C-Ensp/%E7%AF%87%E5%A4%96%EF%BC%881%EF%BC%89%E5%85%89%E7%BA%A4%E6%8E%A5%E5%85%A5%E6%8A%80%E6%9C%AF%E4%B8%8EPON/" class="article-nav-link">
     <strong class="article-nav-caption">前一篇</strong>
     <div class="article-nav-title">
       
@@ -145,9 +156,9 @@
   </a>
   
   
-  <a href="/2023/07/21/%E7%BD%91%E7%BB%9C-Ensp/%E7%AF%87%E5%85%AD-%E4%B8%89%E5%B1%82%E4%BA%A4%E6%8D%A2%E6%8A%80%E6%9C%AF/" class="article-nav-link">
+  <a href="/2023/07/21/%E7%BD%91%E7%BB%9C-Ensp/%E7%AF%876-%E4%B8%89%E5%B1%82%E4%BA%A4%E6%8D%A2%E6%8A%80%E6%9C%AF/" class="article-nav-link">
     <strong class="article-nav-caption">后一篇</strong>
-    <div class="article-nav-title">篇六 三层交换技术</div>
+    <div class="article-nav-title">篇6 三层交换技术</div>
   </a>
   
 </nav>
