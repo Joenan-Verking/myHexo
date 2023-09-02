@@ -135,8 +135,7 @@
 <li>修改OSPF的默认参考带宽值，作用范围是本路由器使能OSPF的接口。建议参考整个网络的带宽情况建立参考基线，所有路由器修改相同的参考带宽值，从而确保选路的—致性。</li>
 <li>OSPF以“累计cost”为开销值，也就是流量从源网络到目的网络所经过所有路由器的出接口的cost总和</li>
 </ul>
-<h2 id="报文类型及作用"><a href="#报文类型及作用" class="headerlink" title="报文类型及作用"></a>报文类型及作用</h2><img src="/images/OSPF/OSPF%E6%8A%A5%E6%96%87%E5%A4%B4%E9%83%A8.png" class="center" title="OSPF报文头部">
-
+<h2 id="报文类型及作用"><a href="#报文类型及作用" class="headerlink" title="报文类型及作用"></a>报文类型及作用</h2><p><img src="/../../images/OSPF/OSPF%E6%8A%A5%E6%96%87%E5%A4%B4%E9%83%A8.png"></p>
 <p>RIP路由器之间是基于UDP 520的报文进行通信，OSPF也有其规定的通信标准。OSPF使用IP承载其报文，协议号为89。<br>在OSPF Packet部分，所有的OSPF报文均使用相同的OSPF报文头部∶</p>
 <ul>
 <li>Version：对于当前所使用的OSPFv2，该字段的值为2。</li>
@@ -388,7 +387,7 @@
 <td align="center">网段掩码</td>
 </tr>
 </tbody></table>
-<h3 id="构建SPF树"><a href="#构建SPF树" class="headerlink" title="构建SPF树"></a>构建SPF树</h3><p><strong>网络拓扑图如下</strong>（router1至router5分别对应routerA至routerE，router ID分别为1.1.1.1 ~ 5.5.5.5）</p>
+<h3 id="构建SPF树（相同区域内）"><a href="#构建SPF树（相同区域内）" class="headerlink" title="构建SPF树（相同区域内）"></a>构建SPF树（相同区域内）</h3><p><strong>网络拓扑图如下</strong>（router1至router5分别对应routerA至routerE，router ID分别为1.1.1.1 ~ 5.5.5.5）</p>
 <p><img src="/../../images/OSPF/%E6%95%99%E6%9D%90%E6%8B%93%E6%89%91%E5%9B%BE.png"></p>
 <ol>
 <li>以routerA为根节点，构建SPF树</li>
@@ -459,6 +458,7 @@
 <li>192.168.1.0 网络在本区域以一类LSA进行传递，ABR RTB 负责将该一类LSA转换成三类LSA，并发送到Area 0；ABR RBC 又重新生成一份三类 LSA 发送到 Area 2</li>
 </ul>
 <h3 id="Summary-LSA（三类LSA）"><a href="#Summary-LSA（三类LSA）" class="headerlink" title="Summary LSA（三类LSA）"></a>Summary LSA（三类LSA）</h3><p><img src="/../../images/OSPF/%E4%B8%89%E7%B1%BBLSA.png"></p>
+<p><u>记录对于本区域的非本区域网段</u></p>
 <p><strong>对照表</strong></p>
 <table>
 <thead>
@@ -487,7 +487,7 @@
 <p>示例：</p>
 <p><img src="/../../images/OSPF/%E6%88%AA%E5%9B%BE1.png"></p>
 <p>对于router 6 的summary LSA 有：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">	         Area: 0.0.0.0</span><br><span class="line">Type      LinkState ID    AdvRouter          Age  Len   Sequence   Metric</span><br><span class="line">Sum-Net   10.1.67.0       6.6.6.6            124  28    80000001       1</span><br><span class="line">Sum-Net   10.1.16.0       6.6.6.6            124  28    80000001       1</span><br><span class="line">Sum-Net   10.1.16.0       1.1.1.1            163  28    80000001       1</span><br><span class="line">//由于R1和R6之间有一条虚拟连接，所以有两条sum LSA</span><br><span class="line"></span><br><span class="line">	         Area: 0.0.0.1</span><br><span class="line">Type      LinkState ID    AdvRouter          Age  Len   Sequence   Metric</span><br><span class="line">Sum-Net   10.1.45.0       1.1.1.1            124  28    80000003      50</span><br><span class="line">Sum-Net   10.1.13.0       1.1.1.1            161  28    80000001      48</span><br><span class="line">Sum-Net   10.1.24.0       1.1.1.1            124  28    80000002      49</span><br><span class="line">Sum-Net   10.1.12.0       1.1.1.1            164  28    80000001       1</span><br><span class="line">Sum-Net   10.1.235.0      1.1.1.1            124  28    80000002       2</span><br><span class="line">Sum-Net   10.1.67.0       6.6.6.6            124  28    80000001       1</span><br><span class="line"></span><br><span class="line">	         Area: 0.0.0.2</span><br><span class="line">Type      LinkState ID    AdvRouter          Age  Len   Sequence   Metric</span><br><span class="line">Sum-Net   10.1.45.0       6.6.6.6            123  28    80000002      51</span><br><span class="line">Sum-Net   10.1.13.0       6.6.6.6            124  28    80000001      49</span><br><span class="line">Sum-Net   10.1.24.0       6.6.6.6            124  28    80000002      50</span><br><span class="line">Sum-Net   10.1.12.0       6.6.6.6            125  28    80000001       2</span><br><span class="line">Sum-Net   10.1.235.0      6.6.6.6            124  28    80000002       3</span><br><span class="line">Sum-Net   10.1.16.0       6.6.6.6            125  28    80000001       1</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">	         Area: 0.0.0.0</span><br><span class="line">Type      LinkState ID    AdvRouter          Age  Len   Sequence   Metric</span><br><span class="line">Sum-Net   10.1.67.0       6.6.6.6            124  28    80000001       1</span><br><span class="line">Sum-Net   10.1.16.0       6.6.6.6            124  28    80000001       1</span><br><span class="line">Sum-Net   10.1.16.0       1.1.1.1            163  28    80000001       1</span><br><span class="line">//由于R1和R6之间有一条虚拟连接，所以有两条sum LSA</span><br><span class="line"></span><br><span class="line">	         Area: 0.0.0.1</span><br><span class="line">Type      LinkState ID    AdvRouter          Age  Len   Sequence   Metric</span><br><span class="line">Sum-Net   10.1.45.0       1.1.1.1            124  28    80000003      50</span><br><span class="line">Sum-Net   10.1.13.0       1.1.1.1            161  28    80000001      48</span><br><span class="line">Sum-Net   10.1.24.0       1.1.1.1            124  28    80000002      49</span><br><span class="line">Sum-Net   10.1.12.0       1.1.1.1            164  28    80000001       1</span><br><span class="line">Sum-Net   10.1.235.0      1.1.1.1            124  28    80000002       2</span><br><span class="line">Sum-Net   10.1.67.0       6.6.6.6            124  28    80000001       1</span><br><span class="line">//Area1 有两个ABR</span><br><span class="line"></span><br><span class="line">	         Area: 0.0.0.2</span><br><span class="line">Type      LinkState ID    AdvRouter          Age  Len   Sequence   Metric</span><br><span class="line">Sum-Net   10.1.45.0       6.6.6.6            123  28    80000002      51</span><br><span class="line">Sum-Net   10.1.13.0       6.6.6.6            124  28    80000001      49</span><br><span class="line">Sum-Net   10.1.24.0       6.6.6.6            124  28    80000002      50</span><br><span class="line">Sum-Net   10.1.12.0       6.6.6.6            125  28    80000001       2</span><br><span class="line">Sum-Net   10.1.235.0      6.6.6.6            124  28    80000002       3</span><br><span class="line">Sum-Net   10.1.16.0       6.6.6.6            125  28    80000001       1</span><br></pre></td></tr></table></figure>
 
 <h3 id="避免域间路由环路"><a href="#避免域间路由环路" class="headerlink" title="避免域间路由环路"></a>避免域间路由环路</h3><p>为防止区域间的环路OSPF定义了骨干区域和非骨干区域和三类LSA的传递规则</p>
 <ul>
@@ -500,15 +500,294 @@
 <li>骨干区域必须是连续的，但是并不要求物理上连续，可以使用虚连接使骨干区域逻辑上连续。</li>
 <li>虚连接可以在任意两个区域边界路由器上建立，但是<u>要求这两个区域边界路由器都有端口连接到一个相同的非骨干区域。</u></li>
 <li><strong>骨干区域不允许配置虚拟链接</strong></li>
-<li><strong>跨域哪个区域就进入哪个区域配置虚拟连接</strong></li>
-<li><strong>建立虚拟链接的不是接口ip，而是router ID</strong></li>
+<li><strong>跨越哪个区域就进入哪个区域配置虚拟连接</strong></li>
+<li><strong>建立虚拟链接的不是接口ip，而是router ID</strong>（邻居）</li>
 <li>如图所示，在RTB和RTC之间建立了一条虚连接，以使Area 2穿越Area1连接到骨干区域。</li>
 </ul>
-<h2 id=""><a href="#" class="headerlink" title=""></a></h2>
+<h2 id="外部路由"><a href="#外部路由" class="headerlink" title="外部路由"></a>外部路由</h2><h3 id="外部路由计算"><a href="#外部路由计算" class="headerlink" title="外部路由计算"></a>外部路由计算</h3><p><img src="/../../images/OSPF/%E5%A4%96%E9%83%A8%E8%B7%AF%E7%94%B1demo.png"></p>
+<p>在之前的实验基础上，AR10是外部路由，不做ospf协议，仅做基本的配置，和AR1做了双向的静态路由。</p>
+<p>在AR1上将静态路由加入ospf协议中：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[Huawei]ospf 1</span><br><span class="line">[Huawei-ospf-1]import-route static ?</span><br><span class="line">  cost          Set cost</span><br><span class="line">  route-policy  Route policy</span><br><span class="line">  tag           Specify route tag</span><br><span class="line">  type          Metric type of the imported external routes</span><br><span class="line">  &lt;cr&gt;          Please press ENTER to execute command </span><br><span class="line">[Huawei-ospf-1]import-route static </span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>在AR1的OSPF进程下，将配置的静态路由重发布到OSPF网络中，其中引入外部路由的OSPF路由器叫做ASBR（设备间互访需要路由双向可达，这里仅介绍OSPF网络内获取外部路由的过程）。</li>
+<li>AR1会生成一条**<u>AS-External-LSA(五类LSA)</u><strong>，用于描述如何从ASBR（Autonomous System Boundary Router 自治系统边界路由器）到达外部目的地；AR6会生成一条</strong><u>ASBR-Summary-LSA(四类LSA)</u>**，用于描述如何从ABR到达ASBR。</li>
+<li>四类LSA和五类LSA，将被OSPF路由器用来计算外部路由。</li>
+</ul>
+<h4 id="AS-External-LSA"><a href="#AS-External-LSA" class="headerlink" title="AS External LSA"></a>AS External LSA</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[AR1]dis ospf lsdb</span><br><span class="line"></span><br><span class="line">	 OSPF Process 1 with Router ID 1.1.1.1</span><br><span class="line">		 Link State Database </span><br><span class="line"> </span><br><span class="line"> //已忽略其他区域</span><br><span class="line"> </span><br><span class="line">		 AS External Database</span><br><span class="line"> Type      LinkState ID    AdvRouter          Age  Len   Sequence   Metric</span><br><span class="line"> External  114.114.114.0   1.1.1.1             26  36    80000001       1</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&lt;AR1&gt;dis ospf lsdb ase self-originate </span><br><span class="line"></span><br><span class="line">	 OSPF Process 1 with Router ID 1.1.1.1</span><br><span class="line">		 Link State Database</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  Type      : External                   //LSA类型</span><br><span class="line">  Ls id     : 114.114.114.0				//目的网段</span><br><span class="line">  Adv rtr   : 1.1.1.1  					//产生此五类LSA ASBR的router ID</span><br><span class="line">  Ls age    : 1706 </span><br><span class="line">  Len       : 36 </span><br><span class="line">  Options   :  E  </span><br><span class="line">  seq#      : 80000003 </span><br><span class="line">  chksum    : 0xc4ae</span><br><span class="line">  Net mask  : 255.255.255.0 			//掩码</span><br><span class="line">  TOS 0  Metric: 1 					    //开销值</span><br><span class="line">  E type    : 2</span><br><span class="line">  Forwarding Address : 0.0.0.0 </span><br><span class="line">  Tag       : 1 						//Tag:外部路由信息可以携带一个Tag标签，用于传递该路由的附加信	   Priority  : Low						 //息，通常用于路由策略，默认值为1。</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="ASBR-Summary-LSA"><a href="#ASBR-Summary-LSA" class="headerlink" title="ASBR Summary LSA"></a>ASBR Summary LSA</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">[AR1]dis ospf lsdb</span><br><span class="line"></span><br><span class="line">	 OSPF Process 1 with Router ID 1.1.1.1</span><br><span class="line">		 Link State Database </span><br><span class="line"></span><br><span class="line">		         Area: 0.0.0.0</span><br><span class="line"> Type      LinkState ID    AdvRouter          Age  Len   Sequence   Metric</span><br><span class="line"> Sum-Asbr  1.1.1.1         6.6.6.6             26  28    80000001       1</span><br><span class="line"> </span><br><span class="line">		         Area: 0.0.0.1</span><br><span class="line"> Type      LinkState ID    AdvRouter          Age  Len   Sequence   Metric</span><br><span class="line"> Sum-Asbr  1.1.1.1         6.6.6.6             26  28    80000001       1</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">&lt;AR1&gt;dis ospf lsdb asbr </span><br><span class="line"></span><br><span class="line">	 OSPF Process 1 with Router ID 1.1.1.1</span><br><span class="line">		         Area: 0.0.0.0</span><br><span class="line">		 Link State Database </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  Type      : Sum-Asbr</span><br><span class="line">  Ls id     : 1.1.1.1						//LSA类型</span><br><span class="line">  Adv rtr   : 6.6.6.6  						//ASBR的router ID</span><br><span class="line">  Ls age    : 483 							//产生此四类LSA ABR的router ID</span><br><span class="line">  Len       : 28 </span><br><span class="line">  Options   :  E  </span><br><span class="line">  seq#      : 80000004 </span><br><span class="line">  chksum    : 0x7ebd</span><br><span class="line">  Tos 0  metric: 1							//从此ABR到ASBR的开销</span><br><span class="line">		         Area: 0.0.0.1				//AR1即是area 0 的ABR又是area 1的ABR</span><br><span class="line">		 Link State Database </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  Type      : Sum-Asbr</span><br><span class="line">  Ls id     : 1.1.1.1</span><br><span class="line">  Adv rtr   : 6.6.6.6  </span><br><span class="line">  Ls age    : 483 </span><br><span class="line">  Len       : 28 </span><br><span class="line">  Options   :  E  </span><br><span class="line">  seq#      : 80000004 </span><br><span class="line">  chksum    : 0x7ebd</span><br><span class="line">  Tos 0  metric: 1</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>四类LSA只能在一个区域内泛洪，五类LSA每泛洪到一个区域，相应区域的ABR都会生成一条新的四类LSA来描述如何到达ASBR。</li>
+<li>因此描述到达同一个ASBR的四类LSA可以有多条，其Adv rtr是不同的，表示是由不同的ABR生成的。</li>
+</ul>
+<h3 id="外部路由类型"><a href="#外部路由类型" class="headerlink" title="外部路由类型"></a>外部路由类型</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">&lt;AR7&gt;dis ip routing-table </span><br><span class="line">Route Flags: R - relay, D - download to fib</span><br><span class="line">------------------------------------------------------------------------------</span><br><span class="line">Routing Tables: Public</span><br><span class="line">         Destinations : 15       Routes : 15       </span><br><span class="line"></span><br><span class="line">Destination/Mask    Proto   Pre  Cost      Flags NextHop         Interface</span><br><span class="line"></span><br><span class="line">      10.1.12.0/24  OSPF    10   3           D   10.1.67.6       GigabitEthernet</span><br><span class="line">0/0/0</span><br><span class="line">      10.1.13.0/24  OSPF    10   50          D   10.1.67.6       GigabitEthernet</span><br><span class="line">0/0/0</span><br><span class="line">      10.1.16.0/24  OSPF    10   2           D   10.1.67.6       GigabitEthernet</span><br><span class="line">0/0/0</span><br><span class="line">      10.1.24.0/24  OSPF    10   51          D   10.1.67.6       GigabitEthernet</span><br><span class="line">0/0/0</span><br><span class="line">      10.1.45.0/24  OSPF    10   52          D   10.1.67.6       GigabitEthernet</span><br><span class="line">0/0/0</span><br><span class="line">      10.1.67.0/24  Direct  0    0           D   10.1.67.7       GigabitEthernet</span><br><span class="line">0/0/0</span><br><span class="line">      10.1.67.7/32  Direct  0    0           D   127.0.0.1       GigabitEthernet</span><br><span class="line">0/0/0</span><br><span class="line">    10.1.67.255/32  Direct  0    0           D   127.0.0.1       GigabitEthernet</span><br><span class="line">0/0/0</span><br><span class="line">     10.1.113.0/24  OSPF    10   5           D   10.1.67.6       GigabitEthernet</span><br><span class="line">0/0/0</span><br><span class="line">     10.1.235.0/24  OSPF    10   4           D   10.1.67.6       GigabitEthernet</span><br><span class="line">0/0/0</span><br><span class="line">  114.114.114.0/24  O_ASE   150  1           D   10.1.67.6       GigabitEthernet</span><br><span class="line">0/0/0</span><br><span class="line">      127.0.0.0/8   Direct  0    0           D   127.0.0.1       InLoopBack0</span><br><span class="line">      127.0.0.1/32  Direct  0    0           D   127.0.0.1       InLoopBack0</span><br><span class="line">127.255.255.255/32  Direct  0    0           D   127.0.0.1       InLoopBack0</span><br><span class="line">255.255.255.255/32  Direct  0    0           D   127.0.0.1       InLoopBack0</span><br></pre></td></tr></table></figure>
+
+<p>在AR7上查看路由表，发现到外部114.114.114.0网段的开销为1，而从图片上看很明显不为1</p>
+<table>
+<thead>
+<tr>
+<th align="center">Type</th>
+<th align="center">Cost</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">第一类外部路由（External Type 1）</td>
+<td align="center">AS 内部开销值 + AS 外部开销值</td>
+</tr>
+<tr>
+<td align="center">第二类外部路由（External Type 2）</td>
+<td align="center">AS外部开销值</td>
+</tr>
+</tbody></table>
+<ul>
+<li><p>OSPF引入外部路由，共有两种类型可选：</p>
+<ol>
+<li><p>第一类外部路由的AS外部开销值被认为和AS内部开销值是同一数量级的，因此第一类外部路由的开销值为AS内部开销值（路由器到ASBR的开销）与AS外部开销值之和;这类路由的可信程度高一些，所以计算出的外部路由的开销与自治系统内部的路由开销是相当的，并且和OSPF自身路由的开销具有可比性。</p>
+</li>
+<li><p>第二类外部路由的AS外部开销值被认为远大于AS内部开销值，因此第二类外部路由<br>的开销值只包含AS外部开销，忽略AS内部开销（默认为第二类），这类路由的可信度比较低。</p>
+</li>
+</ol>
+</li>
+<li><p>默认情况下，OSPF外部路由采用的是第二类外部路由。</p>
+</li>
+</ul>
+<h3 id="次优外部路由的产生"><a href="#次优外部路由的产生" class="headerlink" title="次优外部路由的产生"></a>次优外部路由的产生</h3><p><img src="/../../images/OSPF/%E6%AC%A1%E4%BC%98%E5%A4%96%E9%83%A8%E8%B7%AF%E7%94%B11.png"></p>
+<ol>
+<li>RTA 和 RTB 运行OSPF协议，RTB 和 RTC 运行RIP协议</li>
+<li>RTB 把通过 RIP 学来的协议发布到OSPF中，RTA 通过OSPF学到了到192.168.3.0网段的路由，但是下一跳为RTB，这一条路径在 RTA 上是次优的，最优的下一跳应该是 RTC 的10.1.123.3接口</li>
+<li>OSPF 通过设置 Forwarding Address 来解决这个问题</li>
+</ol>
+<p><img src="/../../images/OSPF/%E6%AC%A1%E4%BC%98%E5%A4%96%E9%83%A8%E8%B7%AF%E7%94%B12.png"></p>
+<ul>
+<li>通常情况下，ASBR引入外部路由产生的五类LSA中Forwarding Address字段设置为0.0.0.0。</li>
+<li>对于图中的场景，RTB路由表中到达192.168.3.0&#x2F;24的下一跳地址为10.1.123.3。</li>
+<li>10.1.123.3 所属网段 10.1.123.0&#x2F;24 运行OSPF，所以RTB生成的五类LSA中，ForwardingAddress被设置为10.1.123.3。</li>
+<li>当RTA收到五类LSA时，发现Forwarding Address字段非0，其值为10.1.123.3，所以RTA按照Forwarding Address计算下一跳</li>
+</ul>
+<h1 id="OSPF特殊区域及其他特性"><a href="#OSPF特殊区域及其他特性" class="headerlink" title="OSPF特殊区域及其他特性"></a>OSPF特殊区域及其他特性</h1><h2 id="Stub区域和Totally-Stub区域"><a href="#Stub区域和Totally-Stub区域" class="headerlink" title="Stub区域和Totally Stub区域"></a>Stub区域和Totally Stub区域</h2><h3 id="传输区域和末端区域"><a href="#传输区域和末端区域" class="headerlink" title="传输区域和末端区域"></a>传输区域和末端区域</h3><p><img src="/../../images/OSPF/%E4%BC%A0%E8%BE%93%E5%8C%BA%E5%9F%9F%E5%92%8C%E6%9C%AB%E7%AB%AF%E5%8C%BA%E5%9F%9F.png"></p>
+<p>如图所示，全网可分为四部分Area 0、Area 1、Area 2、外部网络。四部分之间相互访问的主要流量如图中红线所示。</p>
+<p>对于OSPF各区域，可分为两种类型∶</p>
+<ul>
+<li>传输区域︰除了承载本区域反也的流!以，如Area 0。IP都不属于本区域的流量，即“穿越型流量”，如Area 0。</li>
+<li>末端区域:只承载本区域发起的流量和访问本区域的流量，如Area 1。</li>
+</ul>
+<p>对于末端区域，需要考虑下几个问题:</p>
+<ul>
+<li>保存到达其他区域明细路由的必要性∶访问其他区域通过单一出口，“汇总”路由相对明细路由更为简洁。</li>
+<li>设备性能︰网络建设与维护必须要考虑成本因素。末端区域中可选择部署性能相对较低的路由器。</li>
+</ul>
+<p>OSPF路由器计算区域内、区域间、外部路由都需要依靠收集网络中的大量LSA，大量LSA会占用LSDB存储空间，所以解决问题的关键是在不影响正常路由的情况下，减少LSA的数量。</p>
+<h3 id="Stub区域"><a href="#Stub区域" class="headerlink" title="Stub区域"></a>Stub区域</h3><p><img src="/../../images/OSPF/Stub%E5%8C%BA%E5%9F%9F.png"></p>
+<p>Stub区域的ABR不向Stub区域内传播它接收到的自治系统外部路由（对应四类、五类LSA )，Stub区域中路由器的LSDB、路由表规模都会大大减小。</p>
+<p>为保证Stub区域能够到达自治系统外部，<u>Stub区域的ABR将生成一条缺省路由（对应三类LSA )</u>，并发布给Stub区域中的其他路由器。</p>
+<p>Stub区域是一种可选的配置属性，但并不建议将每个区域都配置为Stub区域。通常来说，Stub区域位于自治系统的末梢，是那些只有一个ABR的非骨干区域。</p>
+<p>配置Stub区域时需要注意下列几点︰</p>
+<ul>
+<li>骨干区域不能被配置为Stub区域。</li>
+<li><u>如果要将一个区域配置成Stub区域，则<strong>该区域中的所有路由器必须都要配置成Stub路由器</strong>。</u></li>
+<li>Stub区域内不能存在ASBR，自治系统外部路由不能在本区域内传播。</li>
+<li><u>虚连接不能穿越Stub区域建立</u>。</li>
+</ul>
+<p><img src="/../../images/OSPF/Stub%E5%8C%BA%E5%9F%9Fdemo.png"></p>
+<p>AR4 设置Stub之前的LSDB：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&lt;AR4&gt;dis ospf lsdb</span><br><span class="line"></span><br><span class="line">	 OSPF Process 1 with Router ID 4.4.4.4</span><br><span class="line">		 Link State Database </span><br><span class="line"></span><br><span class="line">		         Area: 0.0.0.1</span><br><span class="line"> Type      LinkState ID    AdvRouter          Age  Len   Sequence   Metric</span><br><span class="line"> Router    4.4.4.4         4.4.4.4            242  36    80000003       1</span><br><span class="line"> Router    2.2.2.2         2.2.2.2            240  36    80000005       1</span><br><span class="line"> Network   10.1.24.2       2.2.2.2            241  32    80000002       0</span><br><span class="line"> Sum-Net   10.1.35.0       2.2.2.2            114  28    80000001       3</span><br><span class="line"> Sum-Net   10.1.13.0       2.2.2.2            282  28    80000001       2</span><br><span class="line"> Sum-Net   10.1.12.0       2.2.2.2            282  28    80000001       1</span><br></pre></td></tr></table></figure>
+
+<p>只给AR4设置Stub后：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[AR4]ospf 1</span><br><span class="line">[AR4-ospf-1]area 1</span><br><span class="line">[AR4-ospf-1-area-0.0.0.1]stub </span><br><span class="line">&lt;AR4&gt;dis ospf lsdb</span><br><span class="line"></span><br><span class="line">	 OSPF Process 1 with Router ID 4.4.4.4</span><br><span class="line">		 Link State Database </span><br><span class="line"></span><br><span class="line">		         Area: 0.0.0.1</span><br><span class="line"> Type      LinkState ID    AdvRouter          Age  Len   Sequence   Metric</span><br><span class="line"> Router    4.4.4.4         4.4.4.4             15  36    80000001       1</span><br></pre></td></tr></table></figure>
+
+<p>给AR2设置Stub后，AR4的LSDB变化</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">[AR2]ospf 1</span><br><span class="line">[AR2-ospf-1]area 1</span><br><span class="line">[AR2-ospf-1-area-0.0.0.1]stub </span><br><span class="line"></span><br><span class="line">-----------------------------------------------------------</span><br><span class="line"></span><br><span class="line">&lt;AR4&gt;dis ospf lsdb</span><br><span class="line"></span><br><span class="line">	 OSPF Process 1 with Router ID 4.4.4.4</span><br><span class="line">		 Link State Database </span><br><span class="line"></span><br><span class="line">		         Area: 0.0.0.1</span><br><span class="line"> Type      LinkState ID    AdvRouter          Age  Len   Sequence   Metric</span><br><span class="line"> Router    4.4.4.4         4.4.4.4              1  36    80000003       1</span><br><span class="line"> Router    2.2.2.2         2.2.2.2              1  36    80000003       1</span><br><span class="line"> Network   10.1.24.4       4.4.4.4              0  32    80000001       0</span><br><span class="line"> Sum-Net   0.0.0.0         2.2.2.2              8  28    80000001       1     //多了一条缺省LSA</span><br><span class="line"> Sum-Net   10.1.35.0       2.2.2.2              8  28    80000001       3</span><br><span class="line"> Sum-Net   10.1.13.0       2.2.2.2              8  28    80000001       2</span><br><span class="line"> Sum-Net   10.1.12.0       2.2.2.2              8  28    80000001       1</span><br><span class="line"> </span><br><span class="line"> &lt;AR4&gt;dis ospf routing </span><br><span class="line"></span><br><span class="line">	 OSPF Process 1 with Router ID 4.4.4.4</span><br><span class="line">		  Routing Tables </span><br><span class="line"></span><br><span class="line"> Routing for Network </span><br><span class="line"> Destination        Cost  Type       NextHop         AdvRouter       Area</span><br><span class="line"> 10.1.24.0/24       1     Transit    10.1.24.4       4.4.4.4         0.0.0.1</span><br><span class="line"> 0.0.0.0/0          2     Inter-area 10.1.24.2       2.2.2.2         0.0.0.1    //多了一条缺省路由</span><br><span class="line"> 10.1.12.0/24       2     Inter-area 10.1.24.2       2.2.2.2         0.0.0.1</span><br><span class="line"> 10.1.13.0/24       3     Inter-area 10.1.24.2       2.2.2.2         0.0.0.1</span><br><span class="line"> 10.1.35.0/24       4     Inter-area 10.1.24.2       2.2.2.2         0.0.0.1</span><br><span class="line"></span><br><span class="line"> Total Nets: 5  </span><br><span class="line"> Intra Area: 1  Inter Area: 4  ASE: 0  NSSA: 0 </span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>配置Stub区域后，所有自治系统外部路由均由一条三类的默认路由代替。</li>
+<li>除路由条目的减少外，当外部网络发生变化后，Stub区域内的路由器是不会直接受到影响的。</li>
+</ul>
+<h3 id="Totally-Stub区域"><a href="#Totally-Stub区域" class="headerlink" title="Totally Stub区域"></a>Totally Stub区域</h3><p>![](..&#x2F;..&#x2F;images&#x2F;OSPF&#x2F;Totally Stub区域.png)</p>
+<ul>
+<li>Totally Stub区域既不允许自治系统外部路由（四类、五类LSA)在本区域内传播，也不允许区域间路由（三类LSA)在本区域内传播。</li>
+<li>Totally Stub区域内的路由器对其他区域及自制系统外部的访问需求是通过本区域ABR所产生的三类LSA缺省路由实现的。</li>
+<li>与Stub区域配置的区别在于，在ABR上需要追加no-summary参数</li>
+</ul>
+<p>在AR2 设置及变化：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">[AR2]ospf 1</span><br><span class="line">[AR2-ospf-1]area 1</span><br><span class="line">[AR2-ospf-1-area-0.0.0.1]stub no-summary </span><br><span class="line"></span><br><span class="line">&lt;AR2&gt;dis ospf lsdb</span><br><span class="line"></span><br><span class="line">	 OSPF Process 1 with Router ID 2.2.2.2</span><br><span class="line">		 Link State Database </span><br><span class="line"></span><br><span class="line">                  //已忽略 Area 0</span><br><span class="line"> </span><br><span class="line">		         Area: 0.0.0.1</span><br><span class="line"> Type      LinkState ID    AdvRouter          Age  Len   Sequence   Metric</span><br><span class="line"> Router    4.4.4.4         4.4.4.4            106  36    80000009       1</span><br><span class="line"> Router    2.2.2.2         2.2.2.2            113  36    80000005       1</span><br><span class="line"> Network   10.1.24.4       4.4.4.4            106  32    80000002       0</span><br><span class="line"> Sum-Net   0.0.0.0         2.2.2.2            124  28    80000001       1      //缺省</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line"> &lt;AR2&gt;dis ospf routing </span><br><span class="line"></span><br><span class="line">	 OSPF Process 1 with Router ID 2.2.2.2</span><br><span class="line">		  Routing Tables </span><br><span class="line"></span><br><span class="line"> Routing for Network </span><br><span class="line"> Destination        Cost  Type       NextHop         AdvRouter       Area</span><br><span class="line"> 10.1.12.0/24       1     Transit    10.1.12.2       2.2.2.2         0.0.0.0</span><br><span class="line"> 10.1.24.0/24       1     Transit    10.1.24.2       2.2.2.2         0.0.0.1</span><br><span class="line"> 10.1.13.0/24       2     Transit    10.1.12.1       1.1.1.1         0.0.0.0</span><br><span class="line"> 10.1.35.0/24       3     Inter-area 10.1.12.1       3.3.3.3         0.0.0.0</span><br><span class="line"></span><br><span class="line"> Total Nets: 4  </span><br><span class="line"> Intra Area: 3  Inter Area: 1  ASE: 0  NSSA: 0 </span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>AR4的变化：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">&lt;AR4&gt;dis ospf lsdb</span><br><span class="line"></span><br><span class="line">	 OSPF Process 1 with Router ID 4.4.4.4</span><br><span class="line">		 Link State Database </span><br><span class="line"></span><br><span class="line">		         Area: 0.0.0.1</span><br><span class="line"> Type      LinkState ID    AdvRouter          Age  Len   Sequence   Metric</span><br><span class="line"> Router    4.4.4.4         4.4.4.4            207  36    80000009       1</span><br><span class="line"> Router    2.2.2.2         2.2.2.2            217  36    80000005       1</span><br><span class="line"> Network   10.1.24.4       4.4.4.4            207  32    80000002       0</span><br><span class="line"> Sum-Net   0.0.0.0         2.2.2.2            228  28    80000001       1     //缺省</span><br><span class="line"> </span><br><span class="line">&lt;AR4&gt;dis ospf routing</span><br><span class="line"></span><br><span class="line">	 OSPF Process 1 with Router ID 4.4.4.4</span><br><span class="line">		  Routing Tables </span><br><span class="line"></span><br><span class="line"> Routing for Network </span><br><span class="line"> Destination        Cost  Type       NextHop         AdvRouter       Area</span><br><span class="line"> 10.1.24.0/24       1     Transit    10.1.24.4       4.4.4.4         0.0.0.1</span><br><span class="line"> 0.0.0.0/0          2     Inter-area 10.1.24.2       2.2.2.2         0.0.0.1   //缺省</span><br><span class="line"></span><br><span class="line"> Total Nets: 2  </span><br><span class="line"> Intra Area: 1  Inter Area: 1  ASE: 0  NSSA: 0 </span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>Totally Stub区域访问其他区域及自制系统外部是通过默认路由实现的。</li>
+<li>自制系统外部、其他OSPF区域的网络发生变化，Totally Stub区域内的路由器是不直接受影响的。</li>
+<li>Stub、Totally Stub解决了末端区域维护过大LSDB带来的问题，但对于某些特定场景Stub、Totally Stub并不是最佳解决方案。</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th align="center">区域</th>
+<th align="center">区域内路由的LSDB</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">Stub</td>
+<td align="center">一、二、三类LSA以及一条缺省三类LSA</td>
+</tr>
+<tr>
+<td align="center">Totally Stub</td>
+<td align="center">一、二类LSA以及一条缺省三类LSA</td>
+</tr>
+</tbody></table>
+<h2 id="NSSA区域和Totally-NSSA区域"><a href="#NSSA区域和Totally-NSSA区域" class="headerlink" title="NSSA区域和Totally NSSA区域"></a>NSSA区域和Totally NSSA区域</h2><p><img src="/../../images/OSPF/NSSA%E5%8C%BA%E5%9F%9F.png"></p>
+<p>OSPF NSSA区域(Not-So-Stubby Area)是在原始OSPF协议标准中新增的一类特殊区域类型。</p>
+<p>NSSA区域和Stub区域有许多相似的地方。两者的差别在于，<u>NSSA区域能够将自治域外部路由引入并传播到整个OSPF自治域中，同时又不会学习来自OSPF网络其它区域的外部路由</u>。</p>
+<p>NSSA LSA(七类LSA ) :</p>
+<ul>
+<li><p>七类LSA是为了支持NSSA区域而新增的一种LSA类型，用于描述NSSA区域引入的外部路由信息。</p>
+</li>
+<li><p>七类LSA由NSSA区域的ASBR产生，其扩散范围仅限于ASBR所在的NSSA区域。</p>
+</li>
+<li><p>缺省路由也可以通过七类LSA来产生，用于指导流量流向其它自治域。</p>
+</li>
+</ul>
+<p>七类LSA转换为五类LSA:</p>
+<ul>
+<li>.NSSA区域的ABR收到七类LSA时，会有选择地将其转换为五类LSA，以便将外部路由信息通告到OSPF网络的其它区域。</li>
+<li>NSSA区域有多个ABR时，进行7类LSA与5类LSA转换的是Router ID最大的ABR。</li>
+</ul>
+<p>Totally NSSA和NSSA区别∶</p>
+<ul>
+<li>Totally NSSA不允许三类LSA在本区域内泛洪。</li>
+<li>Totally NSSA与NSSA区域的配置区别在于ABR上需要追加no-summary参数。</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th align="center">LSA类型</th>
+<th align="center">通告路由</th>
+<th align="center">LSA内容</th>
+<th align="center">传播范围</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">Router LSA（一）</td>
+<td align="center">OSPF Router</td>
+<td align="center">拓扑信息+路由信息</td>
+<td align="center">本区域内</td>
+</tr>
+<tr>
+<td align="center">Network LSA（二）</td>
+<td align="center">DR</td>
+<td align="center">拓扑信息+路由信息</td>
+<td align="center">本区域内</td>
+</tr>
+<tr>
+<td align="center">Network Summer LSA（三）</td>
+<td align="center">ABR</td>
+<td align="center">域间路由信息</td>
+<td align="center">非（Totally）Stub区域</td>
+</tr>
+<tr>
+<td align="center">ASBR Summary LSA（四）</td>
+<td align="center">ABR</td>
+<td align="center">ASBR 的Router ID</td>
+<td align="center">非（Totally）Stub区域</td>
+</tr>
+<tr>
+<td align="center">AS external LSA（五）</td>
+<td align="center">ASBR</td>
+<td align="center">路由进程域外部路由</td>
+<td align="center">（非Stub区域）OSPF进程区域</td>
+</tr>
+<tr>
+<td align="center">NSSA LSA（七）</td>
+<td align="center">ASBR</td>
+<td align="center">NSSA域外部路由信息</td>
+<td align="center">（Totally）NSSA区域</td>
+</tr>
+</tbody></table>
+<p>LSA作用∶</p>
+<ul>
+<li>Router LSA （一类）：每个路由器都会产生，描述了路由器的链路状态和开销，在所属的区域内传播。</li>
+<li>oNetwork LSA（二类）：由DR产生，描述本网段的链路状态，在所属的区域内传播。</li>
+<li>Network-summary-LSA（三类）︰由ABR产生，描述区域内某个网段的路由，并通告给其他相关区域。</li>
+<li>ASBR-summary-LSA（四类）：由ABR产生，描述到ASBR的路由，通告给除ASBR所在区域的其他相关区域。</li>
+<li>AS-external-LSA（五类）：由ASBR产生，描述到AS外部的路由，<u>通告到所有的区域(除了Stub区域和NSSA区域)</u>。</li>
+<li>NSSA LSA（七类）：由ASBR产生，描述到AS外部的路由，<u>仅在NSSA区域内传播</u>。</li>
+</ul>
+<h3 id="Nssa"><a href="#Nssa" class="headerlink" title="Nssa"></a>Nssa</h3><p>![](..&#x2F;..&#x2F;images&#x2F;OSPF&#x2F;nssa demo.png)</p>
+<p>配置静态路由</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">AR6</span><br><span class="line">[AR6]ip route-static 10.1.0.0 16 10.1.16.1</span><br><span class="line">[AR6]ip route-static 10.1.0.0 16 10.1.56.5</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">AR5</span><br><span class="line">[AR5]ip route-static 6.6.6.0 24 10.1.56.6</span><br><span class="line">[AR5]ospf 1</span><br><span class="line">[AR5-ospf-1]import-route static </span><br><span class="line">[AR5-ospf-1]a 2</span><br><span class="line">[AR5-ospf-1-area-0.0.0.2]nssa</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">AR3</span><br><span class="line">[AR3]ospf 1</span><br><span class="line">[AR3-ospf-1] a 2</span><br><span class="line">[AR3-ospf-1-area-0.0.0.2]nssa </span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">AR1</span><br><span class="line">[AR1]ip route-static 6.6.6.0 24 10.1.16.6</span><br><span class="line">[AR1]ospf 1</span><br><span class="line">[AR1-ospf-1]import-route static </span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&lt;AR5&gt;dis ospf lsdb </span><br><span class="line"></span><br><span class="line">	 OSPF Process 1 with Router ID 5.5.5.5</span><br><span class="line">		 Link State Database </span><br><span class="line"></span><br><span class="line">		         Area: 0.0.0.2</span><br><span class="line"> Type      LinkState ID    AdvRouter          Age  Len   Sequence   Metric</span><br><span class="line"> Router    5.5.5.5         5.5.5.5           1415  36    8000000C       1</span><br><span class="line"> Router    3.3.3.3         3.3.3.3           1417  36    80000004       1</span><br><span class="line"> Network   10.1.35.3       3.3.3.3           1417  32    80000001       0</span><br><span class="line"> Sum-Net   10.1.13.0       3.3.3.3             75  28    80000002       1</span><br><span class="line"> Sum-Net   10.1.24.0       3.3.3.3             30  28    80000002       3</span><br><span class="line"> Sum-Net   10.1.12.0       3.3.3.3             30  28    80000002       2</span><br><span class="line"> NSSA      6.6.6.0         5.5.5.5           1425  36    80000001       1  //由于引入了静态路由而产生</span><br><span class="line"> NSSA      0.0.0.0         3.3.3.3             37  36    80000002       1  //七类缺省</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">&lt;AR3&gt;dis ospf lsdb</span><br><span class="line"></span><br><span class="line">	 OSPF Process 1 with Router ID 3.3.3.3</span><br><span class="line">		 Link State Database </span><br><span class="line"></span><br><span class="line">                 //已忽略area 0</span><br><span class="line"></span><br><span class="line">		         Area: 0.0.0.2</span><br><span class="line"> Type      LinkState ID    AdvRouter          Age  Len   Sequence   Metric</span><br><span class="line"> Router    5.5.5.5         5.5.5.5            401  36    8000000D       1</span><br><span class="line"> Router    3.3.3.3         3.3.3.3            400  36    80000005       1</span><br><span class="line"> Network   10.1.35.3       3.3.3.3            400  32    80000002       0</span><br><span class="line"> Sum-Net   10.1.13.0       3.3.3.3            859  28    80000002       1</span><br><span class="line"> Sum-Net   10.1.24.0       3.3.3.3            814  28    80000002       3</span><br><span class="line"> Sum-Net   10.1.12.0       3.3.3.3            814  28    80000002       2</span><br><span class="line"> NSSA      0.0.0.0         3.3.3.3            821  36    80000002       1</span><br><span class="line"> NSSA      6.6.6.0         5.5.5.5            411  36    80000002       1</span><br><span class="line"> </span><br><span class="line"></span><br><span class="line">		 AS External Database</span><br><span class="line"> Type      LinkState ID    AdvRouter          Age  Len   Sequence   Metric</span><br><span class="line"> External  6.6.6.0         3.3.3.3            399  36    80000002       1</span><br><span class="line"> External  6.6.6.0         1.1.1.1             97  36    80000002       1</span><br><span class="line">//在区域2内，AR3 是ABR，将七类LSA转化为了五类LSA</span><br></pre></td></tr></table></figure>
+
+<h3 id="Totally-Nssa"><a href="#Totally-Nssa" class="headerlink" title="Totally Nssa"></a>Totally Nssa</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">AR3</span><br><span class="line">[AR3]ospf 1</span><br><span class="line">[AR3-ospf-1]a 2</span><br><span class="line">[AR3-ospf-1-area-0.0.0.2]nssa no-summary</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&lt;AR5&gt;dis ospf lsdb</span><br><span class="line"></span><br><span class="line">	 OSPF Process 1 with Router ID 5.5.5.5</span><br><span class="line">		 Link State Database </span><br><span class="line"></span><br><span class="line">		         Area: 0.0.0.2</span><br><span class="line"> Type      LinkState ID    AdvRouter          Age  Len   Sequence   Metric</span><br><span class="line"> Router    5.5.5.5         5.5.5.5              5  36    80000012       1</span><br><span class="line"> Router    3.3.3.3         3.3.3.3             10  36    80000006       1</span><br><span class="line"> Network   10.1.35.5       5.5.5.5              5  32    80000002       0</span><br><span class="line"> Sum-Net   0.0.0.0         3.3.3.3             16  28    80000001       1  //只剩一条缺省三类LSA</span><br><span class="line"> NSSA      6.6.6.0         5.5.5.5           1660  36    80000002       1</span><br><span class="line"> NSSA      0.0.0.0         3.3.3.3             12  36    80000004       1</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="区域间路由汇总和外部路由汇总"><a href="#区域间路由汇总和外部路由汇总" class="headerlink" title="区域间路由汇总和外部路由汇总"></a>区域间路由汇总和外部路由汇总</h2><p><img src="/../../images/OSPF/%E5%8C%BA%E5%9F%9F%E9%97%B4%E8%B7%AF%E7%94%B1%E6%B1%87%E6%80%BB.png"></p>
+<p>在大规模部署OSPF网络时，可能会出现由于OSPF路由表规模过大而降低路由查找速度的现象，为了解决这个问题，可以配置路由汇总，减小路由表的规模。</p>
+<p><u>路由汇总是指将多条连续的IP前缀汇总成一条路由前缀</u>。如果被汇总的IP地址范围内的某条链路频繁Up和Down，该变化并不会通告给被汇总的IP地址范围外的设备。因此，可以避免网络中的路由振荡，在一定程度上提高了网络的稳定性。</p>
+<p>路由汇总只能汇总路由信息，所以ABR是可以执行路由汇总的位置之一：<br>ABR向其它区域发送路由信息时，以网段为单位生成三类LSA。如果该区域中存在一些连续的网段，则可以通过命令将这些连续的网段汇总成一个网段。这样ABR只发送一条汇总后的三类LSA，所有属于命令指定的汇总网段范围的LSA将不会再被单独发送出去。</p>
+<p>如图所示，Area 1中存在8个连续网段，汇总前RTB将产生8条三类LSA。在RTB上配置汇总后，RTB仅产生1条三类LSA并泛洪到Area 0。</p>
+<p>引入外部路由的ASBR也是执行路由汇总的位置之一。</p>
+<p><img src="/../../images/OSPF/%E5%A4%96%E9%83%A8%E8%B7%AF%E7%94%B1%E6%B1%87%E6%80%BB.png"></p>
+<p>ASBR汇总∶</p>
+<ul>
+<li>配置ASBR汇总后，ASBR将对引入的外部路由进行汇总。NSSA区域的ASBR也可以对引入NSSA区域的外部路由进行汇总。</li>
+<li>如果设备既是NSAA区域的ASBR又是ABR，则可在将七类LSA转换成五类LSA时对相应前缀进行汇总。</li>
+</ul>
+<p>如图所示，Area 0中RTA将8个连续的外部路由引入到OSPF域内，产生8条五类LSA并在OSPF进程域内泛洪。</p>
+<p>在ASBR ( RTA)配置外部路由汇总后，RTA将仅产生1条五类LSA并泛洪至OSPF路由进程域内。</p>
+<p>路由汇总降低了网络故障的影响范围。</p>
+<p>网络发生故障后，路由协议的收敛速度也是衡量路由协议的重要参考依据之一。</p>
+<h2 id="OSPF更新机制"><a href="#OSPF更新机制" class="headerlink" title="OSPF更新机制"></a>OSPF更新机制</h2><p><img src="/../../images/OSPF/%E5%AE%9A%E6%9C%9F%E6%9B%B4%E6%96%B0%E4%B8%8E%E8%A7%A6%E5%8F%91%E6%9B%B4%E6%96%B0.png"></p>
+<p>为了保证路由计算的准确性，需要保证LSA的可靠性。</p>
+<p>OSPF为每个LSA条目维持一个老化计时器(3600s )，当计时器超时，此LSA将从LSDB中删除。</p>
+<p>为了防止LSA条目达到最大生存时间而被删除，OSPF通过定期更新（每1800s刷新一次)机制来刷新LSA。</p>
+<p>OSPF路由器每1800s会重新生成LSA，并通告给其他路由器。为了加快收敛速度，OSPF设置了触发更新机制。</p>
+<p>当链路状态发生变化后，路由器立即发送更新消息，其他路由器收到更新消息后立即进行路由计算，快速完成收敛。</p>
+<h2 id="OSPF认证机制"><a href="#OSPF认证机制" class="headerlink" title="OSPF认证机制"></a>OSPF认证机制</h2><h3 id="安全隐患"><a href="#安全隐患" class="headerlink" title="安全隐患"></a>安全隐患</h3><p><img src="/../../images/OSPF/%E5%AE%89%E5%85%A8%E9%9A%90%E6%82%A3.png"></p>
+<p>如图所示，内部网络通过OSPF协议传递路由。正常情况下，财务部访问公司数据库的流量走向是 <code>财务部-&gt;RTA-&gt;RTB-&gt;Database</code>。</p>
+<p>非法设备接入公司内网，通过向网络中注入非法路由，引导流量进行非正常的转发。即 <code>财务部-&gt;RTA-&gt;非法设备-&gt;RTB-&gt;Database</code>。非法设备收到财务部的流量之后，进行恶意分析，获取财务部关键信息，造成公司机密泄露。</p>
+<h3 id="安全认证"><a href="#安全认证" class="headerlink" title="安全认证"></a>安全认证</h3><p><img src="/../../images/OSPF/%E5%AE%89%E5%85%A8%E8%AE%A4%E8%AF%81.png"></p>
+<p>OSPF支持认证功能，只有通过认证的OSPF路由器才能正常建立邻居关系，交互信息</p>
+<p>两种认证方式︰</p>
+<ul>
+<li>区域认证方式</li>
+<li>接口认证方式。</li>
+</ul>
+<p>支持的认证模式分为null (不认证)、simple（明文)、MD5以及HMAC-MD5。</p>
+<p>当两种认证方式都存在时，优先使用接口认证方式。</p>
+<h2 id="综合应用"><a href="#综合应用" class="headerlink" title="综合应用"></a>综合应用</h2><p><img src="/../../images/OSPF/ospf%E7%BB%BC%E5%90%88%E5%BA%94%E7%94%A8.png"></p>
+<ul>
+<li>需求1分析︰办事处C处于Area 3，RTE左侧与Area 2相连。根据OSPF骨干区域与非骨干区域的连接规则，不能正常通行的原因在于Area 3没有与Area 0直接相连。解决的方式是在RTE和RTC之间建立虚连接。</li>
+<li>需求2分析︰区域内部设备性能低，降低路由计算压力可以通过Stub、Totally Stub、NSSA、Totally NSSA，最大程度减少需要选择Totally Stub或Totally NSSA，同时为了保留外部路由引入的功能，只能选择Totally NSSA。</li>
+<li>需求3分析∶保证路由安全性需要通过认证的方式，最安全的认证模式是采用HMAC-MD5。认证形式采取接口认证。</li>
+<li>需求4分析∶在计算外部路由时如要考虑OSPF域内开销，可通过引入类型为1类的外部路由实现。</li>
+</ul>
+<h3 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h3><p><img src="/../../images/OSPF/%E7%BB%BC%E5%90%88%E5%BA%94%E7%94%A8%E5%AE%9E%E7%8E%B01.png"></p>
+<p><img src="/../../images/OSPF/%E7%BB%BC%E5%90%88%E5%BA%94%E7%94%A8%E5%AE%9E%E7%8E%B02.png"></p>
+
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://exmaple.com/2023/08/16/%E7%BD%91%E7%BB%9C-%E7%90%86%E8%AE%BA/%E7%AF%871-ospf/" data-id="cllhwyqd1000sqkwogypc2mav" class="article-share-link">
+      <a data-url="https://exmaple.com/2023/08/16/%E7%BD%91%E7%BB%9C-%E7%90%86%E8%AE%BA/%E7%AF%871-ospf/" data-id="clm2482qm000s1swo8m1895ox" class="article-share-link">
         分享
       </a>
       

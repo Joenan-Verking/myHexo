@@ -61,6 +61,41 @@
       </tags>
   </entry>
   <entry>
+    <title>浏览器事件循环</title>
+    <url>/2023/07/02/%E5%89%8D%E7%AB%AF/%E6%B5%8F%E8%A7%88%E5%99%A8%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF/</url>
+    <content><![CDATA[<h2 id="事件循环的背景"><a href="#事件循环的背景" class="headerlink" title="事件循环的背景"></a>事件循环的背景</h2><h3 id="浏览器"><a href="#浏览器" class="headerlink" title="浏览器"></a>浏览器</h3><p>浏览器在运行中会开启很多进程，其中最主要的进程有：</p>
+<ol>
+<li>浏览器进程<br> 主要负责界面显示、用户交互、子进程管理等。浏览器进程内部又会启动多个线程处理不同的任务</li>
+<li>网络进程<br> 负责加载网络资源。网络进程内容会启动多个线程来处理不同任务</li>
+<li>渲染进程<br> 渲染进程启动后会开启一个<strong>渲染主线程</strong>，负责执行html、css、js代码。默认情况下，浏览器会为每一个标签页开启一个新的渲染进程，以保证不同的标签页之间互不影响</li>
+</ol>
+<h3 id="JS"><a href="#JS" class="headerlink" title="JS"></a>JS</h3><p>JS 是单线程的语言，这是因为它运行在浏览器的渲染主线程中，而渲染主线程只有一个，且承担诸多工作，如渲染页面、执行JS等，因此如果使用同步的方式，就很容易导致主线程产生阻塞，从而导致消息队列中的其他任务无法执行</p>
+<p>所以浏览器采用异步的方式来避免。具体做法是当某些任务发生时，比如计时器、网络事件监听，主线程将任务交给其他线程去处理，转而执行后续代码。当其他线程完成时，将事先传递的回调函数包装成任务，加入到消息队列的末尾排队，等待主线程调度执行</p>
+<p>在这中异步模式下，最大限度的保证了单线程的流程执行</p>
+<p><u>因此单线程是异步产生的原因，事件循环是异步的实现方式</u></p>
+<h3 id="事件循环"><a href="#事件循环" class="headerlink" title="事件循环"></a>事件循环</h3><p>事件循环也称消息循环，是浏览器渲染主线程的工作方式。</p>
+<p>循环指的是在不同的消息队列中进行循环，每次循环从当前队列中取出第一个任务执行，其他线程只需要在合适的时候将任务加入到队列末尾即可</p>
+<h3 id="队列优先级"><a href="#队列优先级" class="headerlink" title="队列优先级"></a>队列优先级</h3><ul>
+<li>每个任务有不同的类型，同类型的任务必须在同一个队列，不同的任务可以处于不同的队列。不同的队列有不同的优先级，在一次事件循环中，有浏览器决定取哪一个队列的任务。</li>
+<li>浏览器必须有一个微队列，微队列的任务一定具有最高的优先级，必须优先调度执行。</li>
+</ul>
+<p>目前包含以下队列：</p>
+<ul>
+<li>微队列：用户存放需要最快执行的任务，优先级最高</li>
+<li>交互队列：用于存放用户操作后产生的事件处理任务，优先级高</li>
+<li>延时队列：用于存放计时器到达后的回调任务，优先级中</li>
+</ul>
+<p>添加到微队列的方式主要是Promise、MutationObserver和async&#x2F;await<br>例如：</p>
+<figure class="highlight javascript"><figcaption><span>Promise</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="title class_">Promise</span>.<span class="title function_">resolve</span>().<span class="title function_">then</span>(<span class="function">() =&gt;</span> <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Done&#x27;</span>))</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><figcaption><span>MutationObserver</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="comment">// 创建 MutationObserver 实例，并指定回调函数</span></span><br><span class="line"><span class="keyword">const</span> observer = <span class="keyword">new</span> <span class="title class_">MutationObserver</span>(<span class="function">(<span class="params">mutationsList, observer</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="comment">// 处理 DOM 变化的逻辑</span></span><br><span class="line">  mutationsList.<span class="title function_">forEach</span>(<span class="function"><span class="params">mutation</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(mutation.<span class="property">type</span>); <span class="comment">// 打印变化的类型</span></span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(mutation.<span class="property">target</span>); <span class="comment">// 打印发生变化的节点</span></span><br><span class="line">  &#125;);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用 observe 方法指定要监听的 DOM 元素和变化类型</span></span><br><span class="line">observer.<span class="title function_">observe</span>(<span class="variable language_">document</span>.<span class="property">body</span>, &#123; <span class="attr">childList</span>: <span class="literal">true</span>, <span class="attr">subtree</span>: <span class="literal">true</span> &#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 停止监听 DOM 变化</span></span><br><span class="line">observer.<span class="title function_">disconnect</span>();</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><figcaption><span>async/await</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="comment">//当调用 fetchData 函数时，它会立即返回一个 Promise 对象</span></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">fetchData</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Start&#x27;</span>);</span><br><span class="line">  </span><br><span class="line">  <span class="comment">//await 表达式会在执行时创建一个微任务，并将其添加到微任务队列中,同时暂停主线程的执行。</span></span><br><span class="line">  <span class="comment">//这样可以确保 await 后面的代码在前面的异步操作完成后才会执行。</span></span><br><span class="line">  <span class="keyword">const</span> result = <span class="keyword">await</span> <span class="title function_">fetch</span>(<span class="string">&#x27;https://api.example.com/data&#x27;</span>); </span><br><span class="line">  <span class="keyword">const</span> data = <span class="keyword">await</span> result.<span class="title function_">json</span>();</span><br><span class="line"></span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Data:&#x27;</span>, data);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Before&#x27;</span>);</span><br><span class="line"><span class="title function_">fetchData</span>();</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;After&#x27;</span>);</span><br><span class="line"></span><br><span class="line">最后结果：</span><br><span class="line"><span class="title class_">Before</span></span><br><span class="line"><span class="title class_">After</span></span><br><span class="line"><span class="title class_">Start</span></span><br><span class="line"><span class="title class_">Data</span>: &#123;&#125;</span><br></pre></td></tr></table></figure>]]></content>
+      <tags>
+        <tag>前端</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>wx.getUserProfile 不出现弹窗</title>
     <url>/2023/06/23/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F/wx-getUserProfile-%E4%B8%8D%E5%87%BA%E7%8E%B0%E5%BC%B9%E7%AA%97/</url>
     <content><![CDATA[<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>使用wx.getUserProfile 获取用户信息，但是不出现弹窗就直接获取到了用户信息，且返回灰色头像，和“微信用户”昵称</p>
@@ -272,41 +307,6 @@
       </tags>
   </entry>
   <entry>
-    <title>浏览器事件循环</title>
-    <url>/2023/07/02/%E5%89%8D%E7%AB%AF/%E6%B5%8F%E8%A7%88%E5%99%A8%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF/</url>
-    <content><![CDATA[<h2 id="事件循环的背景"><a href="#事件循环的背景" class="headerlink" title="事件循环的背景"></a>事件循环的背景</h2><h3 id="浏览器"><a href="#浏览器" class="headerlink" title="浏览器"></a>浏览器</h3><p>浏览器在运行中会开启很多进程，其中最主要的进程有：</p>
-<ol>
-<li>浏览器进程<br> 主要负责界面显示、用户交互、子进程管理等。浏览器进程内部又会启动多个线程处理不同的任务</li>
-<li>网络进程<br> 负责加载网络资源。网络进程内容会启动多个线程来处理不同任务</li>
-<li>渲染进程<br> 渲染进程启动后会开启一个<strong>渲染主线程</strong>，负责执行html、css、js代码。默认情况下，浏览器会为每一个标签页开启一个新的渲染进程，以保证不同的标签页之间互不影响</li>
-</ol>
-<h3 id="JS"><a href="#JS" class="headerlink" title="JS"></a>JS</h3><p>JS 是单线程的语言，这是因为它运行在浏览器的渲染主线程中，而渲染主线程只有一个，且承担诸多工作，如渲染页面、执行JS等，因此如果使用同步的方式，就很容易导致主线程产生阻塞，从而导致消息队列中的其他任务无法执行</p>
-<p>所以浏览器采用异步的方式来避免。具体做法是当某些任务发生时，比如计时器、网络事件监听，主线程将任务交给其他线程去处理，转而执行后续代码。当其他线程完成时，将事先传递的回调函数包装成任务，加入到消息队列的末尾排队，等待主线程调度执行</p>
-<p>在这中异步模式下，最大限度的保证了单线程的流程执行</p>
-<p><u>因此单线程是异步产生的原因，事件循环是异步的实现方式</u></p>
-<h3 id="事件循环"><a href="#事件循环" class="headerlink" title="事件循环"></a>事件循环</h3><p>事件循环也称消息循环，是浏览器渲染主线程的工作方式。</p>
-<p>循环指的是在不同的消息队列中进行循环，每次循环从当前队列中取出第一个任务执行，其他线程只需要在合适的时候将任务加入到队列末尾即可</p>
-<h3 id="队列优先级"><a href="#队列优先级" class="headerlink" title="队列优先级"></a>队列优先级</h3><ul>
-<li>每个任务有不同的类型，同类型的任务必须在同一个队列，不同的任务可以处于不同的队列。不同的队列有不同的优先级，在一次事件循环中，有浏览器决定取哪一个队列的任务。</li>
-<li>浏览器必须有一个微队列，微队列的任务一定具有最高的优先级，必须优先调度执行。</li>
-</ul>
-<p>目前包含以下队列：</p>
-<ul>
-<li>微队列：用户存放需要最快执行的任务，优先级最高</li>
-<li>交互队列：用于存放用户操作后产生的事件处理任务，优先级高</li>
-<li>延时队列：用于存放计时器到达后的回调任务，优先级中</li>
-</ul>
-<p>添加到微队列的方式主要是Promise、MutationObserver和async&#x2F;await<br>例如：</p>
-<figure class="highlight javascript"><figcaption><span>Promise</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="title class_">Promise</span>.<span class="title function_">resolve</span>().<span class="title function_">then</span>(<span class="function">() =&gt;</span> <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Done&#x27;</span>))</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight javascript"><figcaption><span>MutationObserver</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="comment">// 创建 MutationObserver 实例，并指定回调函数</span></span><br><span class="line"><span class="keyword">const</span> observer = <span class="keyword">new</span> <span class="title class_">MutationObserver</span>(<span class="function">(<span class="params">mutationsList, observer</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="comment">// 处理 DOM 变化的逻辑</span></span><br><span class="line">  mutationsList.<span class="title function_">forEach</span>(<span class="function"><span class="params">mutation</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(mutation.<span class="property">type</span>); <span class="comment">// 打印变化的类型</span></span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(mutation.<span class="property">target</span>); <span class="comment">// 打印发生变化的节点</span></span><br><span class="line">  &#125;);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用 observe 方法指定要监听的 DOM 元素和变化类型</span></span><br><span class="line">observer.<span class="title function_">observe</span>(<span class="variable language_">document</span>.<span class="property">body</span>, &#123; <span class="attr">childList</span>: <span class="literal">true</span>, <span class="attr">subtree</span>: <span class="literal">true</span> &#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 停止监听 DOM 变化</span></span><br><span class="line">observer.<span class="title function_">disconnect</span>();</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight javascript"><figcaption><span>async/await</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="comment">//当调用 fetchData 函数时，它会立即返回一个 Promise 对象</span></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">fetchData</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Start&#x27;</span>);</span><br><span class="line">  </span><br><span class="line">  <span class="comment">//await 表达式会在执行时创建一个微任务，并将其添加到微任务队列中,同时暂停主线程的执行。</span></span><br><span class="line">  <span class="comment">//这样可以确保 await 后面的代码在前面的异步操作完成后才会执行。</span></span><br><span class="line">  <span class="keyword">const</span> result = <span class="keyword">await</span> <span class="title function_">fetch</span>(<span class="string">&#x27;https://api.example.com/data&#x27;</span>); </span><br><span class="line">  <span class="keyword">const</span> data = <span class="keyword">await</span> result.<span class="title function_">json</span>();</span><br><span class="line"></span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Data:&#x27;</span>, data);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Before&#x27;</span>);</span><br><span class="line"><span class="title function_">fetchData</span>();</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;After&#x27;</span>);</span><br><span class="line"></span><br><span class="line">最后结果：</span><br><span class="line"><span class="title class_">Before</span></span><br><span class="line"><span class="title class_">After</span></span><br><span class="line"><span class="title class_">Start</span></span><br><span class="line"><span class="title class_">Data</span>: &#123;&#125;</span><br></pre></td></tr></table></figure>]]></content>
-      <tags>
-        <tag>前端</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>篇1 DHCP</title>
     <url>/2023/07/09/%E7%BD%91%E7%BB%9C-Ensp/%E7%AF%871-DHCP/</url>
     <content><![CDATA[<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>DHCP（Dynamic Host Configuration Protocol）是一个网络协议，用于自动分配IP地址和其他相关配置信息给网络设备。</p>
@@ -331,6 +331,38 @@
 
 
 <h3 id="检验"><a href="#检验" class="headerlink" title="检验"></a>检验</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ipconfig</span></span><br><span class="line"></span><br><span class="line">Link local IPv6 address...........: fe80::5689:98ff:feec:2846</span><br><span class="line">IPv6 address......................: :: / 128</span><br><span class="line">IPv6 gateway......................: ::</span><br><span class="line">IPv4 address......................: 192.168.1.254</span><br><span class="line">Subnet mask.......................: 255.255.255.0</span><br><span class="line">Gateway...........................: 192.168.1.1</span><br><span class="line">Physical address..................: 54-89-98-EC-28-46</span><br><span class="line">DNS server........................: 0.0.0.0</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <tags>
+        <tag>网络-Ensp</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>篇2 Dns 域名解析</title>
+    <url>/2023/07/10/%E7%BD%91%E7%BB%9C-Ensp/%E7%AF%872-Dns%E5%9F%9F%E5%90%8D%E8%A7%A3%E6%9E%90/</url>
+    <content><![CDATA[<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>DNS（Domain Name System，域名系统）是互联网中用于将域名转换为对应IP地址的系统。它充当了互联网上的“电话簿”，将易于记忆的域名（如<a href="http://www.example.com)映射到对应的ip地址(如192.0.2.1)./">www.example.com）映射到对应的IP地址（如192.0.2.1）。</a></p>
+<p>DNS的主要功能包括域名解析、域名注册和域名管理。 域名解析是DNS的核心功能，当用户在浏览器中输入一个域名时，DNS系统会将该域名解析为对应的IP地址，以便建立与目标服务器的连接。域名注册是指将一个域名注册到DNS系统中，以确保该域名在互联网上的唯一性。域名管理则涉及到对域名的配置、修改和管理，包括设置域名的DNS记录、子域名管理等。 </p>
+<p>DNS采用分层的结构，由多个DNS服务器组成，分为根域名服务器、顶级域名服务器、权威域名服务器和本地域名服务器等。当本地域名服务器无法解析域名时，会向上级域名服务器查询，直到找到对应的IP地址。 </p>
+<p>简单来说，<u>就是当用户访问某个域名时，会先在域名解析服务器上查找该域名对应的ip地址，找到后再访问该IP地址，用户可以使用易于记忆的域名来访问互联网上的各种资源，而无需记住复杂的IP地址。</u>同时，DNS还支持其他功能，如邮件服务器的查找、反向解析等。</p>
+<h2 id="准备内容"><a href="#准备内容" class="headerlink" title="准备内容"></a>准备内容</h2><p>ar2220路由一台、server服务器一台、s5700三层交换机一台、pc机若干</p>
+<img src="/images/ensp-%E5%9F%9F%E5%90%8D%E8%A7%A3%E6%9E%90.png" class="center" width="500">
+
+
+<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><ol>
+<li>给服务器添加自身ip地址，在服务器中的dns解析服务添加域名列表，并启动服务</li>
+<li>在路由对应接口输入<code>dhcp server dns-list [域名解析服务器ip]</code></li>
+<li>pc机刷新dhcp配置</li>
+</ol>
+<h2 id="实操"><a href="#实操" class="headerlink" title="实操"></a>实操</h2><h3 id="添加域名"><a href="#添加域名" class="headerlink" title="添加域名"></a>添加域名</h3><img src="/images/dns%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%B7%BB%E5%8A%A0ip.png" class="center" width="500">
+
+
+<img src="/images/ensp-dns%E6%9C%8D%E5%8A%A1%E5%99%A8.png" class="center" width="500">
+
+<h3 id="路由"><a href="#路由" class="headerlink" title="路由"></a>路由</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[Huawei]interface g0/0/0</span><br><span class="line">[Huawei-GigabitEthernet0/0/0]dhcp server dns-list 192.168.1.100</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="刷新并检验"><a href="#刷新并检验" class="headerlink" title="刷新并检验"></a>刷新并检验</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ipconfig</span></span><br><span class="line"></span><br><span class="line">Link local IPv6 address...........: fe80::5689:98ff:feec:2846</span><br><span class="line">IPv6 address......................: :: / 128</span><br><span class="line">IPv6 gateway......................: ::</span><br><span class="line">IPv4 address......................: 192.168.1.254</span><br><span class="line">Subnet mask.......................: 255.255.255.0</span><br><span class="line">Gateway...........................: 192.168.1.1</span><br><span class="line">Physical address..................: 54-89-98-EC-28-46</span><br><span class="line">DNS server........................: 192.168.1.100</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping www.example.com</span></span><br><span class="line"></span><br><span class="line">Ping www.example.com [192.168.1.253]: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 192.168.1.253: bytes=32 seq=1 ttl=128 time=47 ms</span><br><span class="line">From 192.168.1.253: bytes=32 seq=2 ttl=128 time=15 ms</span><br><span class="line">From 192.168.1.253: bytes=32 seq=3 ttl=128 time=47 ms</span><br><span class="line">From 192.168.1.253: bytes=32 seq=4 ttl=128 time=47 ms</span><br><span class="line">From 192.168.1.253: bytes=32 seq=5 ttl=128 time=31 ms</span><br><span class="line"></span><br><span class="line">--- 192.168.1.253 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 15/37/47 ms</span><br></pre></td></tr></table></figure>
 
 ]]></content>
       <tags>
@@ -391,83 +423,6 @@
       </tags>
   </entry>
   <entry>
-    <title>篇2 Dns 域名解析</title>
-    <url>/2023/07/10/%E7%BD%91%E7%BB%9C-Ensp/%E7%AF%872-Dns%E5%9F%9F%E5%90%8D%E8%A7%A3%E6%9E%90/</url>
-    <content><![CDATA[<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>DNS（Domain Name System，域名系统）是互联网中用于将域名转换为对应IP地址的系统。它充当了互联网上的“电话簿”，将易于记忆的域名（如<a href="http://www.example.com)映射到对应的ip地址(如192.0.2.1)./">www.example.com）映射到对应的IP地址（如192.0.2.1）。</a></p>
-<p>DNS的主要功能包括域名解析、域名注册和域名管理。 域名解析是DNS的核心功能，当用户在浏览器中输入一个域名时，DNS系统会将该域名解析为对应的IP地址，以便建立与目标服务器的连接。域名注册是指将一个域名注册到DNS系统中，以确保该域名在互联网上的唯一性。域名管理则涉及到对域名的配置、修改和管理，包括设置域名的DNS记录、子域名管理等。 </p>
-<p>DNS采用分层的结构，由多个DNS服务器组成，分为根域名服务器、顶级域名服务器、权威域名服务器和本地域名服务器等。当本地域名服务器无法解析域名时，会向上级域名服务器查询，直到找到对应的IP地址。 </p>
-<p>简单来说，<u>就是当用户访问某个域名时，会先在域名解析服务器上查找该域名对应的ip地址，找到后再访问该IP地址，用户可以使用易于记忆的域名来访问互联网上的各种资源，而无需记住复杂的IP地址。</u>同时，DNS还支持其他功能，如邮件服务器的查找、反向解析等。</p>
-<h2 id="准备内容"><a href="#准备内容" class="headerlink" title="准备内容"></a>准备内容</h2><p>ar2220路由一台、server服务器一台、s5700三层交换机一台、pc机若干</p>
-<img src="/images/ensp-%E5%9F%9F%E5%90%8D%E8%A7%A3%E6%9E%90.png" class="center" width="500">
-
-
-<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><ol>
-<li>给服务器添加自身ip地址，在服务器中的dns解析服务添加域名列表，并启动服务</li>
-<li>在路由对应接口输入<code>dhcp server dns-list [域名解析服务器ip]</code></li>
-<li>pc机刷新dhcp配置</li>
-</ol>
-<h2 id="实操"><a href="#实操" class="headerlink" title="实操"></a>实操</h2><h3 id="添加域名"><a href="#添加域名" class="headerlink" title="添加域名"></a>添加域名</h3><img src="/images/dns%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%B7%BB%E5%8A%A0ip.png" class="center" width="500">
-
-
-<img src="/images/ensp-dns%E6%9C%8D%E5%8A%A1%E5%99%A8.png" class="center" width="500">
-
-<h3 id="路由"><a href="#路由" class="headerlink" title="路由"></a>路由</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[Huawei]interface g0/0/0</span><br><span class="line">[Huawei-GigabitEthernet0/0/0]dhcp server dns-list 192.168.1.100</span><br></pre></td></tr></table></figure>
-
-
-
-<h3 id="刷新并检验"><a href="#刷新并检验" class="headerlink" title="刷新并检验"></a>刷新并检验</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ipconfig</span></span><br><span class="line"></span><br><span class="line">Link local IPv6 address...........: fe80::5689:98ff:feec:2846</span><br><span class="line">IPv6 address......................: :: / 128</span><br><span class="line">IPv6 gateway......................: ::</span><br><span class="line">IPv4 address......................: 192.168.1.254</span><br><span class="line">Subnet mask.......................: 255.255.255.0</span><br><span class="line">Gateway...........................: 192.168.1.1</span><br><span class="line">Physical address..................: 54-89-98-EC-28-46</span><br><span class="line">DNS server........................: 192.168.1.100</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping www.example.com</span></span><br><span class="line"></span><br><span class="line">Ping www.example.com [192.168.1.253]: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 192.168.1.253: bytes=32 seq=1 ttl=128 time=47 ms</span><br><span class="line">From 192.168.1.253: bytes=32 seq=2 ttl=128 time=15 ms</span><br><span class="line">From 192.168.1.253: bytes=32 seq=3 ttl=128 time=47 ms</span><br><span class="line">From 192.168.1.253: bytes=32 seq=4 ttl=128 time=47 ms</span><br><span class="line">From 192.168.1.253: bytes=32 seq=5 ttl=128 time=31 ms</span><br><span class="line"></span><br><span class="line">--- 192.168.1.253 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 15/37/47 ms</span><br></pre></td></tr></table></figure>
-
-]]></content>
-      <tags>
-        <tag>网络-Ensp</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>篇4 静态路由</title>
-    <url>/2023/07/17/%E7%BD%91%E7%BB%9C-Ensp/%E7%AF%874-%E9%9D%99%E6%80%81%E8%B7%AF%E7%94%B1/</url>
-    <content><![CDATA[<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>静态路由是网络中使用静态路由表来确定数据包的传输路径的一种路由方式。它是通过手动配置路由器上的路由表来指定目标网络和下一跳路由器的关系，以确定数据包的传输路径。</p>
-<p>在静态路由中，网络管理员手动配置路由器上的路由表，将目标网络的 IP 地址和对应的下一跳路由器的 IP 地址进行映射。当路由器收到一个数据包时，它会根据数据包的目标 IP 地址查找路由表，找到与目标 IP 地址匹配的条目，并将数据包发送到相应的下一跳路由器。下一跳路由器将继续根据路由表将数据包转发到下一个路由器，直到数据包到达目标网络。</p>
-<p>静态路由的主要特点包括：</p>
-<ol>
-<li>静态路由是手动配置的，不会自动适应网络变化。如果网络拓扑发生变化，管理员需要手动更新路由表。</li>
-<li>静态路由是固定的，不会根据网络负载或链路状态进行动态调整。所有数据包都将按照路由表中的配置进行转发。</li>
-<li>静态路由的配置相对简单，适用于小型网络或网络拓扑不经常变化的情况。</li>
-<li>静态路由的优点是稳定性高，因为路由表不会频繁变化，不会产生额外的路由协议开销。</li>
-</ol>
-<p>静态路由适用于简单的网络环境或需要精确控制数据包传输路径的情况。对于复杂的网络环境或需要自动适应网络变化的情况，通常会使用动态路由协议来实现路由功能。</p>
-<h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><p>AR2220 路由两台、交换机一台、PC 机若干</p>
-<img src="/images/%E9%9D%99%E6%80%81%E8%B7%AF%E7%94%B1%E5%AE%9E%E9%AA%8C%E5%87%86%E5%A4%87.png" class="center" width="500">
-
-
-
-<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><p>在路由上输入指令，告诉路由去往目的ip网段应该走的下一跳，<u>下一跳指的是下一个经过的路由的接口所对应的ip</u></p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">ip route-static [目标ip（通常是网段）] [子网掩码] [下一跳ip]</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="实操"><a href="#实操" class="headerlink" title="实操"></a>实操</h2><h3 id="基础路由配置"><a href="#基础路由配置" class="headerlink" title="基础路由配置"></a>基础路由配置</h3><h4 id="第一台路由"><a href="#第一台路由" class="headerlink" title="第一台路由"></a>第一台路由</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[Huawei]interface GigabitEthernet 0/0/0</span><br><span class="line">[Huawei-GigabitEthernet0/0/0]ip address 192.168.1.1 255.255.255.0</span><br><span class="line"></span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/1</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]ip address 192.168.2.1 255.255.255.0</span><br></pre></td></tr></table></figure>
-
-<h4 id="第二台"><a href="#第二台" class="headerlink" title="第二台"></a>第二台</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[Huawei]interface GigabitEthernet 0/0/0</span><br><span class="line">[Huawei-GigabitEthernet0/0/0]ip address 192.168.2.10 255.255.255.0</span><br><span class="line"></span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/1</span><br><span class="line">[Huawei-GigabitEthernet0/0/0]ip address 192.168.3.1 255.255.255.0</span><br></pre></td></tr></table></figure>
-
-
-
-<h3 id="配置静态路由"><a href="#配置静态路由" class="headerlink" title="配置静态路由"></a>配置静态路由</h3><h4 id="第一台"><a href="#第一台" class="headerlink" title="第一台"></a>第一台</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[Huawei]ip route-static 192.168.3.0 255.255.255.0 192.168.2.10</span><br></pre></td></tr></table></figure>
-
-<h4 id="第二台-1"><a href="#第二台-1" class="headerlink" title="第二台"></a>第二台</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[Huawei]ip route-static 192.168.1.0 255.255.255.0 192.168.2.1</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="检验"><a href="#检验" class="headerlink" title="检验"></a>检验</h2><h3 id="pc1-ping-服务器和pc2"><a href="#pc1-ping-服务器和pc2" class="headerlink" title="pc1 ping 服务器和pc2"></a>pc1 ping 服务器和pc2</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 192.168.3.100</span></span><br><span class="line"></span><br><span class="line">Ping 192.168.3.100: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 192.168.3.100: bytes=32 seq=1 ttl=126 time=47 ms</span><br><span class="line">From 192.168.3.100: bytes=32 seq=2 ttl=126 time=47 ms</span><br><span class="line">From 192.168.3.100: bytes=32 seq=3 ttl=126 time=47 ms</span><br><span class="line">From 192.168.3.100: bytes=32 seq=4 ttl=126 time=31 ms</span><br><span class="line">From 192.168.3.100: bytes=32 seq=5 ttl=126 time=63 ms</span><br><span class="line"></span><br><span class="line">--- 192.168.3.100 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 31/47/63 ms</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 192.168.3.10</span></span><br><span class="line"></span><br><span class="line">Ping 192.168.3.10: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 192.168.3.10: bytes=32 seq=1 ttl=253 time=31 ms</span><br><span class="line">From 192.168.3.10: bytes=32 seq=2 ttl=253 time=32 ms</span><br><span class="line">From 192.168.3.10: bytes=32 seq=3 ttl=253 time=31 ms</span><br><span class="line">From 192.168.3.10: bytes=32 seq=4 ttl=253 time=31 ms</span><br><span class="line">From 192.168.3.10: bytes=32 seq=5 ttl=253 time=31 ms</span><br><span class="line"></span><br><span class="line">--- 192.168.3.10 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 31/31/32 ms</span><br></pre></td></tr></table></figure>
-
-<h3 id="pc2-ping-pc1"><a href="#pc2-ping-pc1" class="headerlink" title="pc2 ping pc1"></a>pc2 ping pc1</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 192.168.1.10</span></span><br><span class="line"></span><br><span class="line">Ping 192.168.1.10: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">Request timeout!</span><br><span class="line">From 192.168.1.10: bytes=32 seq=2 ttl=126 time=31 ms</span><br><span class="line">From 192.168.1.10: bytes=32 seq=3 ttl=126 time=31 ms</span><br><span class="line">From 192.168.1.10: bytes=32 seq=4 ttl=126 time=47 ms</span><br><span class="line">From 192.168.1.10: bytes=32 seq=5 ttl=126 time=16 ms</span><br><span class="line"></span><br><span class="line">--- 192.168.1.10 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  4 packet(s) received</span><br><span class="line">  20.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 0/31/47 ms</span><br></pre></td></tr></table></figure>
-
-<p>注：配置好静态路由后，首次ping操作出现timeout是正常的</p>
-]]></content>
-      <tags>
-        <tag>网络-Ensp</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>篇5 vlan</title>
     <url>/2023/07/20/%E7%BD%91%E7%BB%9C-Ensp/%E7%AF%875-vlan/</url>
     <content><![CDATA[<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>VLAN（Virtual Local Area Network）是一种虚拟局域网技术，用于将一个物理网络划分为多个逻辑上独立的虚拟网络。VLAN可以提供更好的网络管理和安全性。</p>
@@ -516,37 +471,45 @@
       </tags>
   </entry>
   <entry>
-    <title>篇6 三层交换技术</title>
-    <url>/2023/07/21/%E7%BD%91%E7%BB%9C-Ensp/%E7%AF%876-%E4%B8%89%E5%B1%82%E4%BA%A4%E6%8D%A2%E6%8A%80%E6%9C%AF/</url>
-    <content><![CDATA[<h1 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h1><p>三层交换技术是指将网络交换机与路由器的功能结合起来，使交换机能够进行基于网络层（第三层）的转发和路由功能。它在传统二层交换机的基础上增加了路由功能，从而能够更高效地处理大规模网络中的数据流量和转发需求。</p>
-<p>三层交换技术的主要特点如下：</p>
+    <title>篇4 静态路由</title>
+    <url>/2023/07/17/%E7%BD%91%E7%BB%9C-Ensp/%E7%AF%874-%E9%9D%99%E6%80%81%E8%B7%AF%E7%94%B1/</url>
+    <content><![CDATA[<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>静态路由是网络中使用静态路由表来确定数据包的传输路径的一种路由方式。它是通过手动配置路由器上的路由表来指定目标网络和下一跳路由器的关系，以确定数据包的传输路径。</p>
+<p>在静态路由中，网络管理员手动配置路由器上的路由表，将目标网络的 IP 地址和对应的下一跳路由器的 IP 地址进行映射。当路由器收到一个数据包时，它会根据数据包的目标 IP 地址查找路由表，找到与目标 IP 地址匹配的条目，并将数据包发送到相应的下一跳路由器。下一跳路由器将继续根据路由表将数据包转发到下一个路由器，直到数据包到达目标网络。</p>
+<p>静态路由的主要特点包括：</p>
 <ol>
-<li>路由能力：<u>三层交换机具备路由器的基本功能，能够在不同的子网之间进行数据包的转发和路由决策</u>。它能够识别目标IP地址，并根据路由表进行转发决策，使数据能够跨越不同的子网进行传输。</li>
-<li>VLAN支持：三层交换机支持虚拟局域网（VLAN）技术，可以将物理网络划分为多个逻辑上独立的虚拟网络。通过VLAN的配置，可以实现更好的网络隔离和安全性。</li>
-<li>高性能转发：三层交换机采用硬件加速和快速转发技术，能够高效处理数据包的路由和转发。它可以进行流量控制、负载均衡和快速转发等功能，以提供更快的数据传输速度和更高的性能。</li>
-<li>动态路由协议支持：三层交换机一般支持主要的动态路由协议，如OSPF、BGP和RIP等，能够与其他路由器进行动态路由协议的交互和学习，以实现更智能的网络路径选择和故障恢复能力。</li>
+<li>静态路由是手动配置的，不会自动适应网络变化。如果网络拓扑发生变化，管理员需要手动更新路由表。</li>
+<li>静态路由是固定的，不会根据网络负载或链路状态进行动态调整。所有数据包都将按照路由表中的配置进行转发。</li>
+<li>静态路由的配置相对简单，适用于小型网络或网络拓扑不经常变化的情况。</li>
+<li>静态路由的优点是稳定性高，因为路由表不会频繁变化，不会产生额外的路由协议开销。</li>
 </ol>
-<p>通过三层交换技术，可以在较大的网络中实现更高效、可靠和有灵活性的数据转发和路由功能，并提供更好的网络性能和管理能力。这对于大型企业、数据中心和服务提供商等具有重要意义。</p>
-<h1 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h1><p>交换机两台（其中不与pc相连的交换机必须为三层交换机）、pc若干</p>
-<img src="/images/%E4%B8%89%E5%B1%82%E4%BA%A4%E6%8D%A2%E6%8A%80%E6%9C%AF%E5%AE%9E%E9%AA%8C%E5%87%86%E5%A4%87.png" class="center" width="500">
+<p>静态路由适用于简单的网络环境或需要精确控制数据包传输路径的情况。对于复杂的网络环境或需要自动适应网络变化的情况，通常会使用动态路由协议来实现路由功能。</p>
+<h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><p>AR2220 路由两台、交换机一台、PC 机若干</p>
+<img src="/images/%E9%9D%99%E6%80%81%E8%B7%AF%E7%94%B1%E5%AE%9E%E9%AA%8C%E5%87%86%E5%A4%87.png" class="center" width="500">
 
 
 
-<h1 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h1><ol>
-<li>近端交换机为两台pc划分不同的vlan，并为vlan放行</li>
-<li>在远端交换机的逻辑接口上添加两台pc的网关ip，即远端交换机在此处起到了网关的作用</li>
-</ol>
-<h1 id="实操"><a href="#实操" class="headerlink" title="实操"></a>实操</h1><ol>
-<li><p>近端交换机划分vlan，并放行</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[Huawei]vlan batch 10 20</span><br><span class="line">[Huawei]int g0/0/1</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]port link-type access 	</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]port de vlan 10</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]int g0/0/2</span><br><span class="line">[Huawei-GigabitEthernet0/0/2]port link-type access</span><br><span class="line">[Huawei-GigabitEthernet0/0/2]port de vlan 20</span><br><span class="line">[Huawei-GigabitEthernet0/0/2]int g0/0/3</span><br><span class="line">[Huawei-GigabitEthernet0/0/3]port link-type trunk </span><br><span class="line">[Huawei-GigabitEthernet0/0/3]port trunk allow-pass vlan all </span><br></pre></td></tr></table></figure>
-</li>
-<li><p>远端交换机配置vlan，并在vlan逻辑接口添加ip</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[Huawei]int g0/0/1</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]port link-type trunk //此处居然不用放行</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]q</span><br><span class="line">[Huawei]int Vlanif 10</span><br><span class="line">[Huawei-Vlanif10]ip address 1.1.1.1 255.255.255.0</span><br><span class="line">[Huawei-Vlanif10]int Vlanif 20</span><br><span class="line">[Huawei-Vlanif20]ip address 2.2.2.1 255.255.255.0</span><br><span class="line"></span><br></pre></td></tr></table></figure></li>
-</ol>
-<h1 id="检验"><a href="#检验" class="headerlink" title="检验"></a>检验</h1><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 1.1.1.254</span></span><br><span class="line"></span><br><span class="line">Ping 1.1.1.254: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 1.1.1.254: bytes=32 seq=1 ttl=127 time=109 ms</span><br><span class="line">From 1.1.1.254: bytes=32 seq=2 ttl=127 time=63 ms</span><br><span class="line">From 1.1.1.254: bytes=32 seq=3 ttl=127 time=93 ms</span><br><span class="line">From 1.1.1.254: bytes=32 seq=4 ttl=127 time=94 ms</span><br><span class="line">From 1.1.1.254: bytes=32 seq=5 ttl=127 time=78 ms</span><br><span class="line"></span><br><span class="line">--- 1.1.1.254 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 63/87/109 ms</span><br></pre></td></tr></table></figure>
+<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><p>在路由上输入指令，告诉路由去往目的ip网段应该走的下一跳，<u>下一跳指的是下一个经过的路由的接口所对应的ip</u></p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">ip route-static [目标ip（通常是网段）] [子网掩码] [下一跳ip]</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 2.2.2.254</span></span><br><span class="line"></span><br><span class="line">Ping 2.2.2.254: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 2.2.2.254: bytes=32 seq=1 ttl=127 time=156 ms</span><br><span class="line">From 2.2.2.254: bytes=32 seq=2 ttl=127 time=94 ms</span><br><span class="line">From 2.2.2.254: bytes=32 seq=3 ttl=127 time=78 ms</span><br><span class="line">From 2.2.2.254: bytes=32 seq=4 ttl=127 time=62 ms</span><br><span class="line">From 2.2.2.254: bytes=32 seq=5 ttl=127 time=94 ms</span><br><span class="line"></span><br><span class="line">--- 2.2.2.254 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 62/96/156 ms</span><br></pre></td></tr></table></figure>
 
+
+<h2 id="实操"><a href="#实操" class="headerlink" title="实操"></a>实操</h2><h3 id="基础路由配置"><a href="#基础路由配置" class="headerlink" title="基础路由配置"></a>基础路由配置</h3><h4 id="第一台路由"><a href="#第一台路由" class="headerlink" title="第一台路由"></a>第一台路由</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[Huawei]interface GigabitEthernet 0/0/0</span><br><span class="line">[Huawei-GigabitEthernet0/0/0]ip address 192.168.1.1 255.255.255.0</span><br><span class="line"></span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/1</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]ip address 192.168.2.1 255.255.255.0</span><br></pre></td></tr></table></figure>
+
+<h4 id="第二台"><a href="#第二台" class="headerlink" title="第二台"></a>第二台</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[Huawei]interface GigabitEthernet 0/0/0</span><br><span class="line">[Huawei-GigabitEthernet0/0/0]ip address 192.168.2.10 255.255.255.0</span><br><span class="line"></span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/1</span><br><span class="line">[Huawei-GigabitEthernet0/0/0]ip address 192.168.3.1 255.255.255.0</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="配置静态路由"><a href="#配置静态路由" class="headerlink" title="配置静态路由"></a>配置静态路由</h3><h4 id="第一台"><a href="#第一台" class="headerlink" title="第一台"></a>第一台</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[Huawei]ip route-static 192.168.3.0 255.255.255.0 192.168.2.10</span><br></pre></td></tr></table></figure>
+
+<h4 id="第二台-1"><a href="#第二台-1" class="headerlink" title="第二台"></a>第二台</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[Huawei]ip route-static 192.168.1.0 255.255.255.0 192.168.2.1</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="检验"><a href="#检验" class="headerlink" title="检验"></a>检验</h2><h3 id="pc1-ping-服务器和pc2"><a href="#pc1-ping-服务器和pc2" class="headerlink" title="pc1 ping 服务器和pc2"></a>pc1 ping 服务器和pc2</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 192.168.3.100</span></span><br><span class="line"></span><br><span class="line">Ping 192.168.3.100: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 192.168.3.100: bytes=32 seq=1 ttl=126 time=47 ms</span><br><span class="line">From 192.168.3.100: bytes=32 seq=2 ttl=126 time=47 ms</span><br><span class="line">From 192.168.3.100: bytes=32 seq=3 ttl=126 time=47 ms</span><br><span class="line">From 192.168.3.100: bytes=32 seq=4 ttl=126 time=31 ms</span><br><span class="line">From 192.168.3.100: bytes=32 seq=5 ttl=126 time=63 ms</span><br><span class="line"></span><br><span class="line">--- 192.168.3.100 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 31/47/63 ms</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 192.168.3.10</span></span><br><span class="line"></span><br><span class="line">Ping 192.168.3.10: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 192.168.3.10: bytes=32 seq=1 ttl=253 time=31 ms</span><br><span class="line">From 192.168.3.10: bytes=32 seq=2 ttl=253 time=32 ms</span><br><span class="line">From 192.168.3.10: bytes=32 seq=3 ttl=253 time=31 ms</span><br><span class="line">From 192.168.3.10: bytes=32 seq=4 ttl=253 time=31 ms</span><br><span class="line">From 192.168.3.10: bytes=32 seq=5 ttl=253 time=31 ms</span><br><span class="line"></span><br><span class="line">--- 192.168.3.10 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 31/31/32 ms</span><br></pre></td></tr></table></figure>
+
+<h3 id="pc2-ping-pc1"><a href="#pc2-ping-pc1" class="headerlink" title="pc2 ping pc1"></a>pc2 ping pc1</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 192.168.1.10</span></span><br><span class="line"></span><br><span class="line">Ping 192.168.1.10: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">Request timeout!</span><br><span class="line">From 192.168.1.10: bytes=32 seq=2 ttl=126 time=31 ms</span><br><span class="line">From 192.168.1.10: bytes=32 seq=3 ttl=126 time=31 ms</span><br><span class="line">From 192.168.1.10: bytes=32 seq=4 ttl=126 time=47 ms</span><br><span class="line">From 192.168.1.10: bytes=32 seq=5 ttl=126 time=16 ms</span><br><span class="line"></span><br><span class="line">--- 192.168.1.10 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  4 packet(s) received</span><br><span class="line">  20.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 0/31/47 ms</span><br></pre></td></tr></table></figure>
+
+<p>注：配置好静态路由后，首次ping操作出现timeout是正常的</p>
 ]]></content>
       <tags>
         <tag>网络-Ensp</tag>
@@ -666,6 +629,43 @@
 <h1 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h1><p>问题来了，这么做的意义是什么？</p>
 <p>不使用vlan，将pc1、pc2的IP设置为同一网段不也可以进行通信吗？</p>
 <p>这样做的目的就是<u>隔离了有可能出现的网络故障，但是保障了设备之间的通信</u></p>
+]]></content>
+      <tags>
+        <tag>网络-Ensp</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>篇6 三层交换技术</title>
+    <url>/2023/07/21/%E7%BD%91%E7%BB%9C-Ensp/%E7%AF%876-%E4%B8%89%E5%B1%82%E4%BA%A4%E6%8D%A2%E6%8A%80%E6%9C%AF/</url>
+    <content><![CDATA[<h1 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h1><p>三层交换技术是指将网络交换机与路由器的功能结合起来，使交换机能够进行基于网络层（第三层）的转发和路由功能。它在传统二层交换机的基础上增加了路由功能，从而能够更高效地处理大规模网络中的数据流量和转发需求。</p>
+<p>三层交换技术的主要特点如下：</p>
+<ol>
+<li>路由能力：<u>三层交换机具备路由器的基本功能，能够在不同的子网之间进行数据包的转发和路由决策</u>。它能够识别目标IP地址，并根据路由表进行转发决策，使数据能够跨越不同的子网进行传输。</li>
+<li>VLAN支持：三层交换机支持虚拟局域网（VLAN）技术，可以将物理网络划分为多个逻辑上独立的虚拟网络。通过VLAN的配置，可以实现更好的网络隔离和安全性。</li>
+<li>高性能转发：三层交换机采用硬件加速和快速转发技术，能够高效处理数据包的路由和转发。它可以进行流量控制、负载均衡和快速转发等功能，以提供更快的数据传输速度和更高的性能。</li>
+<li>动态路由协议支持：三层交换机一般支持主要的动态路由协议，如OSPF、BGP和RIP等，能够与其他路由器进行动态路由协议的交互和学习，以实现更智能的网络路径选择和故障恢复能力。</li>
+</ol>
+<p>通过三层交换技术，可以在较大的网络中实现更高效、可靠和有灵活性的数据转发和路由功能，并提供更好的网络性能和管理能力。这对于大型企业、数据中心和服务提供商等具有重要意义。</p>
+<h1 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h1><p>交换机两台（其中不与pc相连的交换机必须为三层交换机）、pc若干</p>
+<img src="/images/%E4%B8%89%E5%B1%82%E4%BA%A4%E6%8D%A2%E6%8A%80%E6%9C%AF%E5%AE%9E%E9%AA%8C%E5%87%86%E5%A4%87.png" class="center" width="500">
+
+
+
+<h1 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h1><ol>
+<li>近端交换机为两台pc划分不同的vlan，并为vlan放行</li>
+<li>在远端交换机的逻辑接口上添加两台pc的网关ip，即远端交换机在此处起到了网关的作用</li>
+</ol>
+<h1 id="实操"><a href="#实操" class="headerlink" title="实操"></a>实操</h1><ol>
+<li><p>近端交换机划分vlan，并放行</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[Huawei]vlan batch 10 20</span><br><span class="line">[Huawei]int g0/0/1</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]port link-type access 	</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]port de vlan 10</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]int g0/0/2</span><br><span class="line">[Huawei-GigabitEthernet0/0/2]port link-type access</span><br><span class="line">[Huawei-GigabitEthernet0/0/2]port de vlan 20</span><br><span class="line">[Huawei-GigabitEthernet0/0/2]int g0/0/3</span><br><span class="line">[Huawei-GigabitEthernet0/0/3]port link-type trunk </span><br><span class="line">[Huawei-GigabitEthernet0/0/3]port trunk allow-pass vlan all </span><br></pre></td></tr></table></figure>
+</li>
+<li><p>远端交换机配置vlan，并在vlan逻辑接口添加ip</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[Huawei]int g0/0/1</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]port link-type trunk //此处居然不用放行</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]q</span><br><span class="line">[Huawei]int Vlanif 10</span><br><span class="line">[Huawei-Vlanif10]ip address 1.1.1.1 255.255.255.0</span><br><span class="line">[Huawei-Vlanif10]int Vlanif 20</span><br><span class="line">[Huawei-Vlanif20]ip address 2.2.2.1 255.255.255.0</span><br><span class="line"></span><br></pre></td></tr></table></figure></li>
+</ol>
+<h1 id="检验"><a href="#检验" class="headerlink" title="检验"></a>检验</h1><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 1.1.1.254</span></span><br><span class="line"></span><br><span class="line">Ping 1.1.1.254: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 1.1.1.254: bytes=32 seq=1 ttl=127 time=109 ms</span><br><span class="line">From 1.1.1.254: bytes=32 seq=2 ttl=127 time=63 ms</span><br><span class="line">From 1.1.1.254: bytes=32 seq=3 ttl=127 time=93 ms</span><br><span class="line">From 1.1.1.254: bytes=32 seq=4 ttl=127 time=94 ms</span><br><span class="line">From 1.1.1.254: bytes=32 seq=5 ttl=127 time=78 ms</span><br><span class="line"></span><br><span class="line">--- 1.1.1.254 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 63/87/109 ms</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 2.2.2.254</span></span><br><span class="line"></span><br><span class="line">Ping 2.2.2.254: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 2.2.2.254: bytes=32 seq=1 ttl=127 time=156 ms</span><br><span class="line">From 2.2.2.254: bytes=32 seq=2 ttl=127 time=94 ms</span><br><span class="line">From 2.2.2.254: bytes=32 seq=3 ttl=127 time=78 ms</span><br><span class="line">From 2.2.2.254: bytes=32 seq=4 ttl=127 time=62 ms</span><br><span class="line">From 2.2.2.254: bytes=32 seq=5 ttl=127 time=94 ms</span><br><span class="line"></span><br><span class="line">--- 2.2.2.254 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 62/96/156 ms</span><br></pre></td></tr></table></figure>
+
 ]]></content>
       <tags>
         <tag>网络-Ensp</tag>
@@ -915,8 +915,7 @@
 <li>修改OSPF的默认参考带宽值，作用范围是本路由器使能OSPF的接口。建议参考整个网络的带宽情况建立参考基线，所有路由器修改相同的参考带宽值，从而确保选路的—致性。</li>
 <li>OSPF以“累计cost”为开销值，也就是流量从源网络到目的网络所经过所有路由器的出接口的cost总和</li>
 </ul>
-<h2 id="报文类型及作用"><a href="#报文类型及作用" class="headerlink" title="报文类型及作用"></a>报文类型及作用</h2><img src="/images/OSPF/OSPF%E6%8A%A5%E6%96%87%E5%A4%B4%E9%83%A8.png" class="center" title="OSPF报文头部">
-
+<h2 id="报文类型及作用"><a href="#报文类型及作用" class="headerlink" title="报文类型及作用"></a>报文类型及作用</h2><p><img src="/../../images/OSPF/OSPF%E6%8A%A5%E6%96%87%E5%A4%B4%E9%83%A8.png"></p>
 <p>RIP路由器之间是基于UDP 520的报文进行通信，OSPF也有其规定的通信标准。OSPF使用IP承载其报文，协议号为89。<br>在OSPF Packet部分，所有的OSPF报文均使用相同的OSPF报文头部∶</p>
 <ul>
 <li>Version：对于当前所使用的OSPFv2，该字段的值为2。</li>
@@ -1168,7 +1167,7 @@
 <td align="center">网段掩码</td>
 </tr>
 </tbody></table>
-<h3 id="构建SPF树"><a href="#构建SPF树" class="headerlink" title="构建SPF树"></a>构建SPF树</h3><p><strong>网络拓扑图如下</strong>（router1至router5分别对应routerA至routerE，router ID分别为1.1.1.1 ~ 5.5.5.5）</p>
+<h3 id="构建SPF树（相同区域内）"><a href="#构建SPF树（相同区域内）" class="headerlink" title="构建SPF树（相同区域内）"></a>构建SPF树（相同区域内）</h3><p><strong>网络拓扑图如下</strong>（router1至router5分别对应routerA至routerE，router ID分别为1.1.1.1 ~ 5.5.5.5）</p>
 <p><img src="/../../images/OSPF/%E6%95%99%E6%9D%90%E6%8B%93%E6%89%91%E5%9B%BE.png"></p>
 <ol>
 <li>以routerA为根节点，构建SPF树</li>
@@ -1239,6 +1238,7 @@
 <li>192.168.1.0 网络在本区域以一类LSA进行传递，ABR RTB 负责将该一类LSA转换成三类LSA，并发送到Area 0；ABR RBC 又重新生成一份三类 LSA 发送到 Area 2</li>
 </ul>
 <h3 id="Summary-LSA（三类LSA）"><a href="#Summary-LSA（三类LSA）" class="headerlink" title="Summary LSA（三类LSA）"></a>Summary LSA（三类LSA）</h3><p><img src="/../../images/OSPF/%E4%B8%89%E7%B1%BBLSA.png"></p>
+<p><u>记录对于本区域的非本区域网段</u></p>
 <p><strong>对照表</strong></p>
 <table>
 <thead>
@@ -1267,7 +1267,7 @@
 <p>示例：</p>
 <p><img src="/../../images/OSPF/%E6%88%AA%E5%9B%BE1.png"></p>
 <p>对于router 6 的summary LSA 有：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">	         Area: 0.0.0.0</span><br><span class="line">Type      LinkState ID    AdvRouter          Age  Len   Sequence   Metric</span><br><span class="line">Sum-Net   10.1.67.0       6.6.6.6            124  28    80000001       1</span><br><span class="line">Sum-Net   10.1.16.0       6.6.6.6            124  28    80000001       1</span><br><span class="line">Sum-Net   10.1.16.0       1.1.1.1            163  28    80000001       1</span><br><span class="line">//由于R1和R6之间有一条虚拟连接，所以有两条sum LSA</span><br><span class="line"></span><br><span class="line">	         Area: 0.0.0.1</span><br><span class="line">Type      LinkState ID    AdvRouter          Age  Len   Sequence   Metric</span><br><span class="line">Sum-Net   10.1.45.0       1.1.1.1            124  28    80000003      50</span><br><span class="line">Sum-Net   10.1.13.0       1.1.1.1            161  28    80000001      48</span><br><span class="line">Sum-Net   10.1.24.0       1.1.1.1            124  28    80000002      49</span><br><span class="line">Sum-Net   10.1.12.0       1.1.1.1            164  28    80000001       1</span><br><span class="line">Sum-Net   10.1.235.0      1.1.1.1            124  28    80000002       2</span><br><span class="line">Sum-Net   10.1.67.0       6.6.6.6            124  28    80000001       1</span><br><span class="line"></span><br><span class="line">	         Area: 0.0.0.2</span><br><span class="line">Type      LinkState ID    AdvRouter          Age  Len   Sequence   Metric</span><br><span class="line">Sum-Net   10.1.45.0       6.6.6.6            123  28    80000002      51</span><br><span class="line">Sum-Net   10.1.13.0       6.6.6.6            124  28    80000001      49</span><br><span class="line">Sum-Net   10.1.24.0       6.6.6.6            124  28    80000002      50</span><br><span class="line">Sum-Net   10.1.12.0       6.6.6.6            125  28    80000001       2</span><br><span class="line">Sum-Net   10.1.235.0      6.6.6.6            124  28    80000002       3</span><br><span class="line">Sum-Net   10.1.16.0       6.6.6.6            125  28    80000001       1</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">	         Area: 0.0.0.0</span><br><span class="line">Type      LinkState ID    AdvRouter          Age  Len   Sequence   Metric</span><br><span class="line">Sum-Net   10.1.67.0       6.6.6.6            124  28    80000001       1</span><br><span class="line">Sum-Net   10.1.16.0       6.6.6.6            124  28    80000001       1</span><br><span class="line">Sum-Net   10.1.16.0       1.1.1.1            163  28    80000001       1</span><br><span class="line">//由于R1和R6之间有一条虚拟连接，所以有两条sum LSA</span><br><span class="line"></span><br><span class="line">	         Area: 0.0.0.1</span><br><span class="line">Type      LinkState ID    AdvRouter          Age  Len   Sequence   Metric</span><br><span class="line">Sum-Net   10.1.45.0       1.1.1.1            124  28    80000003      50</span><br><span class="line">Sum-Net   10.1.13.0       1.1.1.1            161  28    80000001      48</span><br><span class="line">Sum-Net   10.1.24.0       1.1.1.1            124  28    80000002      49</span><br><span class="line">Sum-Net   10.1.12.0       1.1.1.1            164  28    80000001       1</span><br><span class="line">Sum-Net   10.1.235.0      1.1.1.1            124  28    80000002       2</span><br><span class="line">Sum-Net   10.1.67.0       6.6.6.6            124  28    80000001       1</span><br><span class="line">//Area1 有两个ABR</span><br><span class="line"></span><br><span class="line">	         Area: 0.0.0.2</span><br><span class="line">Type      LinkState ID    AdvRouter          Age  Len   Sequence   Metric</span><br><span class="line">Sum-Net   10.1.45.0       6.6.6.6            123  28    80000002      51</span><br><span class="line">Sum-Net   10.1.13.0       6.6.6.6            124  28    80000001      49</span><br><span class="line">Sum-Net   10.1.24.0       6.6.6.6            124  28    80000002      50</span><br><span class="line">Sum-Net   10.1.12.0       6.6.6.6            125  28    80000001       2</span><br><span class="line">Sum-Net   10.1.235.0      6.6.6.6            124  28    80000002       3</span><br><span class="line">Sum-Net   10.1.16.0       6.6.6.6            125  28    80000001       1</span><br></pre></td></tr></table></figure>
 
 <h3 id="避免域间路由环路"><a href="#避免域间路由环路" class="headerlink" title="避免域间路由环路"></a>避免域间路由环路</h3><p>为防止区域间的环路OSPF定义了骨干区域和非骨干区域和三类LSA的传递规则</p>
 <ul>
@@ -1280,11 +1280,290 @@
 <li>骨干区域必须是连续的，但是并不要求物理上连续，可以使用虚连接使骨干区域逻辑上连续。</li>
 <li>虚连接可以在任意两个区域边界路由器上建立，但是<u>要求这两个区域边界路由器都有端口连接到一个相同的非骨干区域。</u></li>
 <li><strong>骨干区域不允许配置虚拟链接</strong></li>
-<li><strong>跨域哪个区域就进入哪个区域配置虚拟连接</strong></li>
-<li><strong>建立虚拟链接的不是接口ip，而是router ID</strong></li>
+<li><strong>跨越哪个区域就进入哪个区域配置虚拟连接</strong></li>
+<li><strong>建立虚拟链接的不是接口ip，而是router ID</strong>（邻居）</li>
 <li>如图所示，在RTB和RTC之间建立了一条虚连接，以使Area 2穿越Area1连接到骨干区域。</li>
 </ul>
-<h2 id=""><a href="#" class="headerlink" title=""></a></h2>]]></content>
+<h2 id="外部路由"><a href="#外部路由" class="headerlink" title="外部路由"></a>外部路由</h2><h3 id="外部路由计算"><a href="#外部路由计算" class="headerlink" title="外部路由计算"></a>外部路由计算</h3><p><img src="/../../images/OSPF/%E5%A4%96%E9%83%A8%E8%B7%AF%E7%94%B1demo.png"></p>
+<p>在之前的实验基础上，AR10是外部路由，不做ospf协议，仅做基本的配置，和AR1做了双向的静态路由。</p>
+<p>在AR1上将静态路由加入ospf协议中：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[Huawei]ospf 1</span><br><span class="line">[Huawei-ospf-1]import-route static ?</span><br><span class="line">  cost          Set cost</span><br><span class="line">  route-policy  Route policy</span><br><span class="line">  tag           Specify route tag</span><br><span class="line">  type          Metric type of the imported external routes</span><br><span class="line">  &lt;cr&gt;          Please press ENTER to execute command </span><br><span class="line">[Huawei-ospf-1]import-route static </span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>在AR1的OSPF进程下，将配置的静态路由重发布到OSPF网络中，其中引入外部路由的OSPF路由器叫做ASBR（设备间互访需要路由双向可达，这里仅介绍OSPF网络内获取外部路由的过程）。</li>
+<li>AR1会生成一条**<u>AS-External-LSA(五类LSA)</u><strong>，用于描述如何从ASBR（Autonomous System Boundary Router 自治系统边界路由器）到达外部目的地；AR6会生成一条</strong><u>ASBR-Summary-LSA(四类LSA)</u>**，用于描述如何从ABR到达ASBR。</li>
+<li>四类LSA和五类LSA，将被OSPF路由器用来计算外部路由。</li>
+</ul>
+<h4 id="AS-External-LSA"><a href="#AS-External-LSA" class="headerlink" title="AS External LSA"></a>AS External LSA</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">[AR1]dis ospf lsdb</span><br><span class="line"></span><br><span class="line">	 OSPF Process 1 with Router ID 1.1.1.1</span><br><span class="line">		 Link State Database </span><br><span class="line"> </span><br><span class="line"> //已忽略其他区域</span><br><span class="line"> </span><br><span class="line">		 AS External Database</span><br><span class="line"> Type      LinkState ID    AdvRouter          Age  Len   Sequence   Metric</span><br><span class="line"> External  114.114.114.0   1.1.1.1             26  36    80000001       1</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;AR1&gt;dis ospf lsdb ase self-originate </span><br><span class="line"></span><br><span class="line">	 OSPF Process 1 with Router ID 1.1.1.1</span><br><span class="line">		 Link State Database</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  Type      : External                   //LSA类型</span><br><span class="line">  Ls id     : 114.114.114.0				//目的网段</span><br><span class="line">  Adv rtr   : 1.1.1.1  					//产生此五类LSA ASBR的router ID</span><br><span class="line">  Ls age    : 1706 </span><br><span class="line">  Len       : 36 </span><br><span class="line">  Options   :  E  </span><br><span class="line">  seq#      : 80000003 </span><br><span class="line">  chksum    : 0xc4ae</span><br><span class="line">  Net mask  : 255.255.255.0 			//掩码</span><br><span class="line">  TOS 0  Metric: 1 					    //开销值</span><br><span class="line">  E type    : 2</span><br><span class="line">  Forwarding Address : 0.0.0.0 </span><br><span class="line">  Tag       : 1 						//Tag:外部路由信息可以携带一个Tag标签，用于传递该路由的附加信	   Priority  : Low						 //息，通常用于路由策略，默认值为1。</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="ASBR-Summary-LSA"><a href="#ASBR-Summary-LSA" class="headerlink" title="ASBR Summary LSA"></a>ASBR Summary LSA</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">[AR1]dis ospf lsdb</span><br><span class="line"></span><br><span class="line">	 OSPF Process 1 with Router ID 1.1.1.1</span><br><span class="line">		 Link State Database </span><br><span class="line"></span><br><span class="line">		         Area: 0.0.0.0</span><br><span class="line"> Type      LinkState ID    AdvRouter          Age  Len   Sequence   Metric</span><br><span class="line"> Sum-Asbr  1.1.1.1         6.6.6.6             26  28    80000001       1</span><br><span class="line"> </span><br><span class="line">		         Area: 0.0.0.1</span><br><span class="line"> Type      LinkState ID    AdvRouter          Age  Len   Sequence   Metric</span><br><span class="line"> Sum-Asbr  1.1.1.1         6.6.6.6             26  28    80000001       1</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;AR1&gt;dis ospf lsdb asbr </span><br><span class="line"></span><br><span class="line">	 OSPF Process 1 with Router ID 1.1.1.1</span><br><span class="line">		         Area: 0.0.0.0</span><br><span class="line">		 Link State Database </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  Type      : Sum-Asbr</span><br><span class="line">  Ls id     : 1.1.1.1						//LSA类型</span><br><span class="line">  Adv rtr   : 6.6.6.6  						//ASBR的router ID</span><br><span class="line">  Ls age    : 483 							//产生此四类LSA ABR的router ID</span><br><span class="line">  Len       : 28 </span><br><span class="line">  Options   :  E  </span><br><span class="line">  seq#      : 80000004 </span><br><span class="line">  chksum    : 0x7ebd</span><br><span class="line">  Tos 0  metric: 1							//从此ABR到ASBR的开销</span><br><span class="line">		         Area: 0.0.0.1				//AR1即是area 0 的ABR又是area 1的ABR</span><br><span class="line">		 Link State Database </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  Type      : Sum-Asbr</span><br><span class="line">  Ls id     : 1.1.1.1</span><br><span class="line">  Adv rtr   : 6.6.6.6  </span><br><span class="line">  Ls age    : 483 </span><br><span class="line">  Len       : 28 </span><br><span class="line">  Options   :  E  </span><br><span class="line">  seq#      : 80000004 </span><br><span class="line">  chksum    : 0x7ebd</span><br><span class="line">  Tos 0  metric: 1</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>四类LSA只能在一个区域内泛洪，五类LSA每泛洪到一个区域，相应区域的ABR都会生成一条新的四类LSA来描述如何到达ASBR。</li>
+<li>因此描述到达同一个ASBR的四类LSA可以有多条，其Adv rtr是不同的，表示是由不同的ABR生成的。</li>
+</ul>
+<h3 id="外部路由类型"><a href="#外部路由类型" class="headerlink" title="外部路由类型"></a>外部路由类型</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;AR7&gt;dis ip routing-table </span><br><span class="line">Route Flags: R - relay, D - download to fib</span><br><span class="line">------------------------------------------------------------------------------</span><br><span class="line">Routing Tables: Public</span><br><span class="line">         Destinations : 15       Routes : 15       </span><br><span class="line"></span><br><span class="line">Destination/Mask    Proto   Pre  Cost      Flags NextHop         Interface</span><br><span class="line"></span><br><span class="line">      10.1.12.0/24  OSPF    10   3           D   10.1.67.6       GigabitEthernet</span><br><span class="line">0/0/0</span><br><span class="line">      10.1.13.0/24  OSPF    10   50          D   10.1.67.6       GigabitEthernet</span><br><span class="line">0/0/0</span><br><span class="line">      10.1.16.0/24  OSPF    10   2           D   10.1.67.6       GigabitEthernet</span><br><span class="line">0/0/0</span><br><span class="line">      10.1.24.0/24  OSPF    10   51          D   10.1.67.6       GigabitEthernet</span><br><span class="line">0/0/0</span><br><span class="line">      10.1.45.0/24  OSPF    10   52          D   10.1.67.6       GigabitEthernet</span><br><span class="line">0/0/0</span><br><span class="line">      10.1.67.0/24  Direct  0    0           D   10.1.67.7       GigabitEthernet</span><br><span class="line">0/0/0</span><br><span class="line">      10.1.67.7/32  Direct  0    0           D   127.0.0.1       GigabitEthernet</span><br><span class="line">0/0/0</span><br><span class="line">    10.1.67.255/32  Direct  0    0           D   127.0.0.1       GigabitEthernet</span><br><span class="line">0/0/0</span><br><span class="line">     10.1.113.0/24  OSPF    10   5           D   10.1.67.6       GigabitEthernet</span><br><span class="line">0/0/0</span><br><span class="line">     10.1.235.0/24  OSPF    10   4           D   10.1.67.6       GigabitEthernet</span><br><span class="line">0/0/0</span><br><span class="line">  114.114.114.0/24  O_ASE   150  1           D   10.1.67.6       GigabitEthernet</span><br><span class="line">0/0/0</span><br><span class="line">      127.0.0.0/8   Direct  0    0           D   127.0.0.1       InLoopBack0</span><br><span class="line">      127.0.0.1/32  Direct  0    0           D   127.0.0.1       InLoopBack0</span><br><span class="line">127.255.255.255/32  Direct  0    0           D   127.0.0.1       InLoopBack0</span><br><span class="line">255.255.255.255/32  Direct  0    0           D   127.0.0.1       InLoopBack0</span><br></pre></td></tr></table></figure>
+
+<p>在AR7上查看路由表，发现到外部114.114.114.0网段的开销为1，而从图片上看很明显不为1</p>
+<table>
+<thead>
+<tr>
+<th align="center">Type</th>
+<th align="center">Cost</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">第一类外部路由（External Type 1）</td>
+<td align="center">AS 内部开销值 + AS 外部开销值</td>
+</tr>
+<tr>
+<td align="center">第二类外部路由（External Type 2）</td>
+<td align="center">AS外部开销值</td>
+</tr>
+</tbody></table>
+<ul>
+<li><p>OSPF引入外部路由，共有两种类型可选：</p>
+<ol>
+<li><p>第一类外部路由的AS外部开销值被认为和AS内部开销值是同一数量级的，因此第一类外部路由的开销值为AS内部开销值（路由器到ASBR的开销）与AS外部开销值之和;这类路由的可信程度高一些，所以计算出的外部路由的开销与自治系统内部的路由开销是相当的，并且和OSPF自身路由的开销具有可比性。</p>
+</li>
+<li><p>第二类外部路由的AS外部开销值被认为远大于AS内部开销值，因此第二类外部路由<br>的开销值只包含AS外部开销，忽略AS内部开销（默认为第二类），这类路由的可信度比较低。</p>
+</li>
+</ol>
+</li>
+<li><p>默认情况下，OSPF外部路由采用的是第二类外部路由。</p>
+</li>
+</ul>
+<h3 id="次优外部路由的产生"><a href="#次优外部路由的产生" class="headerlink" title="次优外部路由的产生"></a>次优外部路由的产生</h3><p><img src="/../../images/OSPF/%E6%AC%A1%E4%BC%98%E5%A4%96%E9%83%A8%E8%B7%AF%E7%94%B11.png"></p>
+<ol>
+<li>RTA 和 RTB 运行OSPF协议，RTB 和 RTC 运行RIP协议</li>
+<li>RTB 把通过 RIP 学来的协议发布到OSPF中，RTA 通过OSPF学到了到192.168.3.0网段的路由，但是下一跳为RTB，这一条路径在 RTA 上是次优的，最优的下一跳应该是 RTC 的10.1.123.3接口</li>
+<li>OSPF 通过设置 Forwarding Address 来解决这个问题</li>
+</ol>
+<p><img src="/../../images/OSPF/%E6%AC%A1%E4%BC%98%E5%A4%96%E9%83%A8%E8%B7%AF%E7%94%B12.png"></p>
+<ul>
+<li>通常情况下，ASBR引入外部路由产生的五类LSA中Forwarding Address字段设置为0.0.0.0。</li>
+<li>对于图中的场景，RTB路由表中到达192.168.3.0&#x2F;24的下一跳地址为10.1.123.3。</li>
+<li>10.1.123.3 所属网段 10.1.123.0&#x2F;24 运行OSPF，所以RTB生成的五类LSA中，ForwardingAddress被设置为10.1.123.3。</li>
+<li>当RTA收到五类LSA时，发现Forwarding Address字段非0，其值为10.1.123.3，所以RTA按照Forwarding Address计算下一跳</li>
+</ul>
+<h1 id="OSPF特殊区域及其他特性"><a href="#OSPF特殊区域及其他特性" class="headerlink" title="OSPF特殊区域及其他特性"></a>OSPF特殊区域及其他特性</h1><h2 id="Stub区域和Totally-Stub区域"><a href="#Stub区域和Totally-Stub区域" class="headerlink" title="Stub区域和Totally Stub区域"></a>Stub区域和Totally Stub区域</h2><h3 id="传输区域和末端区域"><a href="#传输区域和末端区域" class="headerlink" title="传输区域和末端区域"></a>传输区域和末端区域</h3><p><img src="/../../images/OSPF/%E4%BC%A0%E8%BE%93%E5%8C%BA%E5%9F%9F%E5%92%8C%E6%9C%AB%E7%AB%AF%E5%8C%BA%E5%9F%9F.png"></p>
+<p>如图所示，全网可分为四部分Area 0、Area 1、Area 2、外部网络。四部分之间相互访问的主要流量如图中红线所示。</p>
+<p>对于OSPF各区域，可分为两种类型∶</p>
+<ul>
+<li>传输区域︰除了承载本区域反也的流!以，如Area 0。IP都不属于本区域的流量，即“穿越型流量”，如Area 0。</li>
+<li>末端区域:只承载本区域发起的流量和访问本区域的流量，如Area 1。</li>
+</ul>
+<p>对于末端区域，需要考虑下几个问题:</p>
+<ul>
+<li>保存到达其他区域明细路由的必要性∶访问其他区域通过单一出口，“汇总”路由相对明细路由更为简洁。</li>
+<li>设备性能︰网络建设与维护必须要考虑成本因素。末端区域中可选择部署性能相对较低的路由器。</li>
+</ul>
+<p>OSPF路由器计算区域内、区域间、外部路由都需要依靠收集网络中的大量LSA，大量LSA会占用LSDB存储空间，所以解决问题的关键是在不影响正常路由的情况下，减少LSA的数量。</p>
+<h3 id="Stub区域"><a href="#Stub区域" class="headerlink" title="Stub区域"></a>Stub区域</h3><p><img src="/../../images/OSPF/Stub%E5%8C%BA%E5%9F%9F.png"></p>
+<p>Stub区域的ABR不向Stub区域内传播它接收到的自治系统外部路由（对应四类、五类LSA )，Stub区域中路由器的LSDB、路由表规模都会大大减小。</p>
+<p>为保证Stub区域能够到达自治系统外部，<u>Stub区域的ABR将生成一条缺省路由（对应三类LSA )</u>，并发布给Stub区域中的其他路由器。</p>
+<p>Stub区域是一种可选的配置属性，但并不建议将每个区域都配置为Stub区域。通常来说，Stub区域位于自治系统的末梢，是那些只有一个ABR的非骨干区域。</p>
+<p>配置Stub区域时需要注意下列几点︰</p>
+<ul>
+<li>骨干区域不能被配置为Stub区域。</li>
+<li><u>如果要将一个区域配置成Stub区域，则<strong>该区域中的所有路由器必须都要配置成Stub路由器</strong>。</u></li>
+<li>Stub区域内不能存在ASBR，自治系统外部路由不能在本区域内传播。</li>
+<li><u>虚连接不能穿越Stub区域建立</u>。</li>
+</ul>
+<p><img src="/../../images/OSPF/Stub%E5%8C%BA%E5%9F%9Fdemo.png"></p>
+<p>AR4 设置Stub之前的LSDB：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;AR4&gt;dis ospf lsdb</span><br><span class="line"></span><br><span class="line">	 OSPF Process 1 with Router ID 4.4.4.4</span><br><span class="line">		 Link State Database </span><br><span class="line"></span><br><span class="line">		         Area: 0.0.0.1</span><br><span class="line"> Type      LinkState ID    AdvRouter          Age  Len   Sequence   Metric</span><br><span class="line"> Router    4.4.4.4         4.4.4.4            242  36    80000003       1</span><br><span class="line"> Router    2.2.2.2         2.2.2.2            240  36    80000005       1</span><br><span class="line"> Network   10.1.24.2       2.2.2.2            241  32    80000002       0</span><br><span class="line"> Sum-Net   10.1.35.0       2.2.2.2            114  28    80000001       3</span><br><span class="line"> Sum-Net   10.1.13.0       2.2.2.2            282  28    80000001       2</span><br><span class="line"> Sum-Net   10.1.12.0       2.2.2.2            282  28    80000001       1</span><br></pre></td></tr></table></figure>
+
+<p>只给AR4设置Stub后：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">[AR4]ospf 1</span><br><span class="line">[AR4-ospf-1]area 1</span><br><span class="line">[AR4-ospf-1-area-0.0.0.1]stub </span><br><span class="line">&lt;AR4&gt;dis ospf lsdb</span><br><span class="line"></span><br><span class="line">	 OSPF Process 1 with Router ID 4.4.4.4</span><br><span class="line">		 Link State Database </span><br><span class="line"></span><br><span class="line">		         Area: 0.0.0.1</span><br><span class="line"> Type      LinkState ID    AdvRouter          Age  Len   Sequence   Metric</span><br><span class="line"> Router    4.4.4.4         4.4.4.4             15  36    80000001       1</span><br></pre></td></tr></table></figure>
+
+<p>给AR2设置Stub后，AR4的LSDB变化</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">[AR2]ospf 1</span><br><span class="line">[AR2-ospf-1]area 1</span><br><span class="line">[AR2-ospf-1-area-0.0.0.1]stub </span><br><span class="line"></span><br><span class="line">-----------------------------------------------------------</span><br><span class="line"></span><br><span class="line">&lt;AR4&gt;dis ospf lsdb</span><br><span class="line"></span><br><span class="line">	 OSPF Process 1 with Router ID 4.4.4.4</span><br><span class="line">		 Link State Database </span><br><span class="line"></span><br><span class="line">		         Area: 0.0.0.1</span><br><span class="line"> Type      LinkState ID    AdvRouter          Age  Len   Sequence   Metric</span><br><span class="line"> Router    4.4.4.4         4.4.4.4              1  36    80000003       1</span><br><span class="line"> Router    2.2.2.2         2.2.2.2              1  36    80000003       1</span><br><span class="line"> Network   10.1.24.4       4.4.4.4              0  32    80000001       0</span><br><span class="line"> Sum-Net   0.0.0.0         2.2.2.2              8  28    80000001       1     //多了一条缺省LSA</span><br><span class="line"> Sum-Net   10.1.35.0       2.2.2.2              8  28    80000001       3</span><br><span class="line"> Sum-Net   10.1.13.0       2.2.2.2              8  28    80000001       2</span><br><span class="line"> Sum-Net   10.1.12.0       2.2.2.2              8  28    80000001       1</span><br><span class="line"> </span><br><span class="line"> &lt;AR4&gt;dis ospf routing </span><br><span class="line"></span><br><span class="line">	 OSPF Process 1 with Router ID 4.4.4.4</span><br><span class="line">		  Routing Tables </span><br><span class="line"></span><br><span class="line"> Routing for Network </span><br><span class="line"> Destination        Cost  Type       NextHop         AdvRouter       Area</span><br><span class="line"> 10.1.24.0/24       1     Transit    10.1.24.4       4.4.4.4         0.0.0.1</span><br><span class="line"> 0.0.0.0/0          2     Inter-area 10.1.24.2       2.2.2.2         0.0.0.1    //多了一条缺省路由</span><br><span class="line"> 10.1.12.0/24       2     Inter-area 10.1.24.2       2.2.2.2         0.0.0.1</span><br><span class="line"> 10.1.13.0/24       3     Inter-area 10.1.24.2       2.2.2.2         0.0.0.1</span><br><span class="line"> 10.1.35.0/24       4     Inter-area 10.1.24.2       2.2.2.2         0.0.0.1</span><br><span class="line"></span><br><span class="line"> Total Nets: 5  </span><br><span class="line"> Intra Area: 1  Inter Area: 4  ASE: 0  NSSA: 0 </span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>配置Stub区域后，所有自治系统外部路由均由一条三类的默认路由代替。</li>
+<li>除路由条目的减少外，当外部网络发生变化后，Stub区域内的路由器是不会直接受到影响的。</li>
+</ul>
+<h3 id="Totally-Stub区域"><a href="#Totally-Stub区域" class="headerlink" title="Totally Stub区域"></a>Totally Stub区域</h3><p>![](..&#x2F;..&#x2F;images&#x2F;OSPF&#x2F;Totally Stub区域.png)</p>
+<ul>
+<li>Totally Stub区域既不允许自治系统外部路由（四类、五类LSA)在本区域内传播，也不允许区域间路由（三类LSA)在本区域内传播。</li>
+<li>Totally Stub区域内的路由器对其他区域及自制系统外部的访问需求是通过本区域ABR所产生的三类LSA缺省路由实现的。</li>
+<li>与Stub区域配置的区别在于，在ABR上需要追加no-summary参数</li>
+</ul>
+<p>在AR2 设置及变化：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">[AR2]ospf 1</span><br><span class="line">[AR2-ospf-1]area 1</span><br><span class="line">[AR2-ospf-1-area-0.0.0.1]stub no-summary </span><br><span class="line"></span><br><span class="line">&lt;AR2&gt;dis ospf lsdb</span><br><span class="line"></span><br><span class="line">	 OSPF Process 1 with Router ID 2.2.2.2</span><br><span class="line">		 Link State Database </span><br><span class="line"></span><br><span class="line">                  //已忽略 Area 0</span><br><span class="line"> </span><br><span class="line">		         Area: 0.0.0.1</span><br><span class="line"> Type      LinkState ID    AdvRouter          Age  Len   Sequence   Metric</span><br><span class="line"> Router    4.4.4.4         4.4.4.4            106  36    80000009       1</span><br><span class="line"> Router    2.2.2.2         2.2.2.2            113  36    80000005       1</span><br><span class="line"> Network   10.1.24.4       4.4.4.4            106  32    80000002       0</span><br><span class="line"> Sum-Net   0.0.0.0         2.2.2.2            124  28    80000001       1      //缺省</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line"> &lt;AR2&gt;dis ospf routing </span><br><span class="line"></span><br><span class="line">	 OSPF Process 1 with Router ID 2.2.2.2</span><br><span class="line">		  Routing Tables </span><br><span class="line"></span><br><span class="line"> Routing for Network </span><br><span class="line"> Destination        Cost  Type       NextHop         AdvRouter       Area</span><br><span class="line"> 10.1.12.0/24       1     Transit    10.1.12.2       2.2.2.2         0.0.0.0</span><br><span class="line"> 10.1.24.0/24       1     Transit    10.1.24.2       2.2.2.2         0.0.0.1</span><br><span class="line"> 10.1.13.0/24       2     Transit    10.1.12.1       1.1.1.1         0.0.0.0</span><br><span class="line"> 10.1.35.0/24       3     Inter-area 10.1.12.1       3.3.3.3         0.0.0.0</span><br><span class="line"></span><br><span class="line"> Total Nets: 4  </span><br><span class="line"> Intra Area: 3  Inter Area: 1  ASE: 0  NSSA: 0 </span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>AR4的变化：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;AR4&gt;dis ospf lsdb</span><br><span class="line"></span><br><span class="line">	 OSPF Process 1 with Router ID 4.4.4.4</span><br><span class="line">		 Link State Database </span><br><span class="line"></span><br><span class="line">		         Area: 0.0.0.1</span><br><span class="line"> Type      LinkState ID    AdvRouter          Age  Len   Sequence   Metric</span><br><span class="line"> Router    4.4.4.4         4.4.4.4            207  36    80000009       1</span><br><span class="line"> Router    2.2.2.2         2.2.2.2            217  36    80000005       1</span><br><span class="line"> Network   10.1.24.4       4.4.4.4            207  32    80000002       0</span><br><span class="line"> Sum-Net   0.0.0.0         2.2.2.2            228  28    80000001       1     //缺省</span><br><span class="line"> </span><br><span class="line">&lt;AR4&gt;dis ospf routing</span><br><span class="line"></span><br><span class="line">	 OSPF Process 1 with Router ID 4.4.4.4</span><br><span class="line">		  Routing Tables </span><br><span class="line"></span><br><span class="line"> Routing for Network </span><br><span class="line"> Destination        Cost  Type       NextHop         AdvRouter       Area</span><br><span class="line"> 10.1.24.0/24       1     Transit    10.1.24.4       4.4.4.4         0.0.0.1</span><br><span class="line"> 0.0.0.0/0          2     Inter-area 10.1.24.2       2.2.2.2         0.0.0.1   //缺省</span><br><span class="line"></span><br><span class="line"> Total Nets: 2  </span><br><span class="line"> Intra Area: 1  Inter Area: 1  ASE: 0  NSSA: 0 </span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>Totally Stub区域访问其他区域及自制系统外部是通过默认路由实现的。</li>
+<li>自制系统外部、其他OSPF区域的网络发生变化，Totally Stub区域内的路由器是不直接受影响的。</li>
+<li>Stub、Totally Stub解决了末端区域维护过大LSDB带来的问题，但对于某些特定场景Stub、Totally Stub并不是最佳解决方案。</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th align="center">区域</th>
+<th align="center">区域内路由的LSDB</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">Stub</td>
+<td align="center">一、二、三类LSA以及一条缺省三类LSA</td>
+</tr>
+<tr>
+<td align="center">Totally Stub</td>
+<td align="center">一、二类LSA以及一条缺省三类LSA</td>
+</tr>
+</tbody></table>
+<h2 id="NSSA区域和Totally-NSSA区域"><a href="#NSSA区域和Totally-NSSA区域" class="headerlink" title="NSSA区域和Totally NSSA区域"></a>NSSA区域和Totally NSSA区域</h2><p><img src="/../../images/OSPF/NSSA%E5%8C%BA%E5%9F%9F.png"></p>
+<p>OSPF NSSA区域(Not-So-Stubby Area)是在原始OSPF协议标准中新增的一类特殊区域类型。</p>
+<p>NSSA区域和Stub区域有许多相似的地方。两者的差别在于，<u>NSSA区域能够将自治域外部路由引入并传播到整个OSPF自治域中，同时又不会学习来自OSPF网络其它区域的外部路由</u>。</p>
+<p>NSSA LSA(七类LSA ) :</p>
+<ul>
+<li><p>七类LSA是为了支持NSSA区域而新增的一种LSA类型，用于描述NSSA区域引入的外部路由信息。</p>
+</li>
+<li><p>七类LSA由NSSA区域的ASBR产生，其扩散范围仅限于ASBR所在的NSSA区域。</p>
+</li>
+<li><p>缺省路由也可以通过七类LSA来产生，用于指导流量流向其它自治域。</p>
+</li>
+</ul>
+<p>七类LSA转换为五类LSA:</p>
+<ul>
+<li>.NSSA区域的ABR收到七类LSA时，会有选择地将其转换为五类LSA，以便将外部路由信息通告到OSPF网络的其它区域。</li>
+<li>NSSA区域有多个ABR时，进行7类LSA与5类LSA转换的是Router ID最大的ABR。</li>
+</ul>
+<p>Totally NSSA和NSSA区别∶</p>
+<ul>
+<li>Totally NSSA不允许三类LSA在本区域内泛洪。</li>
+<li>Totally NSSA与NSSA区域的配置区别在于ABR上需要追加no-summary参数。</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th align="center">LSA类型</th>
+<th align="center">通告路由</th>
+<th align="center">LSA内容</th>
+<th align="center">传播范围</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">Router LSA（一）</td>
+<td align="center">OSPF Router</td>
+<td align="center">拓扑信息+路由信息</td>
+<td align="center">本区域内</td>
+</tr>
+<tr>
+<td align="center">Network LSA（二）</td>
+<td align="center">DR</td>
+<td align="center">拓扑信息+路由信息</td>
+<td align="center">本区域内</td>
+</tr>
+<tr>
+<td align="center">Network Summer LSA（三）</td>
+<td align="center">ABR</td>
+<td align="center">域间路由信息</td>
+<td align="center">非（Totally）Stub区域</td>
+</tr>
+<tr>
+<td align="center">ASBR Summary LSA（四）</td>
+<td align="center">ABR</td>
+<td align="center">ASBR 的Router ID</td>
+<td align="center">非（Totally）Stub区域</td>
+</tr>
+<tr>
+<td align="center">AS external LSA（五）</td>
+<td align="center">ASBR</td>
+<td align="center">路由进程域外部路由</td>
+<td align="center">（非Stub区域）OSPF进程区域</td>
+</tr>
+<tr>
+<td align="center">NSSA LSA（七）</td>
+<td align="center">ASBR</td>
+<td align="center">NSSA域外部路由信息</td>
+<td align="center">（Totally）NSSA区域</td>
+</tr>
+</tbody></table>
+<p>LSA作用∶</p>
+<ul>
+<li>Router LSA （一类）：每个路由器都会产生，描述了路由器的链路状态和开销，在所属的区域内传播。</li>
+<li>oNetwork LSA（二类）：由DR产生，描述本网段的链路状态，在所属的区域内传播。</li>
+<li>Network-summary-LSA（三类）︰由ABR产生，描述区域内某个网段的路由，并通告给其他相关区域。</li>
+<li>ASBR-summary-LSA（四类）：由ABR产生，描述到ASBR的路由，通告给除ASBR所在区域的其他相关区域。</li>
+<li>AS-external-LSA（五类）：由ASBR产生，描述到AS外部的路由，<u>通告到所有的区域(除了Stub区域和NSSA区域)</u>。</li>
+<li>NSSA LSA（七类）：由ASBR产生，描述到AS外部的路由，<u>仅在NSSA区域内传播</u>。</li>
+</ul>
+<h3 id="Nssa"><a href="#Nssa" class="headerlink" title="Nssa"></a>Nssa</h3><p>![](..&#x2F;..&#x2F;images&#x2F;OSPF&#x2F;nssa demo.png)</p>
+<p>配置静态路由</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">AR6</span><br><span class="line">[AR6]ip route-static 10.1.0.0 16 10.1.16.1</span><br><span class="line">[AR6]ip route-static 10.1.0.0 16 10.1.56.5</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">AR5</span><br><span class="line">[AR5]ip route-static 6.6.6.0 24 10.1.56.6</span><br><span class="line">[AR5]ospf 1</span><br><span class="line">[AR5-ospf-1]import-route static </span><br><span class="line">[AR5-ospf-1]a 2</span><br><span class="line">[AR5-ospf-1-area-0.0.0.2]nssa</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">AR3</span><br><span class="line">[AR3]ospf 1</span><br><span class="line">[AR3-ospf-1] a 2</span><br><span class="line">[AR3-ospf-1-area-0.0.0.2]nssa </span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">AR1</span><br><span class="line">[AR1]ip route-static 6.6.6.0 24 10.1.16.6</span><br><span class="line">[AR1]ospf 1</span><br><span class="line">[AR1-ospf-1]import-route static </span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;AR5&gt;dis ospf lsdb </span><br><span class="line"></span><br><span class="line">	 OSPF Process 1 with Router ID 5.5.5.5</span><br><span class="line">		 Link State Database </span><br><span class="line"></span><br><span class="line">		         Area: 0.0.0.2</span><br><span class="line"> Type      LinkState ID    AdvRouter          Age  Len   Sequence   Metric</span><br><span class="line"> Router    5.5.5.5         5.5.5.5           1415  36    8000000C       1</span><br><span class="line"> Router    3.3.3.3         3.3.3.3           1417  36    80000004       1</span><br><span class="line"> Network   10.1.35.3       3.3.3.3           1417  32    80000001       0</span><br><span class="line"> Sum-Net   10.1.13.0       3.3.3.3             75  28    80000002       1</span><br><span class="line"> Sum-Net   10.1.24.0       3.3.3.3             30  28    80000002       3</span><br><span class="line"> Sum-Net   10.1.12.0       3.3.3.3             30  28    80000002       2</span><br><span class="line"> NSSA      6.6.6.0         5.5.5.5           1425  36    80000001       1  //由于引入了静态路由而产生</span><br><span class="line"> NSSA      0.0.0.0         3.3.3.3             37  36    80000002       1  //七类缺省</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;AR3&gt;dis ospf lsdb</span><br><span class="line"></span><br><span class="line">	 OSPF Process 1 with Router ID 3.3.3.3</span><br><span class="line">		 Link State Database </span><br><span class="line"></span><br><span class="line">                 //已忽略area 0</span><br><span class="line"></span><br><span class="line">		         Area: 0.0.0.2</span><br><span class="line"> Type      LinkState ID    AdvRouter          Age  Len   Sequence   Metric</span><br><span class="line"> Router    5.5.5.5         5.5.5.5            401  36    8000000D       1</span><br><span class="line"> Router    3.3.3.3         3.3.3.3            400  36    80000005       1</span><br><span class="line"> Network   10.1.35.3       3.3.3.3            400  32    80000002       0</span><br><span class="line"> Sum-Net   10.1.13.0       3.3.3.3            859  28    80000002       1</span><br><span class="line"> Sum-Net   10.1.24.0       3.3.3.3            814  28    80000002       3</span><br><span class="line"> Sum-Net   10.1.12.0       3.3.3.3            814  28    80000002       2</span><br><span class="line"> NSSA      0.0.0.0         3.3.3.3            821  36    80000002       1</span><br><span class="line"> NSSA      6.6.6.0         5.5.5.5            411  36    80000002       1</span><br><span class="line"> </span><br><span class="line"></span><br><span class="line">		 AS External Database</span><br><span class="line"> Type      LinkState ID    AdvRouter          Age  Len   Sequence   Metric</span><br><span class="line"> External  6.6.6.0         3.3.3.3            399  36    80000002       1</span><br><span class="line"> External  6.6.6.0         1.1.1.1             97  36    80000002       1</span><br><span class="line">//在区域2内，AR3 是ABR，将七类LSA转化为了五类LSA</span><br></pre></td></tr></table></figure>
+
+<h3 id="Totally-Nssa"><a href="#Totally-Nssa" class="headerlink" title="Totally Nssa"></a>Totally Nssa</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">AR3</span><br><span class="line">[AR3]ospf 1</span><br><span class="line">[AR3-ospf-1]a 2</span><br><span class="line">[AR3-ospf-1-area-0.0.0.2]nssa no-summary</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;AR5&gt;dis ospf lsdb</span><br><span class="line"></span><br><span class="line">	 OSPF Process 1 with Router ID 5.5.5.5</span><br><span class="line">		 Link State Database </span><br><span class="line"></span><br><span class="line">		         Area: 0.0.0.2</span><br><span class="line"> Type      LinkState ID    AdvRouter          Age  Len   Sequence   Metric</span><br><span class="line"> Router    5.5.5.5         5.5.5.5              5  36    80000012       1</span><br><span class="line"> Router    3.3.3.3         3.3.3.3             10  36    80000006       1</span><br><span class="line"> Network   10.1.35.5       5.5.5.5              5  32    80000002       0</span><br><span class="line"> Sum-Net   0.0.0.0         3.3.3.3             16  28    80000001       1  //只剩一条缺省三类LSA</span><br><span class="line"> NSSA      6.6.6.0         5.5.5.5           1660  36    80000002       1</span><br><span class="line"> NSSA      0.0.0.0         3.3.3.3             12  36    80000004       1</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="区域间路由汇总和外部路由汇总"><a href="#区域间路由汇总和外部路由汇总" class="headerlink" title="区域间路由汇总和外部路由汇总"></a>区域间路由汇总和外部路由汇总</h2><p><img src="/../../images/OSPF/%E5%8C%BA%E5%9F%9F%E9%97%B4%E8%B7%AF%E7%94%B1%E6%B1%87%E6%80%BB.png"></p>
+<p>在大规模部署OSPF网络时，可能会出现由于OSPF路由表规模过大而降低路由查找速度的现象，为了解决这个问题，可以配置路由汇总，减小路由表的规模。</p>
+<p><u>路由汇总是指将多条连续的IP前缀汇总成一条路由前缀</u>。如果被汇总的IP地址范围内的某条链路频繁Up和Down，该变化并不会通告给被汇总的IP地址范围外的设备。因此，可以避免网络中的路由振荡，在一定程度上提高了网络的稳定性。</p>
+<p>路由汇总只能汇总路由信息，所以ABR是可以执行路由汇总的位置之一：<br>ABR向其它区域发送路由信息时，以网段为单位生成三类LSA。如果该区域中存在一些连续的网段，则可以通过命令将这些连续的网段汇总成一个网段。这样ABR只发送一条汇总后的三类LSA，所有属于命令指定的汇总网段范围的LSA将不会再被单独发送出去。</p>
+<p>如图所示，Area 1中存在8个连续网段，汇总前RTB将产生8条三类LSA。在RTB上配置汇总后，RTB仅产生1条三类LSA并泛洪到Area 0。</p>
+<p>引入外部路由的ASBR也是执行路由汇总的位置之一。</p>
+<p><img src="/../../images/OSPF/%E5%A4%96%E9%83%A8%E8%B7%AF%E7%94%B1%E6%B1%87%E6%80%BB.png"></p>
+<p>ASBR汇总∶</p>
+<ul>
+<li>配置ASBR汇总后，ASBR将对引入的外部路由进行汇总。NSSA区域的ASBR也可以对引入NSSA区域的外部路由进行汇总。</li>
+<li>如果设备既是NSAA区域的ASBR又是ABR，则可在将七类LSA转换成五类LSA时对相应前缀进行汇总。</li>
+</ul>
+<p>如图所示，Area 0中RTA将8个连续的外部路由引入到OSPF域内，产生8条五类LSA并在OSPF进程域内泛洪。</p>
+<p>在ASBR ( RTA)配置外部路由汇总后，RTA将仅产生1条五类LSA并泛洪至OSPF路由进程域内。</p>
+<p>路由汇总降低了网络故障的影响范围。</p>
+<p>网络发生故障后，路由协议的收敛速度也是衡量路由协议的重要参考依据之一。</p>
+<h2 id="OSPF更新机制"><a href="#OSPF更新机制" class="headerlink" title="OSPF更新机制"></a>OSPF更新机制</h2><p><img src="/../../images/OSPF/%E5%AE%9A%E6%9C%9F%E6%9B%B4%E6%96%B0%E4%B8%8E%E8%A7%A6%E5%8F%91%E6%9B%B4%E6%96%B0.png"></p>
+<p>为了保证路由计算的准确性，需要保证LSA的可靠性。</p>
+<p>OSPF为每个LSA条目维持一个老化计时器(3600s )，当计时器超时，此LSA将从LSDB中删除。</p>
+<p>为了防止LSA条目达到最大生存时间而被删除，OSPF通过定期更新（每1800s刷新一次)机制来刷新LSA。</p>
+<p>OSPF路由器每1800s会重新生成LSA，并通告给其他路由器。为了加快收敛速度，OSPF设置了触发更新机制。</p>
+<p>当链路状态发生变化后，路由器立即发送更新消息，其他路由器收到更新消息后立即进行路由计算，快速完成收敛。</p>
+<h2 id="OSPF认证机制"><a href="#OSPF认证机制" class="headerlink" title="OSPF认证机制"></a>OSPF认证机制</h2><h3 id="安全隐患"><a href="#安全隐患" class="headerlink" title="安全隐患"></a>安全隐患</h3><p><img src="/../../images/OSPF/%E5%AE%89%E5%85%A8%E9%9A%90%E6%82%A3.png"></p>
+<p>如图所示，内部网络通过OSPF协议传递路由。正常情况下，财务部访问公司数据库的流量走向是 <code>财务部-&gt;RTA-&gt;RTB-&gt;Database</code>。</p>
+<p>非法设备接入公司内网，通过向网络中注入非法路由，引导流量进行非正常的转发。即 <code>财务部-&gt;RTA-&gt;非法设备-&gt;RTB-&gt;Database</code>。非法设备收到财务部的流量之后，进行恶意分析，获取财务部关键信息，造成公司机密泄露。</p>
+<h3 id="安全认证"><a href="#安全认证" class="headerlink" title="安全认证"></a>安全认证</h3><p><img src="/../../images/OSPF/%E5%AE%89%E5%85%A8%E8%AE%A4%E8%AF%81.png"></p>
+<p>OSPF支持认证功能，只有通过认证的OSPF路由器才能正常建立邻居关系，交互信息</p>
+<p>两种认证方式︰</p>
+<ul>
+<li>区域认证方式</li>
+<li>接口认证方式。</li>
+</ul>
+<p>支持的认证模式分为null (不认证)、simple（明文)、MD5以及HMAC-MD5。</p>
+<p>当两种认证方式都存在时，优先使用接口认证方式。</p>
+<h2 id="综合应用"><a href="#综合应用" class="headerlink" title="综合应用"></a>综合应用</h2><p><img src="/../../images/OSPF/ospf%E7%BB%BC%E5%90%88%E5%BA%94%E7%94%A8.png"></p>
+<ul>
+<li>需求1分析︰办事处C处于Area 3，RTE左侧与Area 2相连。根据OSPF骨干区域与非骨干区域的连接规则，不能正常通行的原因在于Area 3没有与Area 0直接相连。解决的方式是在RTE和RTC之间建立虚连接。</li>
+<li>需求2分析︰区域内部设备性能低，降低路由计算压力可以通过Stub、Totally Stub、NSSA、Totally NSSA，最大程度减少需要选择Totally Stub或Totally NSSA，同时为了保留外部路由引入的功能，只能选择Totally NSSA。</li>
+<li>需求3分析∶保证路由安全性需要通过认证的方式，最安全的认证模式是采用HMAC-MD5。认证形式采取接口认证。</li>
+<li>需求4分析∶在计算外部路由时如要考虑OSPF域内开销，可通过引入类型为1类的外部路由实现。</li>
+</ul>
+<h3 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h3><p><img src="/../../images/OSPF/%E7%BB%BC%E5%90%88%E5%BA%94%E7%94%A8%E5%AE%9E%E7%8E%B01.png"></p>
+<p><img src="/../../images/OSPF/%E7%BB%BC%E5%90%88%E5%BA%94%E7%94%A8%E5%AE%9E%E7%8E%B02.png"></p>
+]]></content>
       <tags>
         <tag>网络-理论</tag>
       </tags>
