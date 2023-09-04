@@ -96,28 +96,6 @@
       </tags>
   </entry>
   <entry>
-    <title>wx.getUserProfile 不出现弹窗</title>
-    <url>/2023/06/23/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F/wx-getUserProfile-%E4%B8%8D%E5%87%BA%E7%8E%B0%E5%BC%B9%E7%AA%97/</url>
-    <content><![CDATA[<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>使用wx.getUserProfile 获取用户信息，但是不出现弹窗就直接获取到了用户信息，且返回灰色头像，和“微信用户”昵称</p>
-<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><p>原来这个接口在22年5月的时候被回收了，低版本调试库才会正常显示，高版本则会返回灰色头像和默认的“微信用户”昵称<br>官方的解释是：实践中发现有部分小程序，在用户刚打开小程序时就要求收集用户的微信昵称头像，或者在支付前等不合理路径上要求授权。如果用户拒绝授权，则无法使用小程序或相关功能。在已经获取用户的 openId 与 unionId 信息情况下，用户的微信昵称与头像并不是用户使用小程序的必要条件。</p>
-<h2 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h2><p>我的解决方法是手动加一个权限弹窗</p>
-<img src="/images/%E6%89%8B%E5%8A%A8%E5%BC%B9%E7%AA%97.gif" class="center" width="200" title="权限弹窗">
-
-<h3 id="授权弹窗"><a href="#授权弹窗" class="headerlink" title="授权弹窗"></a>授权弹窗</h3><figure class="highlight typescript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="title function_">signupAndLogin</span>(<span class="params"></span>) &#123;            <span class="comment">//bindtap事件</span></span><br><span class="line">    wx.<span class="title function_">showModal</span>(&#123;                     <span class="comment">//手动授权弹窗</span></span><br><span class="line">      <span class="attr">title</span>: <span class="string">&#x27;授权登录提示&#x27;</span>,</span><br><span class="line">      <span class="attr">content</span>: <span class="string">&#x27;是否允许授权？&#x27;</span>,</span><br><span class="line">      <span class="attr">showCancel</span>: <span class="literal">true</span>,</span><br><span class="line">      <span class="attr">confirmText</span>: <span class="string">&#x27;允许&#x27;</span>,</span><br><span class="line">      <span class="attr">confirmColor</span>: <span class="string">&#x27;#669F76&#x27;</span>,</span><br><span class="line">      <span class="attr">cancelColor</span>: <span class="string">&#x27;#CC463D&#x27;</span>,</span><br><span class="line">      <span class="attr">success</span>: <span class="keyword">async</span> res =&gt; &#123;</span><br><span class="line">        <span class="keyword">if</span> (res.<span class="property">confirm</span>) &#123;     <span class="comment">//用户确认</span></span><br><span class="line">          <span class="keyword">const</span> &#123; <span class="attr">userInfo</span>: &#123; nickName, avatarUrl &#125; &#125; = <span class="keyword">await</span></span><br><span class="line">            wx.<span class="title function_">getUserProfile</span>(&#123;    <span class="comment">//获取用户信息，最新版本已不支持弹窗</span></span><br><span class="line">              <span class="attr">desc</span>: <span class="string">&#x27;用户授权&#x27;</span>,</span><br><span class="line">            &#125;)</span><br><span class="line"> </span><br><span class="line">          <span class="keyword">let</span> &#123; result &#125; = <span class="keyword">await</span> wx.<span class="property">cloud</span>.<span class="title function_">callFunction</span>(&#123;  <span class="comment">// 调用云函数</span></span><br><span class="line">            <span class="attr">name</span>: <span class="string">&#x27;loginOrSignup&#x27;</span>,</span><br><span class="line">            <span class="attr">data</span>: &#123;</span><br><span class="line">              nickName,</span><br><span class="line">              avatarUrl</span><br><span class="line">            &#125;</span><br><span class="line">          &#125;)</span><br><span class="line">          <span class="variable language_">this</span>.<span class="title function_">setData</span>(&#123; <span class="attr">userInfo</span>: result &#125;)</span><br><span class="line">          <span class="title function_">getApp</span>().<span class="property">globalData</span>.<span class="property">userStatus</span> = <span class="literal">true</span>   <span class="comment">//用于检查用户是否登录的全局变量</span></span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (res.<span class="property">cancel</span>) &#123;     <span class="comment">//用户取消</span></span><br><span class="line">          wx.<span class="title function_">showToast</span>(&#123;</span><br><span class="line">            <span class="attr">title</span>: <span class="string">&#x27;取消授权&#x27;</span>,</span><br><span class="line">            <span class="attr">mask</span>: <span class="literal">true</span>,</span><br><span class="line">            <span class="attr">icon</span>: <span class="string">&#x27;error&#x27;</span></span><br><span class="line">          &#125;)</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
-<h1 id=""><a href="#" class="headerlink" title=""></a></h1><h3 id="loginOrSignup云函数"><a href="#loginOrSignup云函数" class="headerlink" title="loginOrSignup云函数"></a>loginOrSignup云函数</h3><figure class="highlight typescript"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 云函数入口文件</span></span><br><span class="line"><span class="keyword">const</span> cloud = <span class="built_in">require</span>(<span class="string">&#x27;wx-server-sdk&#x27;</span>)</span><br><span class="line"> </span><br><span class="line">cloud.<span class="title function_">init</span>(&#123; <span class="attr">env</span>: cloud.<span class="property">DYNAMIC_CURRENT_ENV</span> &#125;) <span class="comment">// 使用当前云环境</span></span><br><span class="line"><span class="keyword">const</span> db = cloud.<span class="title function_">database</span>()</span><br><span class="line"><span class="comment">// 云函数入口函数</span></span><br><span class="line"><span class="built_in">exports</span>.<span class="property">main</span> = <span class="keyword">async</span> (event, context) =&gt; &#123;</span><br><span class="line">  <span class="keyword">const</span> &#123; <span class="variable constant_">OPENID</span> &#125; = cloud.<span class="title function_">getWXContext</span>()</span><br><span class="line">  <span class="keyword">const</span> &#123; nickName, avatarUrl &#125; = event</span><br><span class="line">  <span class="keyword">const</span> user_clct = db.<span class="title function_">collection</span>(<span class="string">&#x27;user&#x27;</span>)</span><br><span class="line"> </span><br><span class="line">  <span class="keyword">const</span> &#123; data &#125; = <span class="keyword">await</span> user_clct.<span class="title function_">where</span>(&#123;    <span class="comment">//查询用户是否存在</span></span><br><span class="line">    <span class="attr">_openId</span>: <span class="variable constant_">OPENID</span></span><br><span class="line">  &#125;).<span class="title function_">get</span>()</span><br><span class="line"> </span><br><span class="line">  <span class="keyword">if</span> (data.<span class="property">length</span> === <span class="number">0</span>) &#123;                     <span class="comment">//如果用户不存在，添加用户</span></span><br><span class="line">    <span class="keyword">let</span> user = <span class="keyword">await</span> user_clct.<span class="title function_">add</span>(&#123;</span><br><span class="line">      <span class="attr">data</span>: &#123;</span><br><span class="line">        nickName,</span><br><span class="line">        avatarUrl,</span><br><span class="line">        <span class="attr">_openId</span>: <span class="variable constant_">OPENID</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      nickName,</span><br><span class="line">      avatarUrl,</span><br><span class="line">      <span class="attr">_openId</span>: <span class="variable constant_">OPENID</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> data[<span class="number">0</span>]       <span class="comment">//如果用户存在，返回该用户信息</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="选择头像"><a href="#选择头像" class="headerlink" title="选择头像"></a>选择头像</h3><img src="/images/%E9%80%89%E6%8B%A9%E5%A4%B4%E5%83%8F.gif" class="center" width="200" title="权限弹窗">
-<h1 id="-1"><a href="#-1" class="headerlink" title=""></a></h1><figure class="highlight html"><figcaption><span>wxml</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">button</span> <span class="attr">class</span>=<span class="string">&quot;chooseAvatar&quot;</span> <span class="attr">open-type</span>=<span class="string">&quot;chooseAvatar&quot;</span> <span class="attr">bindchooseavatar</span>=<span class="string">&quot;chooseAvatar&quot;</span> <span class="attr">plain</span>=<span class="string">&quot;ture&quot;</span> <span class="attr">style</span>=<span class="string">&quot;width: 160rpx; border: none;color: #6e6e6e;&quot;</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">image</span> <span class="attr">class</span>=<span class="string">&quot;userAvatar&quot;</span> <span class="attr">src</span>=<span class="string">&quot;&#123;&#123;userInfo.avatarUrl&#125;&#125;&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">image</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br></pre></td></tr></table></figure>
-<h1 id="-2"><a href="#-2" class="headerlink" title=""></a></h1><figure class="highlight typescript"><figcaption><span>typescript</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="title function_">chooseAvatar</span>(<span class="params">e: <span class="built_in">any</span></span>) &#123;                <span class="comment">//用户更换头像</span></span><br><span class="line">    <span class="comment">//e.detail 已经是 avatarUrl：&quot;...&quot;的格式</span></span><br><span class="line">    <span class="keyword">let</span> &#123; avatarUrl &#125; = e.<span class="property">detail</span></span><br><span class="line"> </span><br><span class="line">    wx.<span class="property">cloud</span>.<span class="title function_">callFunction</span>(&#123;</span><br><span class="line">      <span class="attr">name</span>: <span class="string">&#x27;uploadAvatar&#x27;</span>,</span><br><span class="line">      <span class="attr">data</span>: &#123;</span><br><span class="line">        avatarUrl</span><br><span class="line">      &#125;,</span><br><span class="line">      <span class="attr">success</span>: <span class="keyword">async</span> res =&gt; &#123;</span><br><span class="line">        <span class="keyword">let</span> &#123; result &#125; = <span class="keyword">await</span> wx.<span class="property">cloud</span>.<span class="title function_">callFunction</span>(&#123;  <span class="comment">// 调用登录云函数，不传参，用以更新页面中的用户信息</span></span><br><span class="line">          <span class="attr">name</span>: <span class="string">&#x27;loginOrSignup&#x27;</span>,</span><br><span class="line">        &#125;)</span><br><span class="line">        <span class="variable language_">this</span>.<span class="title function_">setData</span>(&#123; <span class="attr">userInfo</span>: result &#125;)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;,</span><br></pre></td></tr></table></figure>
-
-<h3 id="uploadAvatar，更新头像"><a href="#uploadAvatar，更新头像" class="headerlink" title="uploadAvatar，更新头像"></a>uploadAvatar，更新头像</h3><figure class="highlight typescript"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 云函数入口文件</span></span><br><span class="line"><span class="keyword">const</span> cloud = <span class="built_in">require</span>(<span class="string">&#x27;wx-server-sdk&#x27;</span>)</span><br><span class="line"> </span><br><span class="line">cloud.<span class="title function_">init</span>(&#123; <span class="attr">env</span>: cloud.<span class="property">DYNAMIC_CURRENT_ENV</span> &#125;) <span class="comment">// 使用当前云环境</span></span><br><span class="line"><span class="keyword">const</span> db = cloud.<span class="title function_">database</span>()</span><br><span class="line"><span class="comment">// 云函数入口函数</span></span><br><span class="line"><span class="built_in">exports</span>.<span class="property">main</span> = <span class="keyword">async</span> (event, context) =&gt; &#123;</span><br><span class="line">  <span class="keyword">const</span> &#123; <span class="variable constant_">OPENID</span> &#125; = cloud.<span class="title function_">getWXContext</span>()</span><br><span class="line">  <span class="keyword">const</span> &#123; avatarUrl &#125; = event</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    db.<span class="title function_">collection</span>(<span class="string">&#x27;user&#x27;</span>).<span class="title function_">where</span>(&#123;</span><br><span class="line">      <span class="attr">_openId</span>: <span class="variable constant_">OPENID</span></span><br><span class="line">    &#125;).<span class="title function_">update</span>(&#123;</span><br><span class="line">      <span class="attr">data</span>: &#123;</span><br><span class="line">        avatarUrl</span><br><span class="line">      &#125;,</span><br><span class="line">      <span class="attr">success</span>:<span class="function"><span class="params">res</span>=&gt;</span>&#123;</span><br><span class="line">        <span class="keyword">return</span> avatarUrl</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125; <span class="keyword">catch</span> (err) &#123;</span><br><span class="line">    <span class="keyword">return</span> err</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-]]></content>
-      <tags>
-        <tag>微信小程序</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>mysql进阶篇 一</title>
     <url>/2023/07/05/mysql%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E8%BF%9B%E9%98%B6/</url>
     <content><![CDATA[<h2 id="1-索引"><a href="#1-索引" class="headerlink" title="1.索引"></a>1.索引</h2><h3 id="1-基础语法"><a href="#1-基础语法" class="headerlink" title="1.基础语法"></a>1.基础语法</h3><p>索引是一种数据结构，用于加快数据的检索速度。常见的索引类型包括B树索引和哈希索引。在创建表时，可以为某些列添加索引来提高查询效率。</p>
@@ -290,6 +268,28 @@
       </tags>
   </entry>
   <entry>
+    <title>wx.getUserProfile 不出现弹窗</title>
+    <url>/2023/06/23/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F/wx-getUserProfile-%E4%B8%8D%E5%87%BA%E7%8E%B0%E5%BC%B9%E7%AA%97/</url>
+    <content><![CDATA[<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>使用wx.getUserProfile 获取用户信息，但是不出现弹窗就直接获取到了用户信息，且返回灰色头像，和“微信用户”昵称</p>
+<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><p>原来这个接口在22年5月的时候被回收了，低版本调试库才会正常显示，高版本则会返回灰色头像和默认的“微信用户”昵称<br>官方的解释是：实践中发现有部分小程序，在用户刚打开小程序时就要求收集用户的微信昵称头像，或者在支付前等不合理路径上要求授权。如果用户拒绝授权，则无法使用小程序或相关功能。在已经获取用户的 openId 与 unionId 信息情况下，用户的微信昵称与头像并不是用户使用小程序的必要条件。</p>
+<h2 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h2><p>我的解决方法是手动加一个权限弹窗</p>
+<img src="/images/%E6%89%8B%E5%8A%A8%E5%BC%B9%E7%AA%97.gif" class="center" width="200" title="权限弹窗">
+
+<h3 id="授权弹窗"><a href="#授权弹窗" class="headerlink" title="授权弹窗"></a>授权弹窗</h3><figure class="highlight typescript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="title function_">signupAndLogin</span>(<span class="params"></span>) &#123;            <span class="comment">//bindtap事件</span></span><br><span class="line">    wx.<span class="title function_">showModal</span>(&#123;                     <span class="comment">//手动授权弹窗</span></span><br><span class="line">      <span class="attr">title</span>: <span class="string">&#x27;授权登录提示&#x27;</span>,</span><br><span class="line">      <span class="attr">content</span>: <span class="string">&#x27;是否允许授权？&#x27;</span>,</span><br><span class="line">      <span class="attr">showCancel</span>: <span class="literal">true</span>,</span><br><span class="line">      <span class="attr">confirmText</span>: <span class="string">&#x27;允许&#x27;</span>,</span><br><span class="line">      <span class="attr">confirmColor</span>: <span class="string">&#x27;#669F76&#x27;</span>,</span><br><span class="line">      <span class="attr">cancelColor</span>: <span class="string">&#x27;#CC463D&#x27;</span>,</span><br><span class="line">      <span class="attr">success</span>: <span class="keyword">async</span> res =&gt; &#123;</span><br><span class="line">        <span class="keyword">if</span> (res.<span class="property">confirm</span>) &#123;     <span class="comment">//用户确认</span></span><br><span class="line">          <span class="keyword">const</span> &#123; <span class="attr">userInfo</span>: &#123; nickName, avatarUrl &#125; &#125; = <span class="keyword">await</span></span><br><span class="line">            wx.<span class="title function_">getUserProfile</span>(&#123;    <span class="comment">//获取用户信息，最新版本已不支持弹窗</span></span><br><span class="line">              <span class="attr">desc</span>: <span class="string">&#x27;用户授权&#x27;</span>,</span><br><span class="line">            &#125;)</span><br><span class="line"> </span><br><span class="line">          <span class="keyword">let</span> &#123; result &#125; = <span class="keyword">await</span> wx.<span class="property">cloud</span>.<span class="title function_">callFunction</span>(&#123;  <span class="comment">// 调用云函数</span></span><br><span class="line">            <span class="attr">name</span>: <span class="string">&#x27;loginOrSignup&#x27;</span>,</span><br><span class="line">            <span class="attr">data</span>: &#123;</span><br><span class="line">              nickName,</span><br><span class="line">              avatarUrl</span><br><span class="line">            &#125;</span><br><span class="line">          &#125;)</span><br><span class="line">          <span class="variable language_">this</span>.<span class="title function_">setData</span>(&#123; <span class="attr">userInfo</span>: result &#125;)</span><br><span class="line">          <span class="title function_">getApp</span>().<span class="property">globalData</span>.<span class="property">userStatus</span> = <span class="literal">true</span>   <span class="comment">//用于检查用户是否登录的全局变量</span></span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (res.<span class="property">cancel</span>) &#123;     <span class="comment">//用户取消</span></span><br><span class="line">          wx.<span class="title function_">showToast</span>(&#123;</span><br><span class="line">            <span class="attr">title</span>: <span class="string">&#x27;取消授权&#x27;</span>,</span><br><span class="line">            <span class="attr">mask</span>: <span class="literal">true</span>,</span><br><span class="line">            <span class="attr">icon</span>: <span class="string">&#x27;error&#x27;</span></span><br><span class="line">          &#125;)</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<h1 id=""><a href="#" class="headerlink" title=""></a></h1><h3 id="loginOrSignup云函数"><a href="#loginOrSignup云函数" class="headerlink" title="loginOrSignup云函数"></a>loginOrSignup云函数</h3><figure class="highlight typescript"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 云函数入口文件</span></span><br><span class="line"><span class="keyword">const</span> cloud = <span class="built_in">require</span>(<span class="string">&#x27;wx-server-sdk&#x27;</span>)</span><br><span class="line"> </span><br><span class="line">cloud.<span class="title function_">init</span>(&#123; <span class="attr">env</span>: cloud.<span class="property">DYNAMIC_CURRENT_ENV</span> &#125;) <span class="comment">// 使用当前云环境</span></span><br><span class="line"><span class="keyword">const</span> db = cloud.<span class="title function_">database</span>()</span><br><span class="line"><span class="comment">// 云函数入口函数</span></span><br><span class="line"><span class="built_in">exports</span>.<span class="property">main</span> = <span class="keyword">async</span> (event, context) =&gt; &#123;</span><br><span class="line">  <span class="keyword">const</span> &#123; <span class="variable constant_">OPENID</span> &#125; = cloud.<span class="title function_">getWXContext</span>()</span><br><span class="line">  <span class="keyword">const</span> &#123; nickName, avatarUrl &#125; = event</span><br><span class="line">  <span class="keyword">const</span> user_clct = db.<span class="title function_">collection</span>(<span class="string">&#x27;user&#x27;</span>)</span><br><span class="line"> </span><br><span class="line">  <span class="keyword">const</span> &#123; data &#125; = <span class="keyword">await</span> user_clct.<span class="title function_">where</span>(&#123;    <span class="comment">//查询用户是否存在</span></span><br><span class="line">    <span class="attr">_openId</span>: <span class="variable constant_">OPENID</span></span><br><span class="line">  &#125;).<span class="title function_">get</span>()</span><br><span class="line"> </span><br><span class="line">  <span class="keyword">if</span> (data.<span class="property">length</span> === <span class="number">0</span>) &#123;                     <span class="comment">//如果用户不存在，添加用户</span></span><br><span class="line">    <span class="keyword">let</span> user = <span class="keyword">await</span> user_clct.<span class="title function_">add</span>(&#123;</span><br><span class="line">      <span class="attr">data</span>: &#123;</span><br><span class="line">        nickName,</span><br><span class="line">        avatarUrl,</span><br><span class="line">        <span class="attr">_openId</span>: <span class="variable constant_">OPENID</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      nickName,</span><br><span class="line">      avatarUrl,</span><br><span class="line">      <span class="attr">_openId</span>: <span class="variable constant_">OPENID</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> data[<span class="number">0</span>]       <span class="comment">//如果用户存在，返回该用户信息</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="选择头像"><a href="#选择头像" class="headerlink" title="选择头像"></a>选择头像</h3><img src="/images/%E9%80%89%E6%8B%A9%E5%A4%B4%E5%83%8F.gif" class="center" width="200" title="权限弹窗">
+<h1 id="-1"><a href="#-1" class="headerlink" title=""></a></h1><figure class="highlight html"><figcaption><span>wxml</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">button</span> <span class="attr">class</span>=<span class="string">&quot;chooseAvatar&quot;</span> <span class="attr">open-type</span>=<span class="string">&quot;chooseAvatar&quot;</span> <span class="attr">bindchooseavatar</span>=<span class="string">&quot;chooseAvatar&quot;</span> <span class="attr">plain</span>=<span class="string">&quot;ture&quot;</span> <span class="attr">style</span>=<span class="string">&quot;width: 160rpx; border: none;color: #6e6e6e;&quot;</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">image</span> <span class="attr">class</span>=<span class="string">&quot;userAvatar&quot;</span> <span class="attr">src</span>=<span class="string">&quot;&#123;&#123;userInfo.avatarUrl&#125;&#125;&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">image</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h1 id="-2"><a href="#-2" class="headerlink" title=""></a></h1><figure class="highlight typescript"><figcaption><span>typescript</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="title function_">chooseAvatar</span>(<span class="params">e: <span class="built_in">any</span></span>) &#123;                <span class="comment">//用户更换头像</span></span><br><span class="line">    <span class="comment">//e.detail 已经是 avatarUrl：&quot;...&quot;的格式</span></span><br><span class="line">    <span class="keyword">let</span> &#123; avatarUrl &#125; = e.<span class="property">detail</span></span><br><span class="line"> </span><br><span class="line">    wx.<span class="property">cloud</span>.<span class="title function_">callFunction</span>(&#123;</span><br><span class="line">      <span class="attr">name</span>: <span class="string">&#x27;uploadAvatar&#x27;</span>,</span><br><span class="line">      <span class="attr">data</span>: &#123;</span><br><span class="line">        avatarUrl</span><br><span class="line">      &#125;,</span><br><span class="line">      <span class="attr">success</span>: <span class="keyword">async</span> res =&gt; &#123;</span><br><span class="line">        <span class="keyword">let</span> &#123; result &#125; = <span class="keyword">await</span> wx.<span class="property">cloud</span>.<span class="title function_">callFunction</span>(&#123;  <span class="comment">// 调用登录云函数，不传参，用以更新页面中的用户信息</span></span><br><span class="line">          <span class="attr">name</span>: <span class="string">&#x27;loginOrSignup&#x27;</span>,</span><br><span class="line">        &#125;)</span><br><span class="line">        <span class="variable language_">this</span>.<span class="title function_">setData</span>(&#123; <span class="attr">userInfo</span>: result &#125;)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;,</span><br></pre></td></tr></table></figure>
+
+<h3 id="uploadAvatar，更新头像"><a href="#uploadAvatar，更新头像" class="headerlink" title="uploadAvatar，更新头像"></a>uploadAvatar，更新头像</h3><figure class="highlight typescript"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 云函数入口文件</span></span><br><span class="line"><span class="keyword">const</span> cloud = <span class="built_in">require</span>(<span class="string">&#x27;wx-server-sdk&#x27;</span>)</span><br><span class="line"> </span><br><span class="line">cloud.<span class="title function_">init</span>(&#123; <span class="attr">env</span>: cloud.<span class="property">DYNAMIC_CURRENT_ENV</span> &#125;) <span class="comment">// 使用当前云环境</span></span><br><span class="line"><span class="keyword">const</span> db = cloud.<span class="title function_">database</span>()</span><br><span class="line"><span class="comment">// 云函数入口函数</span></span><br><span class="line"><span class="built_in">exports</span>.<span class="property">main</span> = <span class="keyword">async</span> (event, context) =&gt; &#123;</span><br><span class="line">  <span class="keyword">const</span> &#123; <span class="variable constant_">OPENID</span> &#125; = cloud.<span class="title function_">getWXContext</span>()</span><br><span class="line">  <span class="keyword">const</span> &#123; avatarUrl &#125; = event</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    db.<span class="title function_">collection</span>(<span class="string">&#x27;user&#x27;</span>).<span class="title function_">where</span>(&#123;</span><br><span class="line">      <span class="attr">_openId</span>: <span class="variable constant_">OPENID</span></span><br><span class="line">    &#125;).<span class="title function_">update</span>(&#123;</span><br><span class="line">      <span class="attr">data</span>: &#123;</span><br><span class="line">        avatarUrl</span><br><span class="line">      &#125;,</span><br><span class="line">      <span class="attr">success</span>:<span class="function"><span class="params">res</span>=&gt;</span>&#123;</span><br><span class="line">        <span class="keyword">return</span> avatarUrl</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125; <span class="keyword">catch</span> (err) &#123;</span><br><span class="line">    <span class="keyword">return</span> err</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <tags>
+        <tag>微信小程序</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>微信小程序实现类似qq界面侧滑效果</title>
     <url>/2023/06/23/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%AE%9E%E7%8E%B0%E7%B1%BB%E4%BC%BCqq%E7%95%8C%E9%9D%A2%E4%BE%A7%E6%BB%91%E6%95%88%E6%9E%9C/</url>
     <content><![CDATA[<h2 id="效果浏览"><a href="#效果浏览" class="headerlink" title="效果浏览"></a>效果浏览</h2><img src="/images/%E4%BE%A7%E6%BB%91%E7%95%8C%E9%9D%A2.gif" class="center" width="200" title="效果演示" alt="侧滑界面">
@@ -423,147 +423,36 @@
       </tags>
   </entry>
   <entry>
-    <title>篇5 vlan</title>
-    <url>/2023/07/20/%E7%BD%91%E7%BB%9C-Ensp/%E7%AF%875-vlan/</url>
-    <content><![CDATA[<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>VLAN（Virtual Local Area Network）是一种虚拟局域网技术，用于将一个物理网络划分为多个逻辑上独立的虚拟网络。VLAN可以提供更好的网络管理和安全性。</p>
-<h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><img src="/images/vlan%E5%87%86%E5%A4%87.png" class="center" width="500">
-
-<p>三层交换机两台、pc机若干</p>
-<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><ol>
-<li><p>创建vlan —— <code>vlan [vlan号]</code> </p>
-</li>
-<li><p>划分vlan：<br>  （1）进入接口<br>  （2）<code>port link-type access</code> （终端，如电脑、打印机等为access；其他交换机则为trunk）<br>  （3）<code>port default vlan [vlan号]</code></p>
-</li>
-<li><p>交换机之间允许vlan通信<br>  （1）进入接口<br>  （2）<code>port link-type trunk</code><br>  （3）<code>port trunk allow-pass vlan [vlan号]</code></p>
-</li>
-</ol>
-<h2 id="实操"><a href="#实操" class="headerlink" title="实操"></a>实操</h2><ol>
-<li><p>LSW1(第一台交换机)</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">&lt;Huawei&gt;sy</span><br><span class="line">Enter system view, return user view with Ctrl+Z.</span><br><span class="line"></span><br><span class="line">//创建vlan</span><br><span class="line">[Huawei]vlan 10</span><br><span class="line">[Huawei-vlan10]q</span><br><span class="line">[Huawei]vlan 20</span><br><span class="line">[Huawei-vlan20]q</span><br><span class="line"></span><br><span class="line">//划分vlan</span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/1</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]port link-type access </span><br><span class="line">[Huawei-GigabitEthernet0/0/1]port default vlan 10</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]q</span><br><span class="line"></span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/2</span><br><span class="line">[Huawei-GigabitEthernet0/0/2]port link-type access 	</span><br><span class="line">[Huawei-GigabitEthernet0/0/2]port default vlan 20</span><br><span class="line">[Huawei-GigabitEthernet0/0/2]q</span><br><span class="line"></span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/3</span><br><span class="line">[Huawei-GigabitEthernet0/0/3]port link-type access 	</span><br><span class="line">[Huawei-GigabitEthernet0/0/3]port default vlan 20</span><br><span class="line">[Huawei-GigabitEthernet0/0/3]q</span><br><span class="line"></span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/4</span><br><span class="line">[Huawei-GigabitEthernet0/0/4]port link-type trunk</span><br><span class="line">[Huawei-GigabitEthernet0/0/4]port trunk allow-pass vlan 10</span><br><span class="line">[Huawei-GigabitEthernet0/0/4]port trunk allow-pass vlan 20</span><br></pre></td></tr></table></figure>
-
-
-</li>
-<li><p>LSW2(第二台交换机)</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">&lt;Huawei&gt;sy</span><br><span class="line">Enter system view, return user view with Ctrl+Z.</span><br><span class="line"></span><br><span class="line">//创建vlan</span><br><span class="line">[Huawei]vlan 10</span><br><span class="line">[Huawei-vlan10]q</span><br><span class="line">[Huawei]vlan 20</span><br><span class="line">[Huawei-vlan20]q</span><br><span class="line"></span><br><span class="line">//划分vlan</span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/1</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]port link-type access </span><br><span class="line">[Huawei-GigabitEthernet0/0/1]port default vlan 10</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]q</span><br><span class="line"></span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/2</span><br><span class="line">[Huawei-GigabitEthernet0/0/2]port link-type access </span><br><span class="line">[Huawei-GigabitEthernet0/0/2]port default vlan 20</span><br><span class="line">[Huawei-GigabitEthernet0/0/2]q</span><br><span class="line"></span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/3</span><br><span class="line">[Huawei-GigabitEthernet0/0/3]port link-type trunk </span><br><span class="line">[Huawei-GigabitEthernet0/0/3]port trunk allow-pass vlan 10</span><br><span class="line">[Huawei-GigabitEthernet0/0/3]port trunk allow-pass vlan 20</span><br></pre></td></tr></table></figure>
-
-
-</li>
-<li><p>给pc机的ip从左到右依次设为1.1.1.1~1.1.1.5</p>
-</li>
-</ol>
-<h2 id="检验"><a href="#检验" class="headerlink" title="检验"></a>检验</h2><p><strong>pc1 ping pc2，由于不在同一个vlan中，ping操作失败</strong></p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 1.1.1.2</span></span><br><span class="line"></span><br><span class="line">Ping 1.1.1.2: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 1.1.1.1: Destination host unreachable</span><br><span class="line">From 1.1.1.1: Destination host unreachable</span><br><span class="line">From 1.1.1.1: Destination host unreachable</span><br><span class="line">From 1.1.1.1: Destination host unreachable</span><br><span class="line">From 1.1.1.1: Destination host unreachable</span><br><span class="line"></span><br><span class="line">--- 1.1.1.2 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  0 packet(s) received</span><br><span class="line">  100.00% packet loss</span><br></pre></td></tr></table></figure>
-
-<p><strong>同样的，pc2 ping pc1 也是失败</strong></p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 1.1.1.1</span></span><br><span class="line"></span><br><span class="line">Ping 1.1.1.1: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 1.1.1.2: Destination host unreachable</span><br><span class="line">From 1.1.1.2: Destination host unreachable</span><br><span class="line">From 1.1.1.2: Destination host unreachable</span><br><span class="line">From 1.1.1.2: Destination host unreachable</span><br><span class="line">From 1.1.1.2: Destination host unreachable</span><br><span class="line"></span><br><span class="line">--- 1.1.1.1 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  0 packet(s) received</span><br><span class="line">  100.00% packet loss</span><br></pre></td></tr></table></figure>
-
-<p><strong>pc1 与 pc5 互ping也是失败</strong></p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">//pc1 ping pc5</span><br><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 1.1.1.5</span></span><br><span class="line"></span><br><span class="line">Ping 1.1.1.5: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 1.1.1.1: Destination host unreachable</span><br><span class="line">From 1.1.1.1: Destination host unreachable</span><br><span class="line">From 1.1.1.1: Destination host unreachable</span><br><span class="line">From 1.1.1.1: Destination host unreachable</span><br><span class="line">From 1.1.1.1: Destination host unreachable</span><br><span class="line"></span><br><span class="line">--- 1.1.1.5 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  0 packet(s) received</span><br><span class="line">  100.00% packet loss</span><br><span class="line">  </span><br><span class="line">//pc5 ping pc1</span><br><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 1.1.1.1</span></span><br><span class="line"></span><br><span class="line">Ping 1.1.1.1: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 1.1.1.5: Destination host unreachable</span><br><span class="line">From 1.1.1.5: Destination host unreachable</span><br><span class="line">From 1.1.1.5: Destination host unreachable</span><br><span class="line">From 1.1.1.5: Destination host unreachable</span><br><span class="line">From 1.1.1.5: Destination host unreachable</span><br><span class="line"></span><br><span class="line">--- 1.1.1.1 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  0 packet(s) received</span><br><span class="line">  100.00% packet loss</span><br></pre></td></tr></table></figure>
-
-
-
-<p><strong>相同vlan下互ping不影响</strong></p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">//pc1 ping pc4</span><br><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 1.1.1.4</span></span><br><span class="line"></span><br><span class="line">Ping 1.1.1.4: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 1.1.1.4: bytes=32 seq=1 ttl=128 time=47 ms</span><br><span class="line">From 1.1.1.4: bytes=32 seq=2 ttl=128 time=78 ms</span><br><span class="line">From 1.1.1.4: bytes=32 seq=3 ttl=128 time=78 ms</span><br><span class="line">From 1.1.1.4: bytes=32 seq=4 ttl=128 time=79 ms</span><br><span class="line">From 1.1.1.4: bytes=32 seq=5 ttl=128 time=63 ms</span><br><span class="line"></span><br><span class="line">--- 1.1.1.4 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 47/69/79 ms</span><br><span class="line">  </span><br><span class="line">//pc4 ping pc1</span><br><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 1.1.1.1</span></span><br><span class="line"></span><br><span class="line">Ping 1.1.1.1: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 1.1.1.1: bytes=32 seq=1 ttl=128 time=63 ms</span><br><span class="line">From 1.1.1.1: bytes=32 seq=2 ttl=128 time=62 ms</span><br><span class="line">From 1.1.1.1: bytes=32 seq=3 ttl=128 time=78 ms</span><br><span class="line">From 1.1.1.1: bytes=32 seq=4 ttl=128 time=62 ms</span><br><span class="line">From 1.1.1.1: bytes=32 seq=5 ttl=128 time=63 ms</span><br><span class="line"></span><br><span class="line">--- 1.1.1.1 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 62/65/78 ms</span><br><span class="line">  </span><br><span class="line">//pc2 ping pc5</span><br><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 1.1.1.5</span></span><br><span class="line"></span><br><span class="line">Ping 1.1.1.5: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 1.1.1.5: bytes=32 seq=1 ttl=128 time=94 ms</span><br><span class="line">From 1.1.1.5: bytes=32 seq=2 ttl=128 time=78 ms</span><br><span class="line">From 1.1.1.5: bytes=32 seq=3 ttl=128 time=79 ms</span><br><span class="line">From 1.1.1.5: bytes=32 seq=4 ttl=128 time=78 ms</span><br><span class="line">From 1.1.1.5: bytes=32 seq=5 ttl=128 time=78 ms</span><br><span class="line"></span><br><span class="line">--- 1.1.1.5 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 78/81/94 ms</span><br></pre></td></tr></table></figure>
-
-]]></content>
-      <tags>
-        <tag>网络-Ensp</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>篇4 静态路由</title>
-    <url>/2023/07/17/%E7%BD%91%E7%BB%9C-Ensp/%E7%AF%874-%E9%9D%99%E6%80%81%E8%B7%AF%E7%94%B1/</url>
-    <content><![CDATA[<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>静态路由是网络中使用静态路由表来确定数据包的传输路径的一种路由方式。它是通过手动配置路由器上的路由表来指定目标网络和下一跳路由器的关系，以确定数据包的传输路径。</p>
-<p>在静态路由中，网络管理员手动配置路由器上的路由表，将目标网络的 IP 地址和对应的下一跳路由器的 IP 地址进行映射。当路由器收到一个数据包时，它会根据数据包的目标 IP 地址查找路由表，找到与目标 IP 地址匹配的条目，并将数据包发送到相应的下一跳路由器。下一跳路由器将继续根据路由表将数据包转发到下一个路由器，直到数据包到达目标网络。</p>
-<p>静态路由的主要特点包括：</p>
+    <title>篇6 三层交换技术</title>
+    <url>/2023/07/21/%E7%BD%91%E7%BB%9C-Ensp/%E7%AF%876-%E4%B8%89%E5%B1%82%E4%BA%A4%E6%8D%A2%E6%8A%80%E6%9C%AF/</url>
+    <content><![CDATA[<h1 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h1><p>三层交换技术是指将网络交换机与路由器的功能结合起来，使交换机能够进行基于网络层（第三层）的转发和路由功能。它在传统二层交换机的基础上增加了路由功能，从而能够更高效地处理大规模网络中的数据流量和转发需求。</p>
+<p>三层交换技术的主要特点如下：</p>
 <ol>
-<li>静态路由是手动配置的，不会自动适应网络变化。如果网络拓扑发生变化，管理员需要手动更新路由表。</li>
-<li>静态路由是固定的，不会根据网络负载或链路状态进行动态调整。所有数据包都将按照路由表中的配置进行转发。</li>
-<li>静态路由的配置相对简单，适用于小型网络或网络拓扑不经常变化的情况。</li>
-<li>静态路由的优点是稳定性高，因为路由表不会频繁变化，不会产生额外的路由协议开销。</li>
+<li>路由能力：<u>三层交换机具备路由器的基本功能，能够在不同的子网之间进行数据包的转发和路由决策</u>。它能够识别目标IP地址，并根据路由表进行转发决策，使数据能够跨越不同的子网进行传输。</li>
+<li>VLAN支持：三层交换机支持虚拟局域网（VLAN）技术，可以将物理网络划分为多个逻辑上独立的虚拟网络。通过VLAN的配置，可以实现更好的网络隔离和安全性。</li>
+<li>高性能转发：三层交换机采用硬件加速和快速转发技术，能够高效处理数据包的路由和转发。它可以进行流量控制、负载均衡和快速转发等功能，以提供更快的数据传输速度和更高的性能。</li>
+<li>动态路由协议支持：三层交换机一般支持主要的动态路由协议，如OSPF、BGP和RIP等，能够与其他路由器进行动态路由协议的交互和学习，以实现更智能的网络路径选择和故障恢复能力。</li>
 </ol>
-<p>静态路由适用于简单的网络环境或需要精确控制数据包传输路径的情况。对于复杂的网络环境或需要自动适应网络变化的情况，通常会使用动态路由协议来实现路由功能。</p>
-<h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><p>AR2220 路由两台、交换机一台、PC 机若干</p>
-<img src="/images/%E9%9D%99%E6%80%81%E8%B7%AF%E7%94%B1%E5%AE%9E%E9%AA%8C%E5%87%86%E5%A4%87.png" class="center" width="500">
+<p>通过三层交换技术，可以在较大的网络中实现更高效、可靠和有灵活性的数据转发和路由功能，并提供更好的网络性能和管理能力。这对于大型企业、数据中心和服务提供商等具有重要意义。</p>
+<h1 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h1><p>交换机两台（其中不与pc相连的交换机必须为三层交换机）、pc若干</p>
+<img src="/images/%E4%B8%89%E5%B1%82%E4%BA%A4%E6%8D%A2%E6%8A%80%E6%9C%AF%E5%AE%9E%E9%AA%8C%E5%87%86%E5%A4%87.png" class="center" width="500">
 
 
-
-<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><p>在路由上输入指令，告诉路由去往目的ip网段应该走的下一跳，<u>下一跳指的是下一个经过的路由的接口所对应的ip</u></p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">ip route-static [目标ip（通常是网段）] [子网掩码] [下一跳ip]</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="实操"><a href="#实操" class="headerlink" title="实操"></a>实操</h2><h3 id="基础路由配置"><a href="#基础路由配置" class="headerlink" title="基础路由配置"></a>基础路由配置</h3><h4 id="第一台路由"><a href="#第一台路由" class="headerlink" title="第一台路由"></a>第一台路由</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[Huawei]interface GigabitEthernet 0/0/0</span><br><span class="line">[Huawei-GigabitEthernet0/0/0]ip address 192.168.1.1 255.255.255.0</span><br><span class="line"></span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/1</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]ip address 192.168.2.1 255.255.255.0</span><br></pre></td></tr></table></figure>
-
-<h4 id="第二台"><a href="#第二台" class="headerlink" title="第二台"></a>第二台</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[Huawei]interface GigabitEthernet 0/0/0</span><br><span class="line">[Huawei-GigabitEthernet0/0/0]ip address 192.168.2.10 255.255.255.0</span><br><span class="line"></span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/1</span><br><span class="line">[Huawei-GigabitEthernet0/0/0]ip address 192.168.3.1 255.255.255.0</span><br></pre></td></tr></table></figure>
-
-
-
-<h3 id="配置静态路由"><a href="#配置静态路由" class="headerlink" title="配置静态路由"></a>配置静态路由</h3><h4 id="第一台"><a href="#第一台" class="headerlink" title="第一台"></a>第一台</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[Huawei]ip route-static 192.168.3.0 255.255.255.0 192.168.2.10</span><br></pre></td></tr></table></figure>
-
-<h4 id="第二台-1"><a href="#第二台-1" class="headerlink" title="第二台"></a>第二台</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[Huawei]ip route-static 192.168.1.0 255.255.255.0 192.168.2.1</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="检验"><a href="#检验" class="headerlink" title="检验"></a>检验</h2><h3 id="pc1-ping-服务器和pc2"><a href="#pc1-ping-服务器和pc2" class="headerlink" title="pc1 ping 服务器和pc2"></a>pc1 ping 服务器和pc2</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 192.168.3.100</span></span><br><span class="line"></span><br><span class="line">Ping 192.168.3.100: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 192.168.3.100: bytes=32 seq=1 ttl=126 time=47 ms</span><br><span class="line">From 192.168.3.100: bytes=32 seq=2 ttl=126 time=47 ms</span><br><span class="line">From 192.168.3.100: bytes=32 seq=3 ttl=126 time=47 ms</span><br><span class="line">From 192.168.3.100: bytes=32 seq=4 ttl=126 time=31 ms</span><br><span class="line">From 192.168.3.100: bytes=32 seq=5 ttl=126 time=63 ms</span><br><span class="line"></span><br><span class="line">--- 192.168.3.100 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 31/47/63 ms</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 192.168.3.10</span></span><br><span class="line"></span><br><span class="line">Ping 192.168.3.10: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 192.168.3.10: bytes=32 seq=1 ttl=253 time=31 ms</span><br><span class="line">From 192.168.3.10: bytes=32 seq=2 ttl=253 time=32 ms</span><br><span class="line">From 192.168.3.10: bytes=32 seq=3 ttl=253 time=31 ms</span><br><span class="line">From 192.168.3.10: bytes=32 seq=4 ttl=253 time=31 ms</span><br><span class="line">From 192.168.3.10: bytes=32 seq=5 ttl=253 time=31 ms</span><br><span class="line"></span><br><span class="line">--- 192.168.3.10 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 31/31/32 ms</span><br></pre></td></tr></table></figure>
-
-<h3 id="pc2-ping-pc1"><a href="#pc2-ping-pc1" class="headerlink" title="pc2 ping pc1"></a>pc2 ping pc1</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 192.168.1.10</span></span><br><span class="line"></span><br><span class="line">Ping 192.168.1.10: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">Request timeout!</span><br><span class="line">From 192.168.1.10: bytes=32 seq=2 ttl=126 time=31 ms</span><br><span class="line">From 192.168.1.10: bytes=32 seq=3 ttl=126 time=31 ms</span><br><span class="line">From 192.168.1.10: bytes=32 seq=4 ttl=126 time=47 ms</span><br><span class="line">From 192.168.1.10: bytes=32 seq=5 ttl=126 time=16 ms</span><br><span class="line"></span><br><span class="line">--- 192.168.1.10 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  4 packet(s) received</span><br><span class="line">  20.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 0/31/47 ms</span><br></pre></td></tr></table></figure>
-
-<p>注：配置好静态路由后，首次ping操作出现timeout是正常的</p>
-]]></content>
-      <tags>
-        <tag>网络-Ensp</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>篇8 acl访问控制</title>
-    <url>/2023/07/27/%E7%BD%91%E7%BB%9C-Ensp/%E7%AF%878-acl%E8%AE%BF%E9%97%AE%E6%8E%A7%E5%88%B6/</url>
-    <content><![CDATA[<h1 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h1><p>ACL（Access Control List）是一种用于控制网络流量访问权限的机制。它可以根据预定义的规则来允许或拒绝特定类型的流量通过网络设备。</p>
-<p>ACL 可以应用于路由器、交换机、防火墙等网络设备上的接口，以实现对网络流量的过滤和控制。它可以基于源 IP 地址、目标 IP 地址、协议类型、端口号等条件来决定是否允许流量通过。</p>
-<p>通过配置 ACL，你可以实现以下功能：</p>
-<ol>
-<li>流量过滤：ACL 可以根据规则来过滤特定类型的流量，例如，只允许特定 IP 地址范围的流量通过，或者只允许特定协议和端口的流量通过。</li>
-<li>访问控制：ACL 可以控制特定用户或设备对网络资源的访问权限。例如，你可以配置 ACL 来限制某些用户或设备只能访问特定的服务器或服务。</li>
-<li>安全增强：ACL 可以帮助提高网络的安全性。通过拒绝不必要的流量或限制特定类型的流量，ACL 可以减少网络攻击的风险。</li>
-</ol>
-<h1 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h1><img src="/images/acl%E8%AE%BF%E9%97%AE%E6%8E%A7%E5%88%B6%E5%AE%9E%E9%AA%8C%E5%87%86%E5%A4%87.png" class="center" width="500">
 
 <h1 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h1><ol>
-<li>创建acl</li>
+<li>近端交换机为两台pc划分不同的vlan，并为vlan放行</li>
+<li>在远端交换机的逻辑接口上添加两台pc的网关ip，即远端交换机在此处起到了网关的作用</li>
 </ol>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[Huawei]acl name 【aclName】 ?</span><br><span class="line">  INTEGER&lt;2000-2999&gt;  Basic access-list(add to current using rules)</span><br><span class="line">  INTEGER&lt;3000-3999&gt;  Advanced access-list(add to current using rules)</span><br><span class="line">  INTEGER&lt;4000-4999&gt;  Specify a L2 acl group</span><br><span class="line">  advance             Advanced acl                             //高级配置</span><br><span class="line">  basic               Basic acl								   //普通配置</span><br><span class="line">  <span class="built_in">link</span>                Link acl</span><br><span class="line">  match-order         Set ACL<span class="string">&#x27;s match order</span></span><br><span class="line"><span class="string">  &lt;cr&gt;                Please press ENTER to execute command </span></span><br></pre></td></tr></table></figure>
-
-<ol start="2">
-<li>定义rule</li>
+<h1 id="实操"><a href="#实操" class="headerlink" title="实操"></a>实操</h1><ol>
+<li><p>近端交换机划分vlan，并放行</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[Huawei]vlan batch 10 20</span><br><span class="line">[Huawei]int g0/0/1</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]port link-type access 	</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]port de vlan 10</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]int g0/0/2</span><br><span class="line">[Huawei-GigabitEthernet0/0/2]port link-type access</span><br><span class="line">[Huawei-GigabitEthernet0/0/2]port de vlan 20</span><br><span class="line">[Huawei-GigabitEthernet0/0/2]int g0/0/3</span><br><span class="line">[Huawei-GigabitEthernet0/0/3]port link-type trunk </span><br><span class="line">[Huawei-GigabitEthernet0/0/3]port trunk allow-pass vlan all </span><br></pre></td></tr></table></figure>
+</li>
+<li><p>远端交换机配置vlan，并在vlan逻辑接口添加ip</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[Huawei]int g0/0/1</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]port link-type trunk //此处居然不用放行</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]q</span><br><span class="line">[Huawei]int Vlanif 10</span><br><span class="line">[Huawei-Vlanif10]ip address 1.1.1.1 255.255.255.0</span><br><span class="line">[Huawei-Vlanif10]int Vlanif 20</span><br><span class="line">[Huawei-Vlanif20]ip address 2.2.2.1 255.255.255.0</span><br><span class="line"></span><br></pre></td></tr></table></figure></li>
 </ol>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[Huawei-acl-adv-test]rule ?</span><br><span class="line">  INTEGER&lt;0-4294967294&gt;  ID of ACL rule</span><br><span class="line">  deny                   Specify matched packet deny            //拒绝</span><br><span class="line">  permit                 Specify matched packet permit			//允许</span><br><span class="line">  </span><br><span class="line"> 如果是advance需要定义源ip和目的ip，以及声明基于协议类型，如：</span><br><span class="line"> rule deny ip <span class="built_in">source</span> 【源ip（可以是网段）】 【子网掩码的反码】 destination 【目的ip（可以是网段）】 【子网掩码反码】</span><br><span class="line"> </span><br><span class="line"> 如果是basic则不需要定义目的ip和声明协议类型，如</span><br><span class="line"> rule deny <span class="built_in">source</span> 123.123.0.0 0.0.255.255 </span><br></pre></td></tr></table></figure>
+<h1 id="检验"><a href="#检验" class="headerlink" title="检验"></a>检验</h1><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 1.1.1.254</span></span><br><span class="line"></span><br><span class="line">Ping 1.1.1.254: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 1.1.1.254: bytes=32 seq=1 ttl=127 time=109 ms</span><br><span class="line">From 1.1.1.254: bytes=32 seq=2 ttl=127 time=63 ms</span><br><span class="line">From 1.1.1.254: bytes=32 seq=3 ttl=127 time=93 ms</span><br><span class="line">From 1.1.1.254: bytes=32 seq=4 ttl=127 time=94 ms</span><br><span class="line">From 1.1.1.254: bytes=32 seq=5 ttl=127 time=78 ms</span><br><span class="line"></span><br><span class="line">--- 1.1.1.254 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 63/87/109 ms</span><br></pre></td></tr></table></figure>
 
-<ol start="3">
-<li>应用acl</li>
-</ol>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">traffic-filter inbound acl name 【acl名称】                      //在内部口应用</span><br></pre></td></tr></table></figure>
-
-<h1 id="实操"><a href="#实操" class="headerlink" title="实操"></a>实操</h1><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[Huawei]acl name <span class="built_in">test</span> advance</span><br><span class="line">[Huawei-acl-adv-test]rule deny ip <span class="built_in">source</span> 192.168.255.254 0.0.0.0 destination 10.0.0.0 0.255.255.255</span><br><span class="line">[Huawei-acl-adv-test]q</span><br><span class="line">[Huawei]traffic-filter inbound acl name <span class="built_in">test</span> </span><br></pre></td></tr></table></figure>
-
-<h1 id="检验"><a href="#检验" class="headerlink" title="检验"></a>检验</h1><ul>
-<li>pc1 ping pc3</li>
-</ul>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">PC&gt;ping 10.0.0.254</span><br><span class="line"></span><br><span class="line">Ping 10.0.0.254: 32 data bytes, Press Ctrl_C to <span class="built_in">break</span></span><br><span class="line">Request <span class="built_in">timeout</span>!</span><br><span class="line">Request <span class="built_in">timeout</span>!</span><br><span class="line">Request <span class="built_in">timeout</span>!</span><br><span class="line">Request <span class="built_in">timeout</span>!</span><br><span class="line">Request <span class="built_in">timeout</span>!</span><br><span class="line"></span><br><span class="line">--- 10.0.0.254 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  0 packet(s) received</span><br><span class="line">  100.00% packet loss</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>pc2 ping pc3</li>
-</ul>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">PC&gt;ping 10.0.0.254</span><br><span class="line"></span><br><span class="line">Ping 10.0.0.254: 32 data bytes, Press Ctrl_C to <span class="built_in">break</span></span><br><span class="line">Request <span class="built_in">timeout</span>!</span><br><span class="line">From 10.0.0.254: bytes=32 <span class="built_in">seq</span>=2 ttl=127 time=31 ms</span><br><span class="line">From 10.0.0.254: bytes=32 <span class="built_in">seq</span>=3 ttl=127 time=32 ms</span><br><span class="line">From 10.0.0.254: bytes=32 <span class="built_in">seq</span>=4 ttl=127 time=31 ms</span><br><span class="line">From 10.0.0.254: bytes=32 <span class="built_in">seq</span>=5 ttl=127 time=31 ms</span><br><span class="line"></span><br><span class="line">--- 10.0.0.254 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  4 packet(s) received</span><br><span class="line">  20.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 0/31/32 ms</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>pc3 ping pc1</li>
-</ul>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">PC&gt;ping 192.168.255.254</span><br><span class="line"></span><br><span class="line">Ping 192.168.255.254: 32 data bytes, Press Ctrl_C to <span class="built_in">break</span></span><br><span class="line">Request <span class="built_in">timeout</span>!</span><br><span class="line">Request <span class="built_in">timeout</span>!</span><br><span class="line">Request <span class="built_in">timeout</span>!</span><br><span class="line">Request <span class="built_in">timeout</span>!</span><br><span class="line">Request <span class="built_in">timeout</span>!</span><br><span class="line"></span><br><span class="line">--- 192.168.255.254 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  0 packet(s) received</span><br><span class="line">  100.00% packet loss</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>pc3 ping pc2</li>
-</ul>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">PC&gt;ping 192.168.255.253</span><br><span class="line"></span><br><span class="line">Ping 192.168.255.253: 32 data bytes, Press Ctrl_C to <span class="built_in">break</span></span><br><span class="line">Request <span class="built_in">timeout</span>!</span><br><span class="line">From 192.168.255.253: bytes=32 <span class="built_in">seq</span>=2 ttl=127 time=47 ms</span><br><span class="line">From 192.168.255.253: bytes=32 <span class="built_in">seq</span>=3 ttl=127 time=47 ms</span><br><span class="line">From 192.168.255.253: bytes=32 <span class="built_in">seq</span>=4 ttl=127 time=47 ms</span><br><span class="line">From 192.168.255.253: bytes=32 <span class="built_in">seq</span>=5 ttl=127 time=47 ms</span><br><span class="line"></span><br><span class="line">--- 192.168.255.253 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  4 packet(s) received</span><br><span class="line">  20.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 0/47/47 ms</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 2.2.2.254</span></span><br><span class="line"></span><br><span class="line">Ping 2.2.2.254: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 2.2.2.254: bytes=32 seq=1 ttl=127 time=156 ms</span><br><span class="line">From 2.2.2.254: bytes=32 seq=2 ttl=127 time=94 ms</span><br><span class="line">From 2.2.2.254: bytes=32 seq=3 ttl=127 time=78 ms</span><br><span class="line">From 2.2.2.254: bytes=32 seq=4 ttl=127 time=62 ms</span><br><span class="line">From 2.2.2.254: bytes=32 seq=5 ttl=127 time=94 ms</span><br><span class="line"></span><br><span class="line">--- 2.2.2.254 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 62/96/156 ms</span><br></pre></td></tr></table></figure>
 
 ]]></content>
       <tags>
@@ -635,36 +524,147 @@
       </tags>
   </entry>
   <entry>
-    <title>篇6 三层交换技术</title>
-    <url>/2023/07/21/%E7%BD%91%E7%BB%9C-Ensp/%E7%AF%876-%E4%B8%89%E5%B1%82%E4%BA%A4%E6%8D%A2%E6%8A%80%E6%9C%AF/</url>
-    <content><![CDATA[<h1 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h1><p>三层交换技术是指将网络交换机与路由器的功能结合起来，使交换机能够进行基于网络层（第三层）的转发和路由功能。它在传统二层交换机的基础上增加了路由功能，从而能够更高效地处理大规模网络中的数据流量和转发需求。</p>
-<p>三层交换技术的主要特点如下：</p>
+    <title>篇4 静态路由</title>
+    <url>/2023/07/17/%E7%BD%91%E7%BB%9C-Ensp/%E7%AF%874-%E9%9D%99%E6%80%81%E8%B7%AF%E7%94%B1/</url>
+    <content><![CDATA[<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>静态路由是网络中使用静态路由表来确定数据包的传输路径的一种路由方式。它是通过手动配置路由器上的路由表来指定目标网络和下一跳路由器的关系，以确定数据包的传输路径。</p>
+<p>在静态路由中，网络管理员手动配置路由器上的路由表，将目标网络的 IP 地址和对应的下一跳路由器的 IP 地址进行映射。当路由器收到一个数据包时，它会根据数据包的目标 IP 地址查找路由表，找到与目标 IP 地址匹配的条目，并将数据包发送到相应的下一跳路由器。下一跳路由器将继续根据路由表将数据包转发到下一个路由器，直到数据包到达目标网络。</p>
+<p>静态路由的主要特点包括：</p>
 <ol>
-<li>路由能力：<u>三层交换机具备路由器的基本功能，能够在不同的子网之间进行数据包的转发和路由决策</u>。它能够识别目标IP地址，并根据路由表进行转发决策，使数据能够跨越不同的子网进行传输。</li>
-<li>VLAN支持：三层交换机支持虚拟局域网（VLAN）技术，可以将物理网络划分为多个逻辑上独立的虚拟网络。通过VLAN的配置，可以实现更好的网络隔离和安全性。</li>
-<li>高性能转发：三层交换机采用硬件加速和快速转发技术，能够高效处理数据包的路由和转发。它可以进行流量控制、负载均衡和快速转发等功能，以提供更快的数据传输速度和更高的性能。</li>
-<li>动态路由协议支持：三层交换机一般支持主要的动态路由协议，如OSPF、BGP和RIP等，能够与其他路由器进行动态路由协议的交互和学习，以实现更智能的网络路径选择和故障恢复能力。</li>
+<li>静态路由是手动配置的，不会自动适应网络变化。如果网络拓扑发生变化，管理员需要手动更新路由表。</li>
+<li>静态路由是固定的，不会根据网络负载或链路状态进行动态调整。所有数据包都将按照路由表中的配置进行转发。</li>
+<li>静态路由的配置相对简单，适用于小型网络或网络拓扑不经常变化的情况。</li>
+<li>静态路由的优点是稳定性高，因为路由表不会频繁变化，不会产生额外的路由协议开销。</li>
 </ol>
-<p>通过三层交换技术，可以在较大的网络中实现更高效、可靠和有灵活性的数据转发和路由功能，并提供更好的网络性能和管理能力。这对于大型企业、数据中心和服务提供商等具有重要意义。</p>
-<h1 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h1><p>交换机两台（其中不与pc相连的交换机必须为三层交换机）、pc若干</p>
-<img src="/images/%E4%B8%89%E5%B1%82%E4%BA%A4%E6%8D%A2%E6%8A%80%E6%9C%AF%E5%AE%9E%E9%AA%8C%E5%87%86%E5%A4%87.png" class="center" width="500">
+<p>静态路由适用于简单的网络环境或需要精确控制数据包传输路径的情况。对于复杂的网络环境或需要自动适应网络变化的情况，通常会使用动态路由协议来实现路由功能。</p>
+<h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><p>AR2220 路由两台、交换机一台、PC 机若干</p>
+<img src="/images/%E9%9D%99%E6%80%81%E8%B7%AF%E7%94%B1%E5%AE%9E%E9%AA%8C%E5%87%86%E5%A4%87.png" class="center" width="500">
 
 
 
-<h1 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h1><ol>
-<li>近端交换机为两台pc划分不同的vlan，并为vlan放行</li>
-<li>在远端交换机的逻辑接口上添加两台pc的网关ip，即远端交换机在此处起到了网关的作用</li>
-</ol>
-<h1 id="实操"><a href="#实操" class="headerlink" title="实操"></a>实操</h1><ol>
-<li><p>近端交换机划分vlan，并放行</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[Huawei]vlan batch 10 20</span><br><span class="line">[Huawei]int g0/0/1</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]port link-type access 	</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]port de vlan 10</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]int g0/0/2</span><br><span class="line">[Huawei-GigabitEthernet0/0/2]port link-type access</span><br><span class="line">[Huawei-GigabitEthernet0/0/2]port de vlan 20</span><br><span class="line">[Huawei-GigabitEthernet0/0/2]int g0/0/3</span><br><span class="line">[Huawei-GigabitEthernet0/0/3]port link-type trunk </span><br><span class="line">[Huawei-GigabitEthernet0/0/3]port trunk allow-pass vlan all </span><br></pre></td></tr></table></figure>
+<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><p>在路由上输入指令，告诉路由去往目的ip网段应该走的下一跳，<u>下一跳指的是下一个经过的路由的接口所对应的ip</u></p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">ip route-static [目标ip（通常是网段）] [子网掩码] [下一跳ip]</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="实操"><a href="#实操" class="headerlink" title="实操"></a>实操</h2><h3 id="基础路由配置"><a href="#基础路由配置" class="headerlink" title="基础路由配置"></a>基础路由配置</h3><h4 id="第一台路由"><a href="#第一台路由" class="headerlink" title="第一台路由"></a>第一台路由</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[Huawei]interface GigabitEthernet 0/0/0</span><br><span class="line">[Huawei-GigabitEthernet0/0/0]ip address 192.168.1.1 255.255.255.0</span><br><span class="line"></span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/1</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]ip address 192.168.2.1 255.255.255.0</span><br></pre></td></tr></table></figure>
+
+<h4 id="第二台"><a href="#第二台" class="headerlink" title="第二台"></a>第二台</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[Huawei]interface GigabitEthernet 0/0/0</span><br><span class="line">[Huawei-GigabitEthernet0/0/0]ip address 192.168.2.10 255.255.255.0</span><br><span class="line"></span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/1</span><br><span class="line">[Huawei-GigabitEthernet0/0/0]ip address 192.168.3.1 255.255.255.0</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="配置静态路由"><a href="#配置静态路由" class="headerlink" title="配置静态路由"></a>配置静态路由</h3><h4 id="第一台"><a href="#第一台" class="headerlink" title="第一台"></a>第一台</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[Huawei]ip route-static 192.168.3.0 255.255.255.0 192.168.2.10</span><br></pre></td></tr></table></figure>
+
+<h4 id="第二台-1"><a href="#第二台-1" class="headerlink" title="第二台"></a>第二台</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[Huawei]ip route-static 192.168.1.0 255.255.255.0 192.168.2.1</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="检验"><a href="#检验" class="headerlink" title="检验"></a>检验</h2><h3 id="pc1-ping-服务器和pc2"><a href="#pc1-ping-服务器和pc2" class="headerlink" title="pc1 ping 服务器和pc2"></a>pc1 ping 服务器和pc2</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 192.168.3.100</span></span><br><span class="line"></span><br><span class="line">Ping 192.168.3.100: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 192.168.3.100: bytes=32 seq=1 ttl=126 time=47 ms</span><br><span class="line">From 192.168.3.100: bytes=32 seq=2 ttl=126 time=47 ms</span><br><span class="line">From 192.168.3.100: bytes=32 seq=3 ttl=126 time=47 ms</span><br><span class="line">From 192.168.3.100: bytes=32 seq=4 ttl=126 time=31 ms</span><br><span class="line">From 192.168.3.100: bytes=32 seq=5 ttl=126 time=63 ms</span><br><span class="line"></span><br><span class="line">--- 192.168.3.100 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 31/47/63 ms</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 192.168.3.10</span></span><br><span class="line"></span><br><span class="line">Ping 192.168.3.10: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 192.168.3.10: bytes=32 seq=1 ttl=253 time=31 ms</span><br><span class="line">From 192.168.3.10: bytes=32 seq=2 ttl=253 time=32 ms</span><br><span class="line">From 192.168.3.10: bytes=32 seq=3 ttl=253 time=31 ms</span><br><span class="line">From 192.168.3.10: bytes=32 seq=4 ttl=253 time=31 ms</span><br><span class="line">From 192.168.3.10: bytes=32 seq=5 ttl=253 time=31 ms</span><br><span class="line"></span><br><span class="line">--- 192.168.3.10 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 31/31/32 ms</span><br></pre></td></tr></table></figure>
+
+<h3 id="pc2-ping-pc1"><a href="#pc2-ping-pc1" class="headerlink" title="pc2 ping pc1"></a>pc2 ping pc1</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 192.168.1.10</span></span><br><span class="line"></span><br><span class="line">Ping 192.168.1.10: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">Request timeout!</span><br><span class="line">From 192.168.1.10: bytes=32 seq=2 ttl=126 time=31 ms</span><br><span class="line">From 192.168.1.10: bytes=32 seq=3 ttl=126 time=31 ms</span><br><span class="line">From 192.168.1.10: bytes=32 seq=4 ttl=126 time=47 ms</span><br><span class="line">From 192.168.1.10: bytes=32 seq=5 ttl=126 time=16 ms</span><br><span class="line"></span><br><span class="line">--- 192.168.1.10 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  4 packet(s) received</span><br><span class="line">  20.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 0/31/47 ms</span><br></pre></td></tr></table></figure>
+
+<p>注：配置好静态路由后，首次ping操作出现timeout是正常的</p>
+]]></content>
+      <tags>
+        <tag>网络-Ensp</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>篇5 vlan</title>
+    <url>/2023/07/20/%E7%BD%91%E7%BB%9C-Ensp/%E7%AF%875-vlan/</url>
+    <content><![CDATA[<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>VLAN（Virtual Local Area Network）是一种虚拟局域网技术，用于将一个物理网络划分为多个逻辑上独立的虚拟网络。VLAN可以提供更好的网络管理和安全性。</p>
+<h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><img src="/images/vlan%E5%87%86%E5%A4%87.png" class="center" width="500">
+
+<p>三层交换机两台、pc机若干</p>
+<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><ol>
+<li><p>创建vlan —— <code>vlan [vlan号]</code> </p>
 </li>
-<li><p>远端交换机配置vlan，并在vlan逻辑接口添加ip</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[Huawei]int g0/0/1</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]port link-type trunk //此处居然不用放行</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]q</span><br><span class="line">[Huawei]int Vlanif 10</span><br><span class="line">[Huawei-Vlanif10]ip address 1.1.1.1 255.255.255.0</span><br><span class="line">[Huawei-Vlanif10]int Vlanif 20</span><br><span class="line">[Huawei-Vlanif20]ip address 2.2.2.1 255.255.255.0</span><br><span class="line"></span><br></pre></td></tr></table></figure></li>
+<li><p>划分vlan：<br>  （1）进入接口<br>  （2）<code>port link-type access</code> （终端，如电脑、打印机等为access；其他交换机则为trunk）<br>  （3）<code>port default vlan [vlan号]</code></p>
+</li>
+<li><p>交换机之间允许vlan通信<br>  （1）进入接口<br>  （2）<code>port link-type trunk</code><br>  （3）<code>port trunk allow-pass vlan [vlan号]</code></p>
+</li>
 </ol>
-<h1 id="检验"><a href="#检验" class="headerlink" title="检验"></a>检验</h1><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 1.1.1.254</span></span><br><span class="line"></span><br><span class="line">Ping 1.1.1.254: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 1.1.1.254: bytes=32 seq=1 ttl=127 time=109 ms</span><br><span class="line">From 1.1.1.254: bytes=32 seq=2 ttl=127 time=63 ms</span><br><span class="line">From 1.1.1.254: bytes=32 seq=3 ttl=127 time=93 ms</span><br><span class="line">From 1.1.1.254: bytes=32 seq=4 ttl=127 time=94 ms</span><br><span class="line">From 1.1.1.254: bytes=32 seq=5 ttl=127 time=78 ms</span><br><span class="line"></span><br><span class="line">--- 1.1.1.254 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 63/87/109 ms</span><br></pre></td></tr></table></figure>
+<h2 id="实操"><a href="#实操" class="headerlink" title="实操"></a>实操</h2><ol>
+<li><p>LSW1(第一台交换机)</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">&lt;Huawei&gt;sy</span><br><span class="line">Enter system view, return user view with Ctrl+Z.</span><br><span class="line"></span><br><span class="line">//创建vlan</span><br><span class="line">[Huawei]vlan 10</span><br><span class="line">[Huawei-vlan10]q</span><br><span class="line">[Huawei]vlan 20</span><br><span class="line">[Huawei-vlan20]q</span><br><span class="line"></span><br><span class="line">//划分vlan</span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/1</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]port link-type access </span><br><span class="line">[Huawei-GigabitEthernet0/0/1]port default vlan 10</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]q</span><br><span class="line"></span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/2</span><br><span class="line">[Huawei-GigabitEthernet0/0/2]port link-type access 	</span><br><span class="line">[Huawei-GigabitEthernet0/0/2]port default vlan 20</span><br><span class="line">[Huawei-GigabitEthernet0/0/2]q</span><br><span class="line"></span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/3</span><br><span class="line">[Huawei-GigabitEthernet0/0/3]port link-type access 	</span><br><span class="line">[Huawei-GigabitEthernet0/0/3]port default vlan 20</span><br><span class="line">[Huawei-GigabitEthernet0/0/3]q</span><br><span class="line"></span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/4</span><br><span class="line">[Huawei-GigabitEthernet0/0/4]port link-type trunk</span><br><span class="line">[Huawei-GigabitEthernet0/0/4]port trunk allow-pass vlan 10</span><br><span class="line">[Huawei-GigabitEthernet0/0/4]port trunk allow-pass vlan 20</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 2.2.2.254</span></span><br><span class="line"></span><br><span class="line">Ping 2.2.2.254: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 2.2.2.254: bytes=32 seq=1 ttl=127 time=156 ms</span><br><span class="line">From 2.2.2.254: bytes=32 seq=2 ttl=127 time=94 ms</span><br><span class="line">From 2.2.2.254: bytes=32 seq=3 ttl=127 time=78 ms</span><br><span class="line">From 2.2.2.254: bytes=32 seq=4 ttl=127 time=62 ms</span><br><span class="line">From 2.2.2.254: bytes=32 seq=5 ttl=127 time=94 ms</span><br><span class="line"></span><br><span class="line">--- 2.2.2.254 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 62/96/156 ms</span><br></pre></td></tr></table></figure>
+
+</li>
+<li><p>LSW2(第二台交换机)</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">&lt;Huawei&gt;sy</span><br><span class="line">Enter system view, return user view with Ctrl+Z.</span><br><span class="line"></span><br><span class="line">//创建vlan</span><br><span class="line">[Huawei]vlan 10</span><br><span class="line">[Huawei-vlan10]q</span><br><span class="line">[Huawei]vlan 20</span><br><span class="line">[Huawei-vlan20]q</span><br><span class="line"></span><br><span class="line">//划分vlan</span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/1</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]port link-type access </span><br><span class="line">[Huawei-GigabitEthernet0/0/1]port default vlan 10</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]q</span><br><span class="line"></span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/2</span><br><span class="line">[Huawei-GigabitEthernet0/0/2]port link-type access </span><br><span class="line">[Huawei-GigabitEthernet0/0/2]port default vlan 20</span><br><span class="line">[Huawei-GigabitEthernet0/0/2]q</span><br><span class="line"></span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/3</span><br><span class="line">[Huawei-GigabitEthernet0/0/3]port link-type trunk </span><br><span class="line">[Huawei-GigabitEthernet0/0/3]port trunk allow-pass vlan 10</span><br><span class="line">[Huawei-GigabitEthernet0/0/3]port trunk allow-pass vlan 20</span><br></pre></td></tr></table></figure>
+
+
+</li>
+<li><p>给pc机的ip从左到右依次设为1.1.1.1~1.1.1.5</p>
+</li>
+</ol>
+<h2 id="检验"><a href="#检验" class="headerlink" title="检验"></a>检验</h2><p><strong>pc1 ping pc2，由于不在同一个vlan中，ping操作失败</strong></p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 1.1.1.2</span></span><br><span class="line"></span><br><span class="line">Ping 1.1.1.2: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 1.1.1.1: Destination host unreachable</span><br><span class="line">From 1.1.1.1: Destination host unreachable</span><br><span class="line">From 1.1.1.1: Destination host unreachable</span><br><span class="line">From 1.1.1.1: Destination host unreachable</span><br><span class="line">From 1.1.1.1: Destination host unreachable</span><br><span class="line"></span><br><span class="line">--- 1.1.1.2 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  0 packet(s) received</span><br><span class="line">  100.00% packet loss</span><br></pre></td></tr></table></figure>
+
+<p><strong>同样的，pc2 ping pc1 也是失败</strong></p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 1.1.1.1</span></span><br><span class="line"></span><br><span class="line">Ping 1.1.1.1: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 1.1.1.2: Destination host unreachable</span><br><span class="line">From 1.1.1.2: Destination host unreachable</span><br><span class="line">From 1.1.1.2: Destination host unreachable</span><br><span class="line">From 1.1.1.2: Destination host unreachable</span><br><span class="line">From 1.1.1.2: Destination host unreachable</span><br><span class="line"></span><br><span class="line">--- 1.1.1.1 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  0 packet(s) received</span><br><span class="line">  100.00% packet loss</span><br></pre></td></tr></table></figure>
+
+<p><strong>pc1 与 pc5 互ping也是失败</strong></p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">//pc1 ping pc5</span><br><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 1.1.1.5</span></span><br><span class="line"></span><br><span class="line">Ping 1.1.1.5: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 1.1.1.1: Destination host unreachable</span><br><span class="line">From 1.1.1.1: Destination host unreachable</span><br><span class="line">From 1.1.1.1: Destination host unreachable</span><br><span class="line">From 1.1.1.1: Destination host unreachable</span><br><span class="line">From 1.1.1.1: Destination host unreachable</span><br><span class="line"></span><br><span class="line">--- 1.1.1.5 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  0 packet(s) received</span><br><span class="line">  100.00% packet loss</span><br><span class="line">  </span><br><span class="line">//pc5 ping pc1</span><br><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 1.1.1.1</span></span><br><span class="line"></span><br><span class="line">Ping 1.1.1.1: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 1.1.1.5: Destination host unreachable</span><br><span class="line">From 1.1.1.5: Destination host unreachable</span><br><span class="line">From 1.1.1.5: Destination host unreachable</span><br><span class="line">From 1.1.1.5: Destination host unreachable</span><br><span class="line">From 1.1.1.5: Destination host unreachable</span><br><span class="line"></span><br><span class="line">--- 1.1.1.1 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  0 packet(s) received</span><br><span class="line">  100.00% packet loss</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>相同vlan下互ping不影响</strong></p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">//pc1 ping pc4</span><br><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 1.1.1.4</span></span><br><span class="line"></span><br><span class="line">Ping 1.1.1.4: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 1.1.1.4: bytes=32 seq=1 ttl=128 time=47 ms</span><br><span class="line">From 1.1.1.4: bytes=32 seq=2 ttl=128 time=78 ms</span><br><span class="line">From 1.1.1.4: bytes=32 seq=3 ttl=128 time=78 ms</span><br><span class="line">From 1.1.1.4: bytes=32 seq=4 ttl=128 time=79 ms</span><br><span class="line">From 1.1.1.4: bytes=32 seq=5 ttl=128 time=63 ms</span><br><span class="line"></span><br><span class="line">--- 1.1.1.4 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 47/69/79 ms</span><br><span class="line">  </span><br><span class="line">//pc4 ping pc1</span><br><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 1.1.1.1</span></span><br><span class="line"></span><br><span class="line">Ping 1.1.1.1: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 1.1.1.1: bytes=32 seq=1 ttl=128 time=63 ms</span><br><span class="line">From 1.1.1.1: bytes=32 seq=2 ttl=128 time=62 ms</span><br><span class="line">From 1.1.1.1: bytes=32 seq=3 ttl=128 time=78 ms</span><br><span class="line">From 1.1.1.1: bytes=32 seq=4 ttl=128 time=62 ms</span><br><span class="line">From 1.1.1.1: bytes=32 seq=5 ttl=128 time=63 ms</span><br><span class="line"></span><br><span class="line">--- 1.1.1.1 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 62/65/78 ms</span><br><span class="line">  </span><br><span class="line">//pc2 ping pc5</span><br><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 1.1.1.5</span></span><br><span class="line"></span><br><span class="line">Ping 1.1.1.5: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 1.1.1.5: bytes=32 seq=1 ttl=128 time=94 ms</span><br><span class="line">From 1.1.1.5: bytes=32 seq=2 ttl=128 time=78 ms</span><br><span class="line">From 1.1.1.5: bytes=32 seq=3 ttl=128 time=79 ms</span><br><span class="line">From 1.1.1.5: bytes=32 seq=4 ttl=128 time=78 ms</span><br><span class="line">From 1.1.1.5: bytes=32 seq=5 ttl=128 time=78 ms</span><br><span class="line"></span><br><span class="line">--- 1.1.1.5 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 78/81/94 ms</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <tags>
+        <tag>网络-Ensp</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>篇8 acl访问控制</title>
+    <url>/2023/07/27/%E7%BD%91%E7%BB%9C-Ensp/%E7%AF%878-acl%E8%AE%BF%E9%97%AE%E6%8E%A7%E5%88%B6/</url>
+    <content><![CDATA[<h1 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h1><p>ACL（Access Control List）是一种用于控制网络流量访问权限的机制。它可以根据预定义的规则来允许或拒绝特定类型的流量通过网络设备。</p>
+<p>ACL 可以应用于路由器、交换机、防火墙等网络设备上的接口，以实现对网络流量的过滤和控制。它可以基于源 IP 地址、目标 IP 地址、协议类型、端口号等条件来决定是否允许流量通过。</p>
+<p>通过配置 ACL，你可以实现以下功能：</p>
+<ol>
+<li>流量过滤：ACL 可以根据规则来过滤特定类型的流量，例如，只允许特定 IP 地址范围的流量通过，或者只允许特定协议和端口的流量通过。</li>
+<li>访问控制：ACL 可以控制特定用户或设备对网络资源的访问权限。例如，你可以配置 ACL 来限制某些用户或设备只能访问特定的服务器或服务。</li>
+<li>安全增强：ACL 可以帮助提高网络的安全性。通过拒绝不必要的流量或限制特定类型的流量，ACL 可以减少网络攻击的风险。</li>
+</ol>
+<h1 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h1><p><img src="/../../images/acl%E8%AE%BF%E9%97%AE%E6%8E%A7%E5%88%B6%E5%AE%9E%E9%AA%8C%E5%87%86%E5%A4%87.png"></p>
+<h1 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h1><ol>
+<li>创建acl</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[Huawei]acl name 【aclName】 ?</span><br><span class="line">  INTEGER&lt;2000-2999&gt;  Basic access-list(add to current using rules)</span><br><span class="line">  INTEGER&lt;3000-3999&gt;  Advanced access-list(add to current using rules)</span><br><span class="line">  INTEGER&lt;4000-4999&gt;  Specify a L2 acl group</span><br><span class="line">  advance             Advanced acl                             //高级配置</span><br><span class="line">  basic               Basic acl								   //普通配置</span><br><span class="line">  <span class="built_in">link</span>                Link acl</span><br><span class="line">  match-order         Set ACL<span class="string">&#x27;s match order</span></span><br><span class="line"><span class="string">  &lt;cr&gt;                Please press ENTER to execute command </span></span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>定义rule</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[Huawei-acl-adv-test]rule ?</span><br><span class="line">  INTEGER&lt;0-4294967294&gt;  ID of ACL rule</span><br><span class="line">  deny                   Specify matched packet deny            //拒绝</span><br><span class="line">  permit                 Specify matched packet permit			//允许</span><br><span class="line">  </span><br><span class="line"> 如果是advance需要定义源ip和目的ip，以及声明基于协议类型，如：</span><br><span class="line"> rule deny ip <span class="built_in">source</span> 【源ip（可以是网段）】 【子网掩码的反码】 destination 【目的ip（可以是网段）】 【子网掩码反码】</span><br><span class="line"> </span><br><span class="line"> 如果是basic则不需要定义目的ip和声明协议类型，如</span><br><span class="line"> rule deny <span class="built_in">source</span> 123.123.0.0 0.0.255.255 </span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>应用acl</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">traffic-filter outbound acl name 【acl名称】                      //在内部口应用</span><br><span class="line">traffic-filter inbound acl name 【acl名称】                       //在外部口应用</span><br></pre></td></tr></table></figure>
+
+<p>![](..&#x2F;..&#x2F;images&#x2F;alc 流量出入方向.png)</p>
+<h1 id="实操"><a href="#实操" class="headerlink" title="实操"></a>实操</h1><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[Huawei]acl name <span class="built_in">test</span> advance</span><br><span class="line">[Huawei-acl-adv-test]rule deny ip <span class="built_in">source</span> 192.168.255.254 0.0.0.0 destination 10.0.0.0 0.255.255.255</span><br><span class="line">[Huawei-acl-adv-test]q</span><br><span class="line">[Huawei-GigabitEthernet0/0/0]traffic-filter inbound acl name <span class="built_in">test</span> </span><br><span class="line">//也可以是：</span><br><span class="line">//[Huawei-GigabitEthernet0/0/1]traffic-filter outbound acl name <span class="built_in">test</span> </span><br></pre></td></tr></table></figure>
+
+<h1 id="检验"><a href="#检验" class="headerlink" title="检验"></a>检验</h1><ul>
+<li>pc1 ping pc3</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">PC&gt;ping 10.0.0.254</span><br><span class="line"></span><br><span class="line">Ping 10.0.0.254: 32 data bytes, Press Ctrl_C to <span class="built_in">break</span></span><br><span class="line">Request <span class="built_in">timeout</span>!</span><br><span class="line">Request <span class="built_in">timeout</span>!</span><br><span class="line">Request <span class="built_in">timeout</span>!</span><br><span class="line">Request <span class="built_in">timeout</span>!</span><br><span class="line">Request <span class="built_in">timeout</span>!</span><br><span class="line"></span><br><span class="line">--- 10.0.0.254 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  0 packet(s) received</span><br><span class="line">  100.00% packet loss</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>pc2 ping pc3</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">PC&gt;ping 10.0.0.254</span><br><span class="line"></span><br><span class="line">Ping 10.0.0.254: 32 data bytes, Press Ctrl_C to <span class="built_in">break</span></span><br><span class="line">Request <span class="built_in">timeout</span>!</span><br><span class="line">From 10.0.0.254: bytes=32 <span class="built_in">seq</span>=2 ttl=127 time=31 ms</span><br><span class="line">From 10.0.0.254: bytes=32 <span class="built_in">seq</span>=3 ttl=127 time=32 ms</span><br><span class="line">From 10.0.0.254: bytes=32 <span class="built_in">seq</span>=4 ttl=127 time=31 ms</span><br><span class="line">From 10.0.0.254: bytes=32 <span class="built_in">seq</span>=5 ttl=127 time=31 ms</span><br><span class="line"></span><br><span class="line">--- 10.0.0.254 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  4 packet(s) received</span><br><span class="line">  20.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 0/31/32 ms</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>pc3 ping pc1</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">PC&gt;ping 192.168.255.254</span><br><span class="line"></span><br><span class="line">Ping 192.168.255.254: 32 data bytes, Press Ctrl_C to <span class="built_in">break</span></span><br><span class="line">Request <span class="built_in">timeout</span>!</span><br><span class="line">Request <span class="built_in">timeout</span>!</span><br><span class="line">Request <span class="built_in">timeout</span>!</span><br><span class="line">Request <span class="built_in">timeout</span>!</span><br><span class="line">Request <span class="built_in">timeout</span>!</span><br><span class="line"></span><br><span class="line">--- 192.168.255.254 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  0 packet(s) received</span><br><span class="line">  100.00% packet loss</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>pc3 ping pc2</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">PC&gt;ping 192.168.255.253</span><br><span class="line"></span><br><span class="line">Ping 192.168.255.253: 32 data bytes, Press Ctrl_C to <span class="built_in">break</span></span><br><span class="line">Request <span class="built_in">timeout</span>!</span><br><span class="line">From 192.168.255.253: bytes=32 <span class="built_in">seq</span>=2 ttl=127 time=47 ms</span><br><span class="line">From 192.168.255.253: bytes=32 <span class="built_in">seq</span>=3 ttl=127 time=47 ms</span><br><span class="line">From 192.168.255.253: bytes=32 <span class="built_in">seq</span>=4 ttl=127 time=47 ms</span><br><span class="line">From 192.168.255.253: bytes=32 <span class="built_in">seq</span>=5 ttl=127 time=47 ms</span><br><span class="line"></span><br><span class="line">--- 192.168.255.253 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  4 packet(s) received</span><br><span class="line">  20.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 0/47/47 ms</span><br></pre></td></tr></table></figure>
 
 ]]></content>
       <tags>
@@ -687,14 +687,13 @@
 <li>NAT 设备会在转换表中记录转换的信息，以便在响应数据包返回时将目标 IP 地址转换回相应的内部 IP 地址。</li>
 <li>外部网络返回的数据包到达 NAT 设备时，目标 IP 地址会被转换为相应的内部 IP 地址，并将数据包转发给内部主机。 NAT 地址转换提供了一种有效的方式来扩展 IPv4 地址空间，并实现内部网络与外部网络之间的通信。它在家庭网络、企业网络和互联网服务提供商等场景中广泛应用。</li>
 </ol>
-<h1 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h1><img src="/images/NAT%E5%9C%B0%E5%9D%80%E8%BD%AC%E6%8D%A2%E5%AE%9E%E9%AA%8C%E5%87%86%E5%A4%87.png" class="center" width="1000" title="实验准备">
-
-<h1 id="情景一"><a href="#情景一" class="headerlink" title="情景一"></a>情景一</h1><p><strong>pc1 可以ping通64.1.1.1，不能ping通64.1.1.10</strong></p>
+<h1 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h1><p><img src="/../../images/NAT%E5%AE%9E%E9%AA%8C%E5%87%86%E5%A4%87.png"></p>
+<h1 id="情景一"><a href="#情景一" class="headerlink" title="情景一"></a>情景一</h1><p><strong>pc2 可以ping通10.1.12.2，不能ping通10.1.12.1</strong></p>
 <ul>
 <li>原因：</li>
 </ul>
-<p>​     1. pc1 与 AR1 直连，AR1 内部有64.1.1.0网段的路由，pc1向64.1.1.1发送的数据包能够得到回应，所以可以ping通</p>
-<p>​     2. AR2 与 AR1 直连，pc1 ping 64.1.1.10 时，发送数据包时是没问题的，但是AR2没有192.168.1.0 网段的路由，所以得不到回应，请求超时。</p>
+<p>​     1. pc2 与 AR2 直连，AR1 内部有10.1.12.0和2.2.2.0网段的路由，pc1向10.1.12.2发送的数据包能够得到回应，所以可以ping通</p>
+<p>​     2. AR2 与 AR1 直连，pc2 ping 10.1.12.1 时，发送数据包时是没问题的，10.1.12.1可以接收到数据包，但是<u><strong>AR1没有2.2.2.0 网段的路由</strong></u>，所以得不到回应，请求超时。</p>
 <ul>
 <li>解决方法：</li>
 </ul>
@@ -705,34 +704,39 @@
 <li><code>定义要转换成的ip（使用nat定义ip组）</code></li>
 <li><code>在对外接口上应用规则（nat outbound【acl编号】【nat ip组编号】）</code></li>
 </ol>
-<p>注意：该方法为动态nat转换，内网中的设备数量是不确定的，同一时间会使用nat ip组中的某一ip向外访问，因此外部是访问不到内网ip的</p>
 <h1 id="情景二"><a href="#情景二" class="headerlink" title="情景二"></a>情景二</h1><p>服务器server1需要向外提供访问服务，但是直接添加私有ip的路由安全性太低</p>
-<p>解决方法：使用NAT地址转换让服务器向外提供固定公网ip进行访问</p>
-<h2 id="步骤-1"><a href="#步骤-1" class="headerlink" title="步骤"></a>步骤</h2><p><code>进入出口路由对外接口，使用nat server global 【公网ip】inside 【私有ip】</code></p>
+<p>解决方法：使用静态NAT地址转换让服务器向外提供固定公网ip进行访问</p>
+<h2 id="步骤-1"><a href="#步骤-1" class="headerlink" title="步骤"></a>步骤</h2><p><u>进入出口路由<strong>对外接口</strong>，使用nat server global 【公网ip】inside 【私有ip】</u></p>
+<h1 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h1><p>动态nat转换，内网中的设备数量是不确定的，同一时间会使用nat ip组中的某一ip向外访问，因此<u>外部是访问不到转换后的nat ip的</u>，但是<u><strong>仍然可以访问原来的IP</strong></u>（即转换前的IP）</p>
+<p>以上步骤在转换ip时，要查看转换成的最终ip是否在其他路由设备的路由表上，否则会访问失败</p>
 <h1 id="实操"><a href="#实操" class="headerlink" title="实操"></a>实操</h1><ul>
-<li>为192.168网段添加NAT</li>
+<li>在<strong>AR2</strong>为 2.2.2.0 网段添加动态NAT</li>
 </ul>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">&lt;Huawei&gt;sy</span><br><span class="line">Enter system view, return user view with Ctrl+Z.</span><br><span class="line">[Huawei]u t m</span><br><span class="line">[Huawei]acl name lanRule basic                                    //添加acl规则</span><br><span class="line">[Huawei-acl-basic-lanRule]rule permit sou 192.168.0.0 0.0.255.255 //定义要进行转换的ip</span><br><span class="line">[Huawei-acl-basic-lanRule]q</span><br><span class="line">[Huawei]nat address-group 1 64.1.1.2 64.1.1.6                     //定义转换成的目的ip组</span><br><span class="line">[Huawei]dis acl all </span><br><span class="line"> Total quantity of nonempty ACL number is 1 </span><br><span class="line"></span><br><span class="line">Basic ACL lanRule 2999, 1 rule</span><br><span class="line">Acl&#x27;s step is 5</span><br><span class="line"> rule 5 permit source 192.168.0.0 0.0.255.255 </span><br><span class="line"></span><br><span class="line">[Huawei]int g0/0/1</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]nat outbound 2999 address-group 1     //应用规则进行转换</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[Huawei]acl name pc2 basic </span><br><span class="line">[Huawei-acl-basic-pc2]rule permit source 2.2.2.0 0.0.0.255    //定义要进行转换的ip</span><br><span class="line">[Huawei-acl-basic-pc2]q</span><br><span class="line"></span><br><span class="line">[Huawei]nat address-group 1 10.1.12.100 10.1.12.110       //定义转换后的IP，两个路由器存在该网段，														 //无需另外添加路由</span><br><span class="line"></span><br><span class="line">[Huawei-GigabitEthernet0/0/1]nat outbound 2999 address-group 1     //在对外接口应用，进行绑定</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 <ul>
-<li>为server1添加NAT</li>
+<li>为PC3 添加 静态NAT</li>
 </ul>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">&lt;Huawei&gt;sy</span><br><span class="line">Enter system view, <span class="built_in">return</span> user view with Ctrl+Z.</span><br><span class="line">[Huawei]u t m</span><br><span class="line">[Huawei]int g0/0/1</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]nat server global 64.1.1.100 inside 172.16.0.254 </span><br><span class="line">                                           //将内部172.16.0.254转换成64.1.1.100</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[Huawei]int g0/0/1</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]nat server global 10.1.12.200 inside 3.3.3.3  //两个路由器已存在该网段路																	  //由，无需另外添加</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]q                                    </span><br></pre></td></tr></table></figure>
 
 <h1 id="检验"><a href="#检验" class="headerlink" title="检验"></a>检验</h1><ul>
-<li>pc1 ping 64.1.1.10</li>
+<li>pc2 ping 10.1.12.1</li>
 </ul>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">PC&gt;ping 64.1.1.10</span><br><span class="line"></span><br><span class="line">Ping 64.1.1.10: 32 data bytes, Press Ctrl_C to <span class="built_in">break</span></span><br><span class="line">From 64.1.1.10: bytes=32 <span class="built_in">seq</span>=1 ttl=254 time=15 ms</span><br><span class="line">From 64.1.1.10: bytes=32 <span class="built_in">seq</span>=2 ttl=254 time=16 ms</span><br><span class="line">From 64.1.1.10: bytes=32 <span class="built_in">seq</span>=3 ttl=254 time=31 ms</span><br><span class="line">From 64.1.1.10: bytes=32 <span class="built_in">seq</span>=4 ttl=254 time=16 ms</span><br><span class="line">From 64.1.1.10: bytes=32 <span class="built_in">seq</span>=5 ttl=254 time=16 ms</span><br><span class="line"></span><br><span class="line">--- 64.1.1.10 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 15/18/31 ms</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">PC&gt;ping 10.1.12.1</span><br><span class="line"></span><br><span class="line">Ping 10.1.12.1: 32 data bytes, Press Ctrl_C to <span class="built_in">break</span></span><br><span class="line">From 10.1.12.1: bytes=32 <span class="built_in">seq</span>=1 ttl=254 time=16 ms</span><br><span class="line">From 10.1.12.1: bytes=32 <span class="built_in">seq</span>=2 ttl=254 time=15 ms</span><br><span class="line">From 10.1.12.1: bytes=32 <span class="built_in">seq</span>=3 ttl=254 time=16 ms</span><br><span class="line">From 10.1.12.1: bytes=32 <span class="built_in">seq</span>=4 ttl=254 time=31 ms</span><br><span class="line">From 10.1.12.1: bytes=32 <span class="built_in">seq</span>=5 ttl=254 time=16 ms</span><br><span class="line"></span><br><span class="line">--- 10.1.12.1 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 15/18/31 ms</span><br></pre></td></tr></table></figure>
 
 <ul>
-<li>pc1访问server1</li>
+<li>PC2 ping PC1（在AR2路由器添加了1.1.1.0网段路由）</li>
 </ul>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">PC&gt;ping 64.1.1.100</span><br><span class="line"></span><br><span class="line">Ping 64.1.1.100: 32 data bytes, Press Ctrl_C to <span class="built_in">break</span></span><br><span class="line">From 64.1.1.100: bytes=32 <span class="built_in">seq</span>=1 ttl=253 time=16 ms</span><br><span class="line">From 64.1.1.100: bytes=32 <span class="built_in">seq</span>=2 ttl=253 time=31 ms</span><br><span class="line">From 64.1.1.100: bytes=32 <span class="built_in">seq</span>=3 ttl=253 time=15 ms</span><br><span class="line">From 64.1.1.100: bytes=32 <span class="built_in">seq</span>=4 ttl=253 time=16 ms</span><br><span class="line">From 64.1.1.100: bytes=32 <span class="built_in">seq</span>=5 ttl=253 time=16 ms</span><br><span class="line"></span><br><span class="line">--- 64.1.1.100 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 15/18/31 ms</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">PC&gt;ping 1.1.1.1 </span><br><span class="line"></span><br><span class="line">Ping 1.1.1.1: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">Request timeout!</span><br><span class="line">From 1.1.1.1: bytes=32 seq=2 ttl=126 time=16 ms</span><br><span class="line">From 1.1.1.1: bytes=32 seq=3 ttl=126 time=15 ms</span><br><span class="line">From 1.1.1.1: bytes=32 seq=4 ttl=126 time=16 ms</span><br><span class="line">From 1.1.1.1: bytes=32 seq=5 ttl=126 time=15 ms</span><br><span class="line"></span><br><span class="line">--- 1.1.1.1 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  4 packet(s) received</span><br><span class="line">  20.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 0/15/16 ms</span><br></pre></td></tr></table></figure>
 
+<p>在PC1抓包，可以看到源ip地址已经变成了 10.1.12.103</p>
+<p><img src="/../../images/NAT%E6%8A%93%E5%8C%85.png"></p>
 <ul>
-<li>为server1配置域名example.com，并给pc1添加dns地址为server1的公网ip，再ping server1的域名</li>
+<li>pc1 访问 PC3</li>
 </ul>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">PC&gt;ping example.com</span><br><span class="line"></span><br><span class="line">Ping example.com [64.1.1.100]: 32 data bytes, Press Ctrl_C to <span class="built_in">break</span></span><br><span class="line">From 64.1.1.100: bytes=32 <span class="built_in">seq</span>=1 ttl=253 time=16 ms</span><br><span class="line">From 64.1.1.100: bytes=32 <span class="built_in">seq</span>=2 ttl=253 time=15 ms</span><br><span class="line">From 64.1.1.100: bytes=32 <span class="built_in">seq</span>=3 ttl=253 time=16 ms</span><br><span class="line">From 64.1.1.100: bytes=32 <span class="built_in">seq</span>=4 ttl=253 time=16 ms</span><br><span class="line">From 64.1.1.100: bytes=32 <span class="built_in">seq</span>=5 ttl=253 time=15 ms</span><br><span class="line"></span><br><span class="line">--- 64.1.1.100 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 15/15/16 ms</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">PC&gt;ping 10.1.12.200</span><br><span class="line"></span><br><span class="line">Ping 10.1.12.200: 32 data bytes, Press Ctrl_C to <span class="built_in">break</span></span><br><span class="line">Request <span class="built_in">timeout</span>!</span><br><span class="line">Request <span class="built_in">timeout</span>!</span><br><span class="line">From 10.1.12.200: bytes=32 <span class="built_in">seq</span>=3 ttl=126 time=16 ms</span><br><span class="line">From 10.1.12.200: bytes=32 <span class="built_in">seq</span>=4 ttl=126 time=31 ms</span><br><span class="line">From 10.1.12.200: bytes=32 <span class="built_in">seq</span>=5 ttl=126 time=15 ms</span><br><span class="line"></span><br><span class="line">--- 10.1.12.200 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  3 packet(s) received</span><br><span class="line">  40.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 0/20/31 ms</span><br></pre></td></tr></table></figure>
+
+
 
 ]]></content>
       <tags>
@@ -847,6 +851,74 @@
 ]]></content>
       <tags>
         <tag>网络-Ensp</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>前端工程师职业规划参考</title>
+    <url>/2023/07/02/%E8%81%8C%E4%B8%9A%E8%A7%84%E5%88%92/%E5%89%8D%E7%AB%AF%E5%B7%A5%E7%A8%8B%E5%B8%88%E8%81%8C%E4%B8%9A%E8%A7%84%E5%88%92%E5%8F%82%E8%80%83/</url>
+    <content><![CDATA[<h3 id="1-初级前端工程师（1-2年）："><a href="#1-初级前端工程师（1-2年）：" class="headerlink" title="1. 初级前端工程师（1-2年）："></a>1. 初级前端工程师（1-2年）：</h3><ul>
+<li>学习HTML、CSS和JavaScript等基础知识，并熟练运用它们进行网页开发。</li>
+<li>参与项目团队，积累实际项目经验。</li>
+<li>学习和掌握常用的前端框架和工具，如React、Vue.js、Webpack等。</li>
+<li>参与培训课程和技术社区，不断学习和提升技能。</li>
+</ul>
+<h3 id="2-中级前端工程师（3-5年）："><a href="#2-中级前端工程师（3-5年）：" class="headerlink" title="2. 中级前端工程师（3-5年）："></a>2. 中级前端工程师（3-5年）：</h3><ul>
+<li>在项目中承担更复杂的前端开发任务，如开发响应式网站、移动端应用等。</li>
+<li>深入学习和掌握前端框架和库的原理和使用技巧。</li>
+<li>学习和应用前端最佳实践，如性能优化、代码规范等。</li>
+<li>参与团队协作和项目管理，提升沟通和领导能力。</li>
+</ul>
+<h3 id="3-高级前端工程师（5年以上）："><a href="#3-高级前端工程师（5年以上）：" class="headerlink" title="3. 高级前端工程师（5年以上）："></a>3. 高级前端工程师（5年以上）：</h3><ul>
+<li>在复杂项目中担任技术负责人或架构师角色，负责前端架构设计和技术选型。</li>
+<li>深入研究前端领域的新技术和趋势，并引领团队进行技术创新和实践。</li>
+<li>参与开源项目和技术社区，分享经验和贡献代码。</li>
+<li>建立自己的技术品牌和影响力，如通过博客、演讲等方式分享经验和见解。</li>
+</ul>
+<h3 id="4-职业发展方向："><a href="#4-职业发展方向：" class="headerlink" title="4. 职业发展方向："></a>4. 职业发展方向：</h3><ul>
+<li>前端架构师：专注于前端架构设计和技术选型，负责复杂项目的技术规划和架构设计。</li>
+<li>前端团队管理：发展管理和领导能力，负责前端团队的招聘、培训和项目管理。</li>
+<li>UX&#x2F;UI设计师：学习和掌握用户体验和界面设计的知识，负责前端界面设计和交互优化。</li>
+<li>技术顾问：通过积累丰富的经验和知识，为企业提供前端技术咨询和解决方案。</li>
+</ul>
+<p>这只是一个参考，可以根据自己的兴趣和职业目标进行调整和补充。重要的是制定一个明确的职业规划，并不断学习和发展自己的技能，以实现职业的持续成长和发展。</p>
+]]></content>
+      <tags>
+        <tag>职业规划</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>后端工程师职业规划参考</title>
+    <url>/2023/07/02/%E8%81%8C%E4%B8%9A%E8%A7%84%E5%88%92/%E5%90%8E%E7%AB%AF%E5%B7%A5%E7%A8%8B%E5%B8%88%E8%81%8C%E4%B8%9A%E8%A7%84%E5%88%92%E5%8F%82%E8%80%83/</url>
+    <content><![CDATA[<h3 id="1-初级后端工程师（1-3年）："><a href="#1-初级后端工程师（1-3年）：" class="headerlink" title="1. 初级后端工程师（1-3年）："></a>1. 初级后端工程师（1-3年）：</h3><ul>
+<li>掌握一门主流后端开发语言，如Java、Python或Node.js。</li>
+<li>学习并应用常见的后端开发框架和技术，如Spring、Django或Express.js。</li>
+<li>参与项目开发，负责后端功能的实现和数据库设计。</li>
+<li>学习和应用基本的软件工程原则和最佳实践。</li>
+<li>持续学习和提升编程和问题解决能力。</li>
+</ul>
+<h3 id="2-中级后端工程师（3-5年）："><a href="#2-中级后端工程师（3-5年）：" class="headerlink" title="2. 中级后端工程师（3-5年）："></a>2. 中级后端工程师（3-5年）：</h3><ul>
+<li>深入研究和应用后端开发技术栈，如数据库优化、性能调优、缓存等。</li>
+<li>参与设计和开发复杂的后端系统，包括分布式系统和微服务架构。</li>
+<li>学习和应用设计模式和架构原则，提高系统的可扩展性和可维护性。</li>
+<li>参与团队的技术选型和架构设计，负责解决技术难题和挑战。</li>
+<li>培养团队合作和沟通能力，开始指导和培养初级工程师。</li>
+</ul>
+<h3 id="3-高级后端工程师（5年以上）："><a href="#3-高级后端工程师（5年以上）：" class="headerlink" title="3. 高级后端工程师（5年以上）："></a>3. 高级后端工程师（5年以上）：</h3><ul>
+<li>深入研究和应用领域专有的后端技术，如金融领域的支付系统、电子商务领域的订单处理系统等。</li>
+<li>参与大型项目的架构设计和技术规划，负责解决复杂的技术挑战。</li>
+<li>深入理解和应用云计算和容器化技术，如Docker和Kubernetes。</li>
+<li>参与行业内的研究和交流，提升自己在该领域的专业影响力。</li>
+<li>培养和指导团队成员的技术能力和职业发展。</li>
+</ul>
+<h3 id="4-技术管理者："><a href="#4-技术管理者：" class="headerlink" title="4. 技术管理者："></a>4. 技术管理者：</h3><ul>
+<li>学习项目管理和团队管理知识，培养领导力和沟通能力。</li>
+<li>担任技术团队的领导角色，负责项目的规划和执行。</li>
+<li>帮助团队成员制定个人的职业规划，并提供指导和支持。</li>
+<li>参与公司的技术战略规划和决策，推动团队的技术创新和发展。</li>
+</ul>
+]]></content>
+      <tags>
+        <tag>职业规划</tag>
       </tags>
   </entry>
   <entry>
@@ -1566,74 +1638,6 @@
 ]]></content>
       <tags>
         <tag>网络-理论</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>前端工程师职业规划参考</title>
-    <url>/2023/07/02/%E8%81%8C%E4%B8%9A%E8%A7%84%E5%88%92/%E5%89%8D%E7%AB%AF%E5%B7%A5%E7%A8%8B%E5%B8%88%E8%81%8C%E4%B8%9A%E8%A7%84%E5%88%92%E5%8F%82%E8%80%83/</url>
-    <content><![CDATA[<h3 id="1-初级前端工程师（1-2年）："><a href="#1-初级前端工程师（1-2年）：" class="headerlink" title="1. 初级前端工程师（1-2年）："></a>1. 初级前端工程师（1-2年）：</h3><ul>
-<li>学习HTML、CSS和JavaScript等基础知识，并熟练运用它们进行网页开发。</li>
-<li>参与项目团队，积累实际项目经验。</li>
-<li>学习和掌握常用的前端框架和工具，如React、Vue.js、Webpack等。</li>
-<li>参与培训课程和技术社区，不断学习和提升技能。</li>
-</ul>
-<h3 id="2-中级前端工程师（3-5年）："><a href="#2-中级前端工程师（3-5年）：" class="headerlink" title="2. 中级前端工程师（3-5年）："></a>2. 中级前端工程师（3-5年）：</h3><ul>
-<li>在项目中承担更复杂的前端开发任务，如开发响应式网站、移动端应用等。</li>
-<li>深入学习和掌握前端框架和库的原理和使用技巧。</li>
-<li>学习和应用前端最佳实践，如性能优化、代码规范等。</li>
-<li>参与团队协作和项目管理，提升沟通和领导能力。</li>
-</ul>
-<h3 id="3-高级前端工程师（5年以上）："><a href="#3-高级前端工程师（5年以上）：" class="headerlink" title="3. 高级前端工程师（5年以上）："></a>3. 高级前端工程师（5年以上）：</h3><ul>
-<li>在复杂项目中担任技术负责人或架构师角色，负责前端架构设计和技术选型。</li>
-<li>深入研究前端领域的新技术和趋势，并引领团队进行技术创新和实践。</li>
-<li>参与开源项目和技术社区，分享经验和贡献代码。</li>
-<li>建立自己的技术品牌和影响力，如通过博客、演讲等方式分享经验和见解。</li>
-</ul>
-<h3 id="4-职业发展方向："><a href="#4-职业发展方向：" class="headerlink" title="4. 职业发展方向："></a>4. 职业发展方向：</h3><ul>
-<li>前端架构师：专注于前端架构设计和技术选型，负责复杂项目的技术规划和架构设计。</li>
-<li>前端团队管理：发展管理和领导能力，负责前端团队的招聘、培训和项目管理。</li>
-<li>UX&#x2F;UI设计师：学习和掌握用户体验和界面设计的知识，负责前端界面设计和交互优化。</li>
-<li>技术顾问：通过积累丰富的经验和知识，为企业提供前端技术咨询和解决方案。</li>
-</ul>
-<p>这只是一个参考，可以根据自己的兴趣和职业目标进行调整和补充。重要的是制定一个明确的职业规划，并不断学习和发展自己的技能，以实现职业的持续成长和发展。</p>
-]]></content>
-      <tags>
-        <tag>职业规划</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>后端工程师职业规划参考</title>
-    <url>/2023/07/02/%E8%81%8C%E4%B8%9A%E8%A7%84%E5%88%92/%E5%90%8E%E7%AB%AF%E5%B7%A5%E7%A8%8B%E5%B8%88%E8%81%8C%E4%B8%9A%E8%A7%84%E5%88%92%E5%8F%82%E8%80%83/</url>
-    <content><![CDATA[<h3 id="1-初级后端工程师（1-3年）："><a href="#1-初级后端工程师（1-3年）：" class="headerlink" title="1. 初级后端工程师（1-3年）："></a>1. 初级后端工程师（1-3年）：</h3><ul>
-<li>掌握一门主流后端开发语言，如Java、Python或Node.js。</li>
-<li>学习并应用常见的后端开发框架和技术，如Spring、Django或Express.js。</li>
-<li>参与项目开发，负责后端功能的实现和数据库设计。</li>
-<li>学习和应用基本的软件工程原则和最佳实践。</li>
-<li>持续学习和提升编程和问题解决能力。</li>
-</ul>
-<h3 id="2-中级后端工程师（3-5年）："><a href="#2-中级后端工程师（3-5年）：" class="headerlink" title="2. 中级后端工程师（3-5年）："></a>2. 中级后端工程师（3-5年）：</h3><ul>
-<li>深入研究和应用后端开发技术栈，如数据库优化、性能调优、缓存等。</li>
-<li>参与设计和开发复杂的后端系统，包括分布式系统和微服务架构。</li>
-<li>学习和应用设计模式和架构原则，提高系统的可扩展性和可维护性。</li>
-<li>参与团队的技术选型和架构设计，负责解决技术难题和挑战。</li>
-<li>培养团队合作和沟通能力，开始指导和培养初级工程师。</li>
-</ul>
-<h3 id="3-高级后端工程师（5年以上）："><a href="#3-高级后端工程师（5年以上）：" class="headerlink" title="3. 高级后端工程师（5年以上）："></a>3. 高级后端工程师（5年以上）：</h3><ul>
-<li>深入研究和应用领域专有的后端技术，如金融领域的支付系统、电子商务领域的订单处理系统等。</li>
-<li>参与大型项目的架构设计和技术规划，负责解决复杂的技术挑战。</li>
-<li>深入理解和应用云计算和容器化技术，如Docker和Kubernetes。</li>
-<li>参与行业内的研究和交流，提升自己在该领域的专业影响力。</li>
-<li>培养和指导团队成员的技术能力和职业发展。</li>
-</ul>
-<h3 id="4-技术管理者："><a href="#4-技术管理者：" class="headerlink" title="4. 技术管理者："></a>4. 技术管理者：</h3><ul>
-<li>学习项目管理和团队管理知识，培养领导力和沟通能力。</li>
-<li>担任技术团队的领导角色，负责项目的规划和执行。</li>
-<li>帮助团队成员制定个人的职业规划，并提供指导和支持。</li>
-<li>参与公司的技术战略规划和决策，推动团队的技术创新和发展。</li>
-</ul>
-]]></content>
-      <tags>
-        <tag>职业规划</tag>
       </tags>
   </entry>
   <entry>
