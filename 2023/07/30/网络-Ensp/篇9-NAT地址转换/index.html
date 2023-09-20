@@ -116,7 +116,7 @@
 
 <h1 id="情景二"><a href="#情景二" class="headerlink" title="情景二"></a>情景二</h1><p>服务器server1需要向外提供访问服务，但是直接添加私有ip的路由安全性太低</p>
 <p>解决方法：使用静态NAT地址转换让服务器向外提供固定公网ip进行访问</p>
-<h2 id="步骤-1"><a href="#步骤-1" class="headerlink" title="步骤"></a>步骤</h2><p>进入出口路由**<u>对外接口</u>**</p>
+<h2 id="步骤-1"><a href="#步骤-1" class="headerlink" title="步骤"></a>步骤</h2><p>进入出口路由<u><strong>对外接口</strong></u></p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nat server global 【NAT ip】 inside 【原ip】</span><br></pre></td></tr></table></figure>
 
 <h1 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h1><p>动态nat转换，内网中的设备数量是不确定的，同一时间会使用nat ip组中的某一ip向外访问，因此<u>外部是访问不到转换后的nat ip的</u>，但是如果路由表存在原来ip的路由，则<u><strong>仍然可以访问原来的IP</strong></u>（即转换前的IP）</p>
@@ -151,7 +151,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://exmaple.com/2023/07/30/%E7%BD%91%E7%BB%9C-Ensp/%E7%AF%879-NAT%E5%9C%B0%E5%9D%80%E8%BD%AC%E6%8D%A2/" data-id="clm7ptayt000lwswofqg82ny9" class="article-share-link">
+      <a data-url="https://exmaple.com/2023/07/30/%E7%BD%91%E7%BB%9C-Ensp/%E7%AF%879-NAT%E5%9C%B0%E5%9D%80%E8%BD%AC%E6%8D%A2/" data-id="clmrxdl4c0015z8wo1c0ieeyc" class="article-share-link">
         分享
       </a>
       

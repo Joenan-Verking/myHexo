@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  
+  <meta name="keywords" content="冰山的笔记">
+  
+  
+  <meta name="description" content="学习记录、心得记录">
+  
+  <title>
+    篇2-ISIS |
+    
+    冰山的笔记
+  </title>
+  <!-- Icon -->
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+    
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<script src="/js/pace.min.js"></script>
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <main class="content">
+    <section class="outer">
+  <article id="post-网络-理论/篇2-ISIS" class="article article-type-post" itemscope
+  itemprop="blogPost" data-scroll-reveal>
+
+  <div class="article-inner">
+    
+    <header class="article-header">
+      
+  
+  <h1 class="article-title" itemprop="name">
+    篇2-ISIS
+  </h1>
+  
+  
+
+    </header>
+    
+
+    
+    <div class="article-meta">
+      <a href="/2023/09/20/%E7%BD%91%E7%BB%9C-%E7%90%86%E8%AE%BA/%E7%AF%872-ISIS/" class="article-date">
+  <time datetime="2023-09-20T15:29:55.000Z" itemprop="datePublished">2023-09-20</time>
+</a>
+      
+    </div>
+    
+
+    
+    
+<div class="tocbot"></div>
+
+    
+
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+      
+        <h1 id="ISIS协议基本原理"><a href="#ISIS协议基本原理" class="headerlink" title="ISIS协议基本原理"></a>ISIS协议基本原理</h1><h2 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h2><table>
+<thead>
+<tr>
+<th align="center">园区网</th>
+<th align="center">骨干网</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">应用型网络，主要面向企业网用户</td>
+<td align="center">服务型网络，由ISP（网络服务提供商）组建，并为终端用户提供互联网服务</td>
+</tr>
+<tr>
+<td align="center">路由器数量偏少，动态路由的LSDB库容量偏少，三层路由域相对偏少</td>
+<td align="center">路由调度占绝对统治地位，路由数量庞大</td>
+</tr>
+<tr>
+<td align="center">有出口路由概念，对内外部路由划分敏感</td>
+<td align="center">结构层面扁平化，要求IGP作为基础路由为上层BGP协议服务</td>
+</tr>
+<tr>
+<td align="center">地域性跨度不大，带宽充足，链路状态协议开销对带宽占用偏少</td>
+<td align="center">LSDB规模宏大，对链路收敛极度敏感，线路费用高昂</td>
+</tr>
+<tr>
+<td align="center">路由策略和策略路由应用频繁多变，需要精细化的路由操作</td>
+<td align="center">最求简单高效，扩展性高，满足各种客户业务需求（IPv6&#x2F;IPX)</td>
+</tr>
+<tr>
+<td align="center">OSPF的多路由类型(内部&#x2F;外部)，多区域类型(骨干&#x2F;通&#x2F;特殊)，开销规则优良(根据带宽设定)，网络类型多样( 最多五种类型)的特点在园区网得到了极大的发挥。</td>
+<td align="center">IS-IS的快速算法( PRC得到加强 )，简便报文结构( TLV )，快速居关系建立，大容量路由传递(基于二层开销低)等一系列特点在骨千网有着天然的优势。</td>
+</tr>
+</tbody></table>
+<h2 id="历史起源"><a href="#历史起源" class="headerlink" title="历史起源"></a>历史起源</h2><p>IS-IS最初是国际标准化组织ISO ( the International Organization for Standardization为它的无连接网络协议CLNP ( ConnectionLess Network Protocol) 设计的一种动态路由协议。</p>
+<p>为了提供对IP的路由支持，IETF在RFC1195中对IS-IS进行了扩充和修改，使它能够同时应用在TCP&#x2F;IP和OSI环境中，称为集成化IS-IS (Integrated IS-IS )，后面如果没有特别说明提到的IS-IS都是指集成IS-IS。</p>
+<p>IS-IS属于内部网关协议，用于自治系统内部。IS-IS是一种链路状态协议，使用最短路径优先算法进行路由计算。</p>
+<h2 id="路由计算过程"><a href="#路由计算过程" class="headerlink" title="路由计算过程"></a>路由计算过程</h2><ul>
+<li><p>邻居关系建立</p>
+<p>邻居关系建立主要是通过HELLO包交互并协商各种参数，包括电路类型(level-1&#x2F;level-2 )，Hold time，网络类型，支持协议，区域号，系统ID，PDU长度，接口IP等。</p>
+</li>
+<li><p>链路信息交换</p>
+<p>与OSPF不同，ISIS交互链路状态的基本载体不是LSA ( link state advertisement ) 而是LSP ( link state PDU)；交互的过程没有OSPF协议那样经历了多个阶段，主要是<u>通过CSNP（Complete Sequence Number PDU）和PSNP（Partial Sequence Number PDU）两种协议报文来同步</u>，请求以及确认链路状态信息(承载的是链路状态信息摘要 )，而链路状态信息的详细拓扑和路由信息是由LSP报文传递。</p>
+</li>
+<li><p>路由计算</p>
+<p>SPF计算和OSPF基本一样的，但ISIS算法分离了拓扑结构和IP网段，加快了网络收敛速度。</p>
+</li>
+</ul>
+<h2 id="地址结构"><a href="#地址结构" class="headerlink" title="地址结构"></a>地址结构</h2><p><img src="/../../images/ISIS/%E5%9C%B0%E5%9D%80%E7%BB%93%E6%9E%84.png"></p>
+<p>CLNP（Connectionless Network Protocol），OSI中的网络层协议，类似于TCP&#x2F;IP中的IP协议</p>
+<p>CLNS（Connectionless Network Service，无连接网络服务），类似于IP所提供的“尽力而为”的服务，通过CLNP来完成CLNS</p>
+<ol>
+<li>NPDU（Network protocol Data Unit，网络协议数据单元），是OSI中的网络层协议报文，相当于TCP&#x2F;IP中的IP报文 </li>
+<li>NSAP（Network Service Access Point，网络服务接入点），即OSI中的网络层地址，用于多个抽象的网络服务访问点，描述OSI模型的网络地址结构</li>
+</ol>
+<p>NSAP地址:</p>
+<ul>
+<li><u>IDP相当于IP地址中的主网络号</u>。它是由ISO规定,并由AF与IDI两部分组成。AFI表示地址分配机构和地址格式，IDI用来标识域。IDP部分是ISO规定的，由AFI (Authority and Format Identifler) 与IDI (Initial Domain Indentifler) 组成，AFI<br>表示地址分配机构和地址格式，<u>IDI 用来标识域。AFI设置为49表示私有。设置为47表示全球。</u></li>
+<li><u>DSP相当于IP地址中的子网号和主机地址</u>。它由High Order DSP、System ID和SEL三个部分组成。High Order DSP用来分割区域，System ID用来区分主机, SEL用来指示服务类型。</li>
+<li>IDP 和 DSP 都是可变的，NSAP总长最多20个字节，最少8字节</li>
+<li>Area Address ( Area ID )，由IDP和DSP中的High Order DSP组成，<u>既能够标识路由域，也能够标识路由域中的区域</u>。因此，它们一起被称为区域地址，相当于OSPF中的区域编号。同一 Level-1 区域的路由器必须具有系统的区域地址，Level-2 区域内的路由可以具有不同的区域地址。区域地址长度是可变的，为1-13字节</li>
+<li>System ID，用来在区域内唯一标识主机或路由器，类似OSPF的RID， 在设备的实现中，它的长度固定为48bit( 6字节)，可用MAC地址作为System ID </li>
+<li>SEL的作用类似IP中的”协议标识符”， 不同的传输协议对应不同的SEL。在IP上SEL均为00</li>
+</ul>
+<p>NET :</p>
+<ul>
+<li>网络实体名称NET指的是设备本身的网络层信息，可以看作是一类特殊的NSAP( SEL&#x3D;00），NET的长度与NSAP的相同，最多为20个字节，最少为8个字节。在路由器上配置IS-IS时,只需要考虑NET即可, NSAP可不必去关注。</li>
+<li>在配置IS-IS过程中，NET最多也只能配3个。在配置多个NET时，必须保证它们的System ID都相同。</li>
+</ul>
+<h2 id="路由器分类"><a href="#路由器分类" class="headerlink" title="路由器分类"></a>路由器分类</h2><p>Level-1路由器:</p>
+<ul>
+<li>Level-1只能与属于同一区域的Level-1和Level-1-2路由器形成邻居关系，只负责维护Level-1的链路状态数据库，该LSDB包含本区域内的路由信息，到本区域外的报文转发给最近的Level-1-2路由器。Level-1路由器只可能建立Level-1的邻接关系。</li>
+</ul>
+<p>Level-2路由器:</p>
+<ul>
+<li>Level-2路由器负责区域间的路由，它可以与相同或者不同区域的Level-2路由器或者不同区域的Level-1-2路由器形成邻居关系。Level-2路由器维护一 个Level-2的LSDB，该LSDB包含区域间的路由信息。Level-2路由器只可能建 立Level-2的邻接关系。</li>
+</ul>
+<p>Level-1-2路由器:</p>
+<ul>
+<li>同时属于Level-1和Level-2的路由器称为Level-1-2路由器。Level-1-2路由器维护两个LSDB , Level-1的LSDB用于<strong>区域内</strong>路由，Level-2的LSDB用于<strong>区域间</strong>路由。</li>
+<li>Level-1-2路由器可以与同一区域的Level-1形成Level-1邻居关系，也可以与其他区域的 Level-2 和 Level-1-2 路由器形成Level-2的邻居关系。</li>
+</ul>
+<p>不同区域间，只能建立 Level-2 的邻接关系:</p>
+<ul>
+<li>Level-2路由器可以与Level-2路由器建立邻接关系。</li>
+<li>Level-1-2路由器可以与Level-2路由器建立邻接关系。</li>
+<li>Level-1-2路由器可以与Level-1-2路由器建立邻接关系。</li>
+</ul>
+<p>	</p>
+<h2 id="邻居Hello报文"><a href="#邻居Hello报文" class="headerlink" title="邻居Hello报文"></a>邻居Hello报文</h2><p>HELLO PDU ( Hello protocol data unit ) ：</p>
+<ul>
+<li>HELLO报文的作用是邻居发现，协商参数并建立邻居关系，后期充当保活报文。</li>
+<li>IS-IS建立邻居关系和OSPF一样，通过hello报文的交互来完成。但是会根据场景分为三种类型的hello报文。</li>
+<li>广播网中的Level-1 IS-IS使用 Level-1 LAN IIH ( Level-1 LAN IS-IS Hello) ，目的组播MAC为: 0180-c200-0014</li>
+<li>广播网中的Level-2 IS-IS使用 Level-2 LAN IIH ( Level-2 LAN IS-IS Hello) ，目的组播MAC为: 0180-c200-0015</li>
+<li>非广播网络中则使用P2P IIH ( point to point IS-IS Hello)。但是其没有表示DIS （虚节点）的相关字段。</li>
+<li>非 IIH 报文需要通过填充字段用于邻居两端协商发送报文的大小。</li>
+</ul>
+<p>IS-IS支持的网络类型：</p>
+<ul>
+<li>对点网络类型(P2P)。</li>
+<li>广播多路访问网络类型( Broadcast Multiple Access )。</li>
+<li>在帧中继等特殊环境下,可以通过创建子接口支持P2P的网络类型。</li>
+</ul>
+<h2 id="邻居关系建立"><a href="#邻居关系建立" class="headerlink" title="邻居关系建立"></a>邻居关系建立</h2><p><img src="/../../images/ISIS/%E9%82%BB%E5%B1%85%E5%85%B3%E7%B3%BB%E5%BB%BA%E7%AB%8B.png"></p>
+<p>在P2P链路上,分为两次握手机制和三次握手机制。</p>
+<ul>
+<li>两次握手只要路由器收到对端发来的Hello报文，就单方面宣布邻居为up状态，建立邻居关系，不过容易存在单通风险。</li>
+<li>通过三次发送P2P的IS-IS Hello PDU最终建立起邻居关系，与广播链路邻居关系的建立情况相同。</li>
+</ul>
+<p>在广播链路上，用LAN IH报文执行3三次握手建立邻居关系。</p>
+<ul>
+<li>当收到邻居发送的Hello PDU报文里面没有自己的system ID的时候，状态机进入initialized。</li>
+<li>只有收到邻居发过来的Hello PDU有自己的system ID才会up，排除了链路单通的风险。</li>
+<li>广播网络中邻居up后会选举DIS(虚节点) ，DIS的功能类似OSPF的DR（指定路由器）。</li>
+</ul>
+<h2 id="DIS、DIS与DR的类比"><a href="#DIS、DIS与DR的类比" class="headerlink" title="DIS、DIS与DR的类比"></a>DIS、DIS与DR的类比</h2><p><img src="/../../images/ISIS/DIS%E5%92%8CDR%E7%9A%84%E7%B1%BB%E6%AF%94.png"></p>
+<p>DIS与伪节点:</p>
+<ul>
+<li>DIS是指定中间系统 （Designated IS）。</li>
+<li>伪节点是指在广播网络中由DIS创建的虚拟路由器。</li>
+</ul>
+<p>DIS的特点:</p>
+<ul>
+<li>在广播网络，需要选举DIS ，所以在邻居关系建立后，路由器会<u>等待两个Hello报文间隔</u>再进行DIS的选举。Hello报文中包含Priority 字段，Priority值最大的将被选举为该广播网的DIS。若优先级相同，接口MAC地址较大的被选举为DIS。IS-IS中DIS发送Hello时间间隔默认为10&#x2F;3秒，而其他非DIS路由器发送Hello间隔为10秒。</li>
+</ul>
+<p>DIS与DR的类比</p>
+<ul>
+<li>选举时优选级的比较，<u>DIS的优先级为0也可以参与选举</u>。OSPF中优先级为0不参与选举DR。</li>
+<li>选举的过程需要一定的时间，OSPF选举DR&#x2F;BDR需要waiting time达40秒，过程也较为复杂，而ISIS选举DIS等待两个Hello报文间隔就可以，简单快捷。</li>
+<li>选举结果ISIS只有一个DIS，但是OSPF除了有DR，还有一个BDR用做备份。</li>
+<li>选举结束后，后期有新的Router加入到链路进来，如果<u>优先级比DIS高是可抢占的</u>，但是DR是不可抢占的。</li>
+<li>选举完成后， ISIS网络链路内所有的路由器之间都建立的是邻接关系。OSPF中<br>DRothers只与 DR&#x2F;BDR 形成 full 邻接关系，DRothers之间只有2-way的关系。</li>
+<li>关于DIS和DR的作用:<ol>
+<li>进行SPF计算时，都把它当成虚节点，简化MA网络的逻辑拓扑(相同点)。</li>
+<li>都是为了减少LSP&#x2F;LSA的泛洪(相同点)。</li>
+<li>在ISIS中还可以由DIS发送CSNP来同步链路的LSDB ( ISIS扩展作用)。</li>
+</ol>
+</li>
+</ul>
+<h2 id="链路状态信息的载体"><a href="#链路状态信息的载体" class="headerlink" title="链路状态信息的载体"></a>链路状态信息的载体</h2><p><img src="/../../images/ISIS/%E9%93%BE%E8%B7%AF%E7%8A%B6%E6%80%81%E4%BF%A1%E6%81%AF%E7%9A%84%E8%BD%BD%E4%BD%93.png"></p>
+<p>ISIS TLV :</p>
+<ul>
+<li>TLV的含义是：类型(TYPE) ，长度( LENGTH) ，值( VALUE)。实际上是一个数据结构，这个结构包含了这三个字段。</li>
+<li>使用TLV结构构建报文的好处是灵活性和扩展性好。采用TLV使得报文的整体结构固定，增加新特点只需要增加新TLV即可。不需要改变整个报文的整体结构。</li>
+<li>网络拓扑结构和路由信息用TLV结构表现使得报文的灵活性和扩展性得到了极大的发挥。</li>
+</ul>
+<p>LSP PDU ( Link State Protocol PDU ) :</p>
+<ul>
+<li>LSP类似于OSPF的LSA ,承载的是链路状态信息,包含了拓扑结构和网络号。</li>
+<li>Level-1 LSP由Level-1路由器传送。</li>
+<li>Level-2 LSP由Level-2路由器传送。</li>
+<li>Level-1-2路由器则可传送以上两种LSP。</li>
+<li>LSP报文中包含了两个重要字段是ATT字段、IS-Type字段。 其中ATT字段用于标识该路由是L1&#x2F;L2路由器发送的, IS-Type用来指明生成此LSP的IS-IS类型是Level-1还是Level-2 IS-IS。</li>
+<li>LSP的刷新间隔为15分钟，老化时间为20分钟。但是一条LSP的老化除 了要等待20分</li>
+<li>钟外,还要等待60秒的零老化时延; LSP重传时间为5秒。</li>
+</ul>
+<p>SNP PDU ( Sequence Number PDU ) ：</p>
+<ul>
+<li>CSNP ( Complete Sequence Number PDU )包括<u>LSDB中所有LSP的摘要</u>信息，从而可以在相邻路由器间保持LSD的同步。</li>
+<li>PSNP ( Partial Sequence Number PDU )包含<u>部分LSDB中的LSP摘要</u>信息，能够对LSP进行请求和确认。</li>
+<li><u>CSNP类似于OSPF的DD报文传递的是LSDB里所有链路信息摘要。PSNP类似于OSPF的LSR或LSAck报文用于请求和确认部分链路信息。</u></li>
+</ul>
+<h2 id="链路状态信息的交互"><a href="#链路状态信息的交互" class="headerlink" title="链路状态信息的交互"></a>链路状态信息的交互</h2><p><img src="/../../images/ISIS/%E9%93%BE%E8%B7%AF%E7%8A%B6%E6%80%81%E4%BF%A1%E6%81%AF%E7%9A%84%E4%BA%A4%E4%BA%92.png"></p>
+<p>P2P网络LSDB同步过程:</p>
+<ul>
+<li>建立邻居关系之后，RTA与RTB会先发送CSNP给对端设备。如果对端的LSDB与CSNP没有同步，则发送PSNP请求索取相应的LSP。</li>
+<li>假定RTB向RTA索取相应的LSP ，此时向RTA发送PSNP。RTA发送RTB请求的LSP的同时启动LSP重传定时器，并等待RTB发送PSNP作为收到LSP的确认。</li>
+<li>如果在接口LSP重传定时器超时后, RTA还没有收到RTB发送的PSNP报文作为应答，则重新发送该LSP直至收到RTB的PSNP报文作为确认。</li>
+</ul>
+<p>MA网络中新加入的路由器与DIS的LSDB同步交互过程：</p>
+<ul>
+<li>假设新加入的路由器RTC已经与RTB ( DIS )和RTA建立了邻居关系。</li>
+<li>建立邻居关系之后， RTC将自己的LSP发往组播地址( Level-1 : 01-80-C2-00-00-14 ; Level-2 : 01-80-C2-00-00-15 )。这样网络上所有的邻居都将收到该LSP。</li>
+<li>该网段中的DIS会把收到RTC的LSP加入到LSDB中,并等待CSNP报文定时器超时( DIS每隔10秒发送CSNP报文）并发送CSNP报文，进行该网络内的LSDB同步。</li>
+<li>RTC收到DIS发来的CSNP报文，对比自己的LSDB数据库，然后向DIS发送PSNP报文请求自己没有的LSP (如RTA和RTB的LSP就没有)。</li>
+<li>RTB作为DIS收到该PSNP报文请求后向RTC发送对应的LSP进行LSDB的同步。</li>
+</ul>
+<h2 id="路由算法"><a href="#路由算法" class="headerlink" title="路由算法"></a>路由算法</h2><p><img src="/../../images/ISIS/%E8%B7%AF%E7%94%B1%E7%AE%97%E6%B3%95.png"></p>
+<h3 id="IS-IS的计算特点"><a href="#IS-IS的计算特点" class="headerlink" title="IS -IS的计算特点"></a>IS -IS的计算特点</h3><ul>
+<li>在本区域内路由器第一次启动的时候执行的是Full-SPF算法。</li>
+<li>后续收到的L SP更新，如果是部分拓扑的变化执行的iSPF计算。</li>
+<li>如果只是路由信息的变化，执行的就是PRC计算。</li>
+<li>由于采用拓扑与网络分离的算法，路由收敛速度得到了加强。</li>
+</ul>
+<h3 id="ISIS路由计算的开销方式"><a href="#ISIS路由计算的开销方式" class="headerlink" title="ISIS路由计算的开销方式"></a>ISIS路由计算的开销方式</h3><ul>
+<li>Narrow模式(设备默认模式开销都是10 ，手工配置接口开销取值范围为1 ~63)。</li>
+<li>Wide模式(设备默认模式开销都是10 ，手工配置接口开销取值范围是1~16777215 )。</li>
+<li>进程下加入auto-cost enable命令， Narrow模式和Wide模式都会参考接口带宽大小计算开销值，只是参考准则有少许差异。</li>
+</ul>
+<h2 id="网络分层路由域"><a href="#网络分层路由域" class="headerlink" title="网络分层路由域"></a>网络分层路由域</h2><p><img src="/../../images/ISIS/%E7%BD%91%E7%BB%9C%E5%88%86%E5%B1%82%E8%B7%AF%E7%94%B1%E5%9F%9F.png"></p>
+<h3 id="IS-IS整体拓扑"><a href="#IS-IS整体拓扑" class="headerlink" title="IS-IS整体拓扑"></a>IS-IS整体拓扑</h3><ul>
+<li>为了支持大规模的路由网络， IS-IS在自治系统内采用骨干区域与非骨干区域两级的分层结构。一般来说，将Level-1路由器部署在非骨干区域，Level-2路由器和Level-1-2路由器部署在骨干区域。每一个非骨干区域都通过Level-1-2路由器与骨干区域相连。</li>
+<li>拓扑中为一个运行IS-IS协议的网络，它与OSPF的多区域网络拓扑结构非常相似。整个骨干区域不仅包括Level-2的所有路由器，还包括Level-1-2路由器。</li>
+<li>Level-1-2级别的路由器可以属于不同的区域,在Level-1区域，维护Level-1的LSDB ，在Level-2区域,维护Level-2的LSDB。</li>
+</ul>
+<h3 id="拓扑所体现的IS-IS与OSPF不同点"><a href="#拓扑所体现的IS-IS与OSPF不同点" class="headerlink" title="拓扑所体现的IS-IS与OSPF不同点"></a>拓扑所体现的IS-IS与OSPF不同点</h3><ul>
+<li>在OSPF中，每个链路只属于一个区域；而在IS-IS中，每个链路可以属于不同的区域;</li>
+<li>在IS-IS中，单个区域没有物理的骨干与非骨干区域的概念；而在OSPF中， Area0被定义为骨干区域;</li>
+<li><u>在IS IS中，Level-1和Level-2级别的路由器分别采用SPF算法，分别生成最短路径树SPT</u>；<u>在OSPF中，只有在同一个区域内才使用SPF算法，区域之间的路由需要通过骨干区域来转发。</u></li>
+</ul>
+<h2 id="区域间路由"><a href="#区域间路由" class="headerlink" title="区域间路由"></a>区域间路由</h2><p><img src="/../../images/ISIS/%E5%8C%BA%E5%9F%9F%E9%97%B4%E8%B7%AF%E7%94%B1.png"></p>
+<h3 id="Level-1路由器的路由特点"><a href="#Level-1路由器的路由特点" class="headerlink" title="Level-1路由器的路由特点"></a>Level-1路由器的路由特点</h3><ul>
+<li>只拥有Level-1的链路状态数据库。</li>
+<li>其链路状态数据库中只有本区域路由器LSP。</li>
+<li>其路由表里没有其他区域的路由信息。</li>
+<li>其路由表里都有一条默认路由，下一条是指向到Level-1 -2路由器。</li>
+</ul>
+<h3 id="Level-2路由器的路由特点"><a href="#Level-2路由器的路由特点" class="headerlink" title="Level-2路由器的路由特点"></a>Level-2路由器的路由特点</h3><ul>
+<li>Level-2路由器只有Level-2的链路状态数据库。</li>
+<li>其LSDB中有骨干区域路由器的LSP，但是没有Level-1路由器产生的LSP。</li>
+<li>路由表里面有整个网络的路由信息。</li>
+</ul>
+<h3 id="Level-1-2路由器的路由特点"><a href="#Level-1-2路由器的路由特点" class="headerlink" title="Level-1-2路由器的路由特点"></a>Level-1-2路由器的路由特点</h3><ul>
+<li>Level-1-2路由器同时拥有Level-2和L evel-1的链路状态数据库。Level-1数据库包含本区域的LSP , Level-2数据库包含骨干区域LSP。</li>
+<li>在自己产生的Level-1的LSP中设置 了ATT比特位为1。</li>
+<li>路由表里面有整个网络的路由信息。</li>
+</ul>
+<h1 id="ISIS与OSPF的区别"><a href="#ISIS与OSPF的区别" class="headerlink" title="ISIS与OSPF的区别"></a>ISIS与OSPF的区别</h1><h2 id="ISIS与OSPF的差异性"><a href="#ISIS与OSPF的差异性" class="headerlink" title="ISIS与OSPF的差异性"></a>ISIS与OSPF的差异性</h2><table>
+<thead>
+<tr>
+<th align="center">差异性</th>
+<th align="center">IS-IS</th>
+<th align="center">OSPF</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">网络类型</td>
+<td align="center">少</td>
+<td align="center">多</td>
+</tr>
+<tr>
+<td align="center">开销方式</td>
+<td align="center">复杂</td>
+<td align="center">简便</td>
+</tr>
+<tr>
+<td align="center">区域类型</td>
+<td align="center">少</td>
+<td align="center">多</td>
+</tr>
+<tr>
+<td align="center">路由报文类型</td>
+<td align="center">简单</td>
+<td align="center">多样</td>
+</tr>
+<tr>
+<td align="center">路由收敛速度</td>
+<td align="center">很快</td>
+<td align="center">快</td>
+</tr>
+<tr>
+<td align="center">扩展性</td>
+<td align="center">强</td>
+<td align="center">一般</td>
+</tr>
+<tr>
+<td align="center">路由负载能力</td>
+<td align="center">超强</td>
+<td align="center">强</td>
+</tr>
+</tbody></table>
+<h3 id="网络类型和开销方式"><a href="#网络类型和开销方式" class="headerlink" title="网络类型和开销方式"></a>网络类型和开销方式</h3><p>IS-IS协议只支持两种网络类型，且所有带宽默认开销值都是-样的，OSPF协议支持四种网络类型，且会根据不同的带宽设定相应的开销值， 对帧中继，按需链路等网络类型有很好的支持。</p>
+<h3 id="区域类型"><a href="#区域类型" class="headerlink" title="区域类型"></a>区域类型</h3><p>IS-IS协议分L1&#x2F;L2区域，L2区域是骨干区域有全部明细路由。L1去往L2只有默认路由。OSPF协议分骨干区域，普通区域，特殊区域。普通区域和特殊区域跨区域访问需要经过骨干区域。</p>
+<h3 id="报文类型"><a href="#报文类型" class="headerlink" title="报文类型"></a>报文类型</h3><p>IS-IS协议路由承载报文类型只有LSP报文且里面路由信息是不区分内部与外部的，简单高效，无需递归计算。OSPF协议路由承载报文LSA类型多样，有1&#x2F;2&#x2F;3&#x2F;4&#x2F;5&#x2F;7类等。路由级别等级森严，且需要递归计算,适合精细化调度计算。</p>
+<h3 id="路由算法-1"><a href="#路由算法-1" class="headerlink" title="路由算法"></a>路由算法</h3><p>ISIS协议区域内某个节点上的网段发生变化时，触发的是PRC算法，收敛比较快，计算路由的报文开销也比较小。OSPF协议由于网络地址参与了拓扑的构建，在区域内当网段地址改变触发的是i-spf算法，相对来说过程繁琐复杂些。</p>
+<h3 id="扩展性"><a href="#扩展性" class="headerlink" title="扩展性"></a>扩展性</h3><p>ISIS协议任何路由信息都使用TLV传递,结构简单，易于扩展，如对IPv6的支持只增加2个TLV就解决了。且ISIS本身对IPX等协议是支持的。OSPF协议本身是为IP特定开发的，支持IPv4和IPv6的OSPF协议是两个独立的版本( OSPFv2和OSPFv3 )。</p>
+<h2 id="术语对照"><a href="#术语对照" class="headerlink" title="术语对照"></a>术语对照</h2><p><img src="/../../images/ISIS/%E6%9C%AF%E8%AF%AD%E5%AF%B9%E7%85%A7.png"></p>
+<h1 id="ISIS应用场景配置"><a href="#ISIS应用场景配置" class="headerlink" title="ISIS应用场景配置"></a>ISIS应用场景配置</h1><p><img src="/../../images/ISIS/%E6%95%99%E6%9D%90%E5%AE%9E%E9%AA%8C%E6%8B%93%E6%89%91.png"></p>
+<h2 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h2><ul>
+<li>所有路由启用IS-IS，进程号为100，全网路由可达</li>
+<li>AR1 在 Area 49.0001 区域为DIS</li>
+<li>AR4 与 AR5 之间采用P2P网络类型</li>
+<li>AR5 引入直连路由192.168.x.x</li>
+<li>AR1 访问 Area 49.0002 走最优路径</li>
+</ul>
+<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><ul>
+<li><p>所有接口配置ip</p>
+</li>
+<li><p>AR1</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">[AR1-isis-100]dis this</span><br><span class="line">[V200R003C00]</span><br><span class="line">#</span><br><span class="line">isis 100</span><br><span class="line"> is-level level-1</span><br><span class="line"> network-entity 49.0001.0000.0000.0001.00</span><br><span class="line">#</span><br><span class="line"></span><br><span class="line">//接口配置</span><br><span class="line">[AR1-GigabitEthernet0/0/0]dis this</span><br><span class="line">[V200R003C00]</span><br><span class="line">#</span><br><span class="line">interface GigabitEthernet0/0/0</span><br><span class="line"> ip address 10.1.123.1 255.255.255.0 </span><br><span class="line"> isis enable 100</span><br><span class="line"> isis dis-priority 120 level-1      //配置高优先级，成为DIS</span><br><span class="line">#</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>AR2</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[AR2-isis-100]dis this</span><br><span class="line">[V200R003C00]</span><br><span class="line">#</span><br><span class="line">isis 100</span><br><span class="line"> network-entity 49.0001.0000.0000.0002.00</span><br><span class="line"> import-route isis level-2 into level-1       //路由渗透</span><br><span class="line">#</span><br><span class="line">//默认为level-1-2</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>AR3</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[AR3-isis-100]dis this</span><br><span class="line">[V200R003C00]</span><br><span class="line">#</span><br><span class="line">isis 100</span><br><span class="line"> network-entity 49.0001.0000.0000.0003.00</span><br><span class="line"> import-route isis level-2 into level-1      //路由渗透</span><br><span class="line">#</span><br><span class="line">//默认为level-1-2</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>AR4</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">[AR4-isis-100]dis this</span><br><span class="line">[V200R003C00]</span><br><span class="line">#</span><br><span class="line">isis 100</span><br><span class="line"> is-level level-2</span><br><span class="line"> network-entity 49.0002.0000.0000.0004.00</span><br><span class="line">#</span><br><span class="line"></span><br><span class="line">//特殊接口配置</span><br><span class="line">[AR4-GigabitEthernet0/0/0]dis this</span><br><span class="line">[V200R003C00]</span><br><span class="line">#</span><br><span class="line">interface GigabitEthernet0/0/0</span><br><span class="line"> ip address 10.1.45.4 255.255.255.0 </span><br><span class="line"> isis enable 100</span><br><span class="line"> isis circuit-type p2p               //接口网络类型修改为P2P</span><br><span class="line">#</span><br><span class="line">return</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>AR5</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">[AR5-isis-100]dis this</span><br><span class="line">[V200R003C00]</span><br><span class="line">#</span><br><span class="line">isis 100</span><br><span class="line"> is-level level-2</span><br><span class="line"> network-entity 49.0002.0000.0000.0005.00</span><br><span class="line"> import-route direct                  //引入直连路由</span><br><span class="line">#</span><br><span class="line"></span><br><span class="line">[AR5-GigabitEthernet0/0/0]dis this</span><br><span class="line">[V200R003C00]</span><br><span class="line">#</span><br><span class="line">interface GigabitEthernet0/0/0</span><br><span class="line"> ip address 10.1.45.5 255.255.255.0 </span><br><span class="line"> isis enable 100</span><br><span class="line"> isis circuit-type p2p               //接口网络类型修改为P2P</span><br><span class="line">#</span><br><span class="line">return</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>所有接口开启ISIS</p>
+</li>
+</ul>
+<h2 id="路由渗透"><a href="#路由渗透" class="headerlink" title="路由渗透"></a>路由渗透</h2><ul>
+<li><u>如果一个level-1区域有两个以上Level-1-2路由器，则区域内Level-1路由器访问其他区域会选择最近的Level-1-2路由器，但是计算的开销值只计算本区域内的，如果最近的Level-1-2路由器在Level-2区域到达目的网络的开销相对比较大，实际会造成业务次优路径。</u>在这种场景下需要做路由渗透操作，把Level-2区域的明细路由(包括开销)引入到Level-1区域，由Level-1路由器自行计算选择最优的路径访问跨区域网络</li>
+<li>本实例要求走最优的路径到达区域49.0002，由于RTB连接RTD的链路带宽相对比较大，作用最好让数据流走RTB。可分别在RTB和RTC的ISIS进程下引入level-2的路由到level-1。由RTA的LSDB里面掌握level-2所有的明细路由，就可以选择最优的路径到达区域49.0002。</li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://exmaple.com/2023/09/20/%E7%BD%91%E7%BB%9C-%E7%90%86%E8%AE%BA/%E7%AF%872-ISIS/" data-id="clmrxdl4d0018z8woh1ge94q6" class="article-share-link">
+        分享
+      </a>
+      
+<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%BD%91%E7%BB%9C-%E7%90%86%E8%AE%BA/" rel="tag">网络-理论</a></li></ul>
+
+    </footer>
+
+  </div>
+
+  
+  
+<nav class="article-nav">
+  
+  
+  <a href="/2023/08/16/%E7%BD%91%E7%BB%9C-%E7%90%86%E8%AE%BA/%E7%AF%871-ospf/" class="article-nav-link">
+    <strong class="article-nav-caption">后一篇</strong>
+    <div class="article-nav-title">篇1 OSPF核心知识</div>
+  </a>
+  
+</nav>
+
+  
+
+  
+  
+  
+  
+
+</article>
+</section>
+    <footer class="footer">
+  <div class="outer">
+    <ul class="list-inline">
+      <li>冰山的笔记 &copy; 2023</li>
+      
+        <li>
+          
+            <a href="https://beian.miit.gov.cn/" target="_blank"></a>
+            
+        </li>
+      
+      <li>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></li>
+      <li>theme  <a target="_blank" rel="noopener" href="https://github.com/zhwangart/hexo-theme-ocean">Ocean</a></li>
+    </ul>
+    <p><ul class="list-inline">
+  
+  <li><i class="fe fe-smile-alt tooltip" data-tooltip="UV"></i> <span id="busuanzi_value_site_uv"></span></li>
+  
+  <li><i class="fe fe-bookmark tooltip" data-tooltip="PV"></i> <span id="busuanzi_value_page_pv"></span></li>
+  
+</ul></p>
+  </div>
+</footer>
+  </main>
+  <aside class="sidebar">
+    <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/hexo.svg" alt="冰山的笔记"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">Home</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">Archives</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/gallery">Gallery</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/about">About</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link nav-item-search" title="搜索">
+        <i class="fe fe-search"></i>
+        搜索
+      </a>
+    </li>
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      <div class="totop" id="totop">
+  <i class="fe fe-rocket"></i>
+</div>
+    </li>
+    <li class="nav-item">
+      
+      <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+        <i class="fe fe-feed"></i>
+      </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+  </aside>
+  
+<script src="/js/jquery-2.0.3.min.js"></script>
+
+
+<script src="/js/jquery.justifiedGallery.min.js"></script>
+
+
+<script src="/js/lazyload.min.js"></script>
+
+
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+
+
+
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+
+<script src="/js/tocbot.min.js"></script>
+
+
+<script>
+  // Tocbot_v4.7.0  http://tscanlin.github.io/tocbot/
+  tocbot.init({
+    tocSelector: '.tocbot',
+    contentSelector: '.article-entry',
+    headingSelector: 'h1, h2, h3, h4, h5, h6',
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    positionFixedSelector: '.tocbot',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto',
+  });
+</script>
+
+
+
+<script src="/js/ocean.js"></script>
+
+</body>
+
+</html>
