@@ -285,6 +285,37 @@
       </tags>
   </entry>
   <entry>
+    <title>篇1 DHCP</title>
+    <url>/2023/07/09/%E7%BD%91%E7%BB%9C-Ensp/%E7%AF%871-DHCP/</url>
+    <content><![CDATA[<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>DHCP（Dynamic Host Configuration Protocol）是一个网络协议，用于自动分配IP地址和其他相关配置信息给网络设备。</p>
+<p>在一个局域网中，DHCP服务器负责管理并分配IP地址给网络上的设备。当一台设备加入局域网或者需要更新自己的IP地址时，它会向DHCP服务器发送一个请求，并在服务器上进行IP地址分配。DHCP服务器收到请求后，会从预定义的IP地址池中选择一个可用的IP地址，并将其分配给设备。此外，DHCP服务器还可以为设备分配其他网络配置，如子网掩码、网关、DNS服务器等。</p>
+<p>DHCP的优势在于它能够自动管理IP地址分配，简化了网络管理工作。通过使用DHCP，管理员可以集中管理IP地址的分配和配置，而无需手动为每个设备进行配置。DHCP还支持地址重用和动态更新配置，使得系统资源能够更有效地利用。</p>
+<p>总而言之，DHCP是一个用于自动分配IP地址和相关配置信息的协议，它简化了网络管理工作，并提高了网络资源的利用效率。</p>
+<h2 id="Ensp"><a href="#Ensp" class="headerlink" title="Ensp"></a>Ensp</h2><h3 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h3><p>AR2220路由器一台，S5700三层交换机一台，pc机若干</p>
+<img src="/images/ensp-1.png" class="center" width="500">
+
+<h3 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h3><ol>
+<li><p>输入 <code>sy</code> 进入路由系统视图，然后输入</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">dhcp enable</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>进入路由器对应接口，开启接口DHCP服务</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">interface g0/0/0</span><br><span class="line"></span><br><span class="line">dhcp select interface</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>pc机刷新dhcp配置即可</p>
+</li>
+</ol>
+<h3 id="实操"><a href="#实操" class="headerlink" title="实操"></a>实操</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">&lt;Huawei&gt;sy</span><br><span class="line"></span><br><span class="line">[Huawei]interface g0/0/0</span><br><span class="line"></span><br><span class="line">[Huawei-GigabitEthernet0/0/0]ip address 192.168.1.1 255.255.255.0</span><br><span class="line"></span><br><span class="line">[Huawei-GigabitEthernet0/0/0] quit</span><br><span class="line"></span><br><span class="line">[Huawei]dhcp enable </span><br><span class="line"></span><br><span class="line">[Huawei-GigabitEthernet0/0/0]dhcp select interface</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="检验"><a href="#检验" class="headerlink" title="检验"></a>检验</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ipconfig</span></span><br><span class="line"></span><br><span class="line">Link local IPv6 address...........: fe80::5689:98ff:feec:2846</span><br><span class="line">IPv6 address......................: :: / 128</span><br><span class="line">IPv6 gateway......................: ::</span><br><span class="line">IPv4 address......................: 192.168.1.254</span><br><span class="line">Subnet mask.......................: 255.255.255.0</span><br><span class="line">Gateway...........................: 192.168.1.1</span><br><span class="line">Physical address..................: 54-89-98-EC-28-46</span><br><span class="line">DNS server........................: 0.0.0.0</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <tags>
+        <tag>网络-Ensp</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>wx.getUserProfile 不出现弹窗</title>
     <url>/2023/06/23/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F/wx-getUserProfile-%E4%B8%8D%E5%87%BA%E7%8E%B0%E5%BC%B9%E7%AA%97/</url>
     <content><![CDATA[<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>使用wx.getUserProfile 获取用户信息，但是不出现弹窗就直接获取到了用户信息，且返回灰色头像，和“微信用户”昵称</p>
@@ -339,113 +370,60 @@
       </tags>
   </entry>
   <entry>
-    <title>篇1 DHCP</title>
-    <url>/2023/07/09/%E7%BD%91%E7%BB%9C-Ensp/%E7%AF%871-DHCP/</url>
-    <content><![CDATA[<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>DHCP（Dynamic Host Configuration Protocol）是一个网络协议，用于自动分配IP地址和其他相关配置信息给网络设备。</p>
-<p>在一个局域网中，DHCP服务器负责管理并分配IP地址给网络上的设备。当一台设备加入局域网或者需要更新自己的IP地址时，它会向DHCP服务器发送一个请求，并在服务器上进行IP地址分配。DHCP服务器收到请求后，会从预定义的IP地址池中选择一个可用的IP地址，并将其分配给设备。此外，DHCP服务器还可以为设备分配其他网络配置，如子网掩码、网关、DNS服务器等。</p>
-<p>DHCP的优势在于它能够自动管理IP地址分配，简化了网络管理工作。通过使用DHCP，管理员可以集中管理IP地址的分配和配置，而无需手动为每个设备进行配置。DHCP还支持地址重用和动态更新配置，使得系统资源能够更有效地利用。</p>
-<p>总而言之，DHCP是一个用于自动分配IP地址和相关配置信息的协议，它简化了网络管理工作，并提高了网络资源的利用效率。</p>
-<h2 id="Ensp"><a href="#Ensp" class="headerlink" title="Ensp"></a>Ensp</h2><h3 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h3><p>AR2220路由器一台，S5700三层交换机一台，pc机若干</p>
-<img src="/images/ensp-1.png" class="center" width="500">
-
-<h3 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h3><ol>
-<li><p>输入 <code>sy</code> 进入路由系统视图，然后输入</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">dhcp enable</span><br></pre></td></tr></table></figure>
+    <title>篇10-ISIS+OSPF+BGP组合</title>
+    <url>/2023/10/03/%E7%BD%91%E7%BB%9C-Ensp/%E7%AF%8710-ISIS-OSPF-BGP%E7%BB%84%E5%90%88/</url>
+    <content><![CDATA[<p><img src="/../../images/%E5%AE%9E%E9%AA%8C/ISIS+OSPF+BGP.png"></p>
+<h1 id="实验情景"><a href="#实验情景" class="headerlink" title="实验情景"></a>实验情景</h1><ul>
+<li>蓝线区域使用IS-IS协议，其中，蓝色区域为Level-2</li>
+<li>红色区域使用OSPF协议</li>
+<li>上述二者使用BGP协议传输数据，用于模拟运营商传输网与企业网相连接</li>
+</ul>
+<h1 id="遇到的问题"><a href="#遇到的问题" class="headerlink" title="遇到的问题"></a>遇到的问题</h1><ol>
+<li><p>ISIS与外部所连接的接口最好也启用ISIS，可以省去很多麻烦，如实验中AR1的g0&#x2F;0&#x2F;1口</p>
 </li>
-<li><p>进入路由器对应接口，开启接口DHCP服务</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">interface g0/0/0</span><br><span class="line"></span><br><span class="line">dhcp select interface</span><br></pre></td></tr></table></figure>
+<li><p>使用BGP需要在两个自治系统（AS）中建立对等EBGP，那么这里就有一个很重要的问题：ISIS传输网到企业网时，使用BGP的到底是ISIS中的哪个路由？</p>
+<p>询问了一些人，有的说与Level-1-2直连建立EBGP，这样在BGP中导入ISIS路由就可以了。但是这样Level-1不就显得多余吗？经过一番测试，我还想到与Level-1-2在Loopback上建立BGP关系，虽然这样物理上是经过了Level-1，但还是感觉有点多余。</p>
+<p>后来突然想到<u>可以将Level-2的路由渗透到Level-1，然后再让Level-1与外部进行BGP关系建立</u>就行了</p>
 </li>
-<li><p>pc机刷新dhcp配置即可</p>
+<li><p>需要在ISIS协议中有BGP的路由，也需要在BGP中有ISIS的路由，还需要在OSPF中有BGP的路由以及BGP中有OSPF的路由。总的来说，就是<u>两个双向导入</u></p>
 </li>
 </ol>
-<h3 id="实操"><a href="#实操" class="headerlink" title="实操"></a>实操</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">&lt;Huawei&gt;sy</span><br><span class="line"></span><br><span class="line">[Huawei]interface g0/0/0</span><br><span class="line"></span><br><span class="line">[Huawei-GigabitEthernet0/0/0]ip address 192.168.1.1 255.255.255.0</span><br><span class="line"></span><br><span class="line">[Huawei-GigabitEthernet0/0/0] quit</span><br><span class="line"></span><br><span class="line">[Huawei]dhcp enable </span><br><span class="line"></span><br><span class="line">[Huawei-GigabitEthernet0/0/0]dhcp select interface</span><br></pre></td></tr></table></figure>
-
-
-
-<h3 id="检验"><a href="#检验" class="headerlink" title="检验"></a>检验</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ipconfig</span></span><br><span class="line"></span><br><span class="line">Link local IPv6 address...........: fe80::5689:98ff:feec:2846</span><br><span class="line">IPv6 address......................: :: / 128</span><br><span class="line">IPv6 gateway......................: ::</span><br><span class="line">IPv4 address......................: 192.168.1.254</span><br><span class="line">Subnet mask.......................: 255.255.255.0</span><br><span class="line">Gateway...........................: 192.168.1.1</span><br><span class="line">Physical address..................: 54-89-98-EC-28-46</span><br><span class="line">DNS server........................: 0.0.0.0</span><br></pre></td></tr></table></figure>
-
-]]></content>
-      <tags>
-        <tag>网络-Ensp</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>篇4 静态路由</title>
-    <url>/2023/07/17/%E7%BD%91%E7%BB%9C-Ensp/%E7%AF%874-%E9%9D%99%E6%80%81%E8%B7%AF%E7%94%B1/</url>
-    <content><![CDATA[<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>静态路由是网络中使用静态路由表来确定数据包的传输路径的一种路由方式。它是通过手动配置路由器上的路由表来指定目标网络和下一跳路由器的关系，以确定数据包的传输路径。</p>
-<p>在静态路由中，网络管理员手动配置路由器上的路由表，将目标网络的 IP 地址和对应的下一跳路由器的 IP 地址进行映射。当路由器收到一个数据包时，它会根据数据包的目标 IP 地址查找路由表，找到与目标 IP 地址匹配的条目，并将数据包发送到相应的下一跳路由器。下一跳路由器将继续根据路由表将数据包转发到下一个路由器，直到数据包到达目标网络。</p>
-<p>静态路由的主要特点包括：</p>
-<ol>
-<li>静态路由是手动配置的，不会自动适应网络变化。如果网络拓扑发生变化，管理员需要手动更新路由表。</li>
-<li>静态路由是固定的，不会根据网络负载或链路状态进行动态调整。所有数据包都将按照路由表中的配置进行转发。</li>
-<li>静态路由的配置相对简单，适用于小型网络或网络拓扑不经常变化的情况。</li>
-<li>静态路由的优点是稳定性高，因为路由表不会频繁变化，不会产生额外的路由协议开销。</li>
-</ol>
-<p>静态路由适用于简单的网络环境或需要精确控制数据包传输路径的情况。对于复杂的网络环境或需要自动适应网络变化的情况，通常会使用动态路由协议来实现路由功能。</p>
-<h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><p>AR2220 路由两台、交换机一台、PC 机若干</p>
-<img src="/images/%E9%9D%99%E6%80%81%E8%B7%AF%E7%94%B1%E5%AE%9E%E9%AA%8C%E5%87%86%E5%A4%87.png" class="center" width="500">
-
-
-
-<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><p>在路由上输入指令，告诉路由去往目的ip网段应该走的下一跳，<u>下一跳指的是下一个经过的路由的接口所对应的ip</u></p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">ip route-static [目标ip（通常是网段）] [子网掩码] [下一跳ip]</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="实操"><a href="#实操" class="headerlink" title="实操"></a>实操</h2><h3 id="基础路由配置"><a href="#基础路由配置" class="headerlink" title="基础路由配置"></a>基础路由配置</h3><h4 id="第一台路由"><a href="#第一台路由" class="headerlink" title="第一台路由"></a>第一台路由</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[Huawei]interface GigabitEthernet 0/0/0</span><br><span class="line">[Huawei-GigabitEthernet0/0/0]ip address 192.168.1.1 255.255.255.0</span><br><span class="line"></span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/1</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]ip address 192.168.2.1 255.255.255.0</span><br></pre></td></tr></table></figure>
-
-<h4 id="第二台"><a href="#第二台" class="headerlink" title="第二台"></a>第二台</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[Huawei]interface GigabitEthernet 0/0/0</span><br><span class="line">[Huawei-GigabitEthernet0/0/0]ip address 192.168.2.10 255.255.255.0</span><br><span class="line"></span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/1</span><br><span class="line">[Huawei-GigabitEthernet0/0/0]ip address 192.168.3.1 255.255.255.0</span><br></pre></td></tr></table></figure>
-
-
-
-<h3 id="配置静态路由"><a href="#配置静态路由" class="headerlink" title="配置静态路由"></a>配置静态路由</h3><h4 id="第一台"><a href="#第一台" class="headerlink" title="第一台"></a>第一台</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[Huawei]ip route-static 192.168.3.0 255.255.255.0 192.168.2.10</span><br></pre></td></tr></table></figure>
-
-<h4 id="第二台-1"><a href="#第二台-1" class="headerlink" title="第二台"></a>第二台</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[Huawei]ip route-static 192.168.1.0 255.255.255.0 192.168.2.1</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="检验"><a href="#检验" class="headerlink" title="检验"></a>检验</h2><h3 id="pc1-ping-服务器和pc2"><a href="#pc1-ping-服务器和pc2" class="headerlink" title="pc1 ping 服务器和pc2"></a>pc1 ping 服务器和pc2</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 192.168.3.100</span></span><br><span class="line"></span><br><span class="line">Ping 192.168.3.100: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 192.168.3.100: bytes=32 seq=1 ttl=126 time=47 ms</span><br><span class="line">From 192.168.3.100: bytes=32 seq=2 ttl=126 time=47 ms</span><br><span class="line">From 192.168.3.100: bytes=32 seq=3 ttl=126 time=47 ms</span><br><span class="line">From 192.168.3.100: bytes=32 seq=4 ttl=126 time=31 ms</span><br><span class="line">From 192.168.3.100: bytes=32 seq=5 ttl=126 time=63 ms</span><br><span class="line"></span><br><span class="line">--- 192.168.3.100 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 31/47/63 ms</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 192.168.3.10</span></span><br><span class="line"></span><br><span class="line">Ping 192.168.3.10: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 192.168.3.10: bytes=32 seq=1 ttl=253 time=31 ms</span><br><span class="line">From 192.168.3.10: bytes=32 seq=2 ttl=253 time=32 ms</span><br><span class="line">From 192.168.3.10: bytes=32 seq=3 ttl=253 time=31 ms</span><br><span class="line">From 192.168.3.10: bytes=32 seq=4 ttl=253 time=31 ms</span><br><span class="line">From 192.168.3.10: bytes=32 seq=5 ttl=253 time=31 ms</span><br><span class="line"></span><br><span class="line">--- 192.168.3.10 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 31/31/32 ms</span><br></pre></td></tr></table></figure>
-
-<h3 id="pc2-ping-pc1"><a href="#pc2-ping-pc1" class="headerlink" title="pc2 ping pc1"></a>pc2 ping pc1</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 192.168.1.10</span></span><br><span class="line"></span><br><span class="line">Ping 192.168.1.10: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">Request timeout!</span><br><span class="line">From 192.168.1.10: bytes=32 seq=2 ttl=126 time=31 ms</span><br><span class="line">From 192.168.1.10: bytes=32 seq=3 ttl=126 time=31 ms</span><br><span class="line">From 192.168.1.10: bytes=32 seq=4 ttl=126 time=47 ms</span><br><span class="line">From 192.168.1.10: bytes=32 seq=5 ttl=126 time=16 ms</span><br><span class="line"></span><br><span class="line">--- 192.168.1.10 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  4 packet(s) received</span><br><span class="line">  20.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 0/31/47 ms</span><br></pre></td></tr></table></figure>
-
-<p>注：配置好静态路由后，首次ping操作出现timeout是正常的</p>
-]]></content>
-      <tags>
-        <tag>网络-Ensp</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>篇6 三层交换技术</title>
-    <url>/2023/07/21/%E7%BD%91%E7%BB%9C-Ensp/%E7%AF%876-%E4%B8%89%E5%B1%82%E4%BA%A4%E6%8D%A2%E6%8A%80%E6%9C%AF/</url>
-    <content><![CDATA[<h1 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h1><p>三层交换技术是指将网络交换机与路由器的功能结合起来，使交换机能够进行基于网络层（第三层）的转发和路由功能。它在传统二层交换机的基础上增加了路由功能，从而能够更高效地处理大规模网络中的数据流量和转发需求。</p>
-<p>三层交换技术的主要特点如下：</p>
-<ol>
-<li>路由能力：<u>三层交换机具备路由器的基本功能，能够在不同的子网之间进行数据包的转发和路由决策</u>。它能够识别目标IP地址，并根据路由表进行转发决策，使数据能够跨越不同的子网进行传输。</li>
-<li>VLAN支持：三层交换机支持虚拟局域网（VLAN）技术，可以将物理网络划分为多个逻辑上独立的虚拟网络。通过VLAN的配置，可以实现更好的网络隔离和安全性。</li>
-<li>高性能转发：三层交换机采用硬件加速和快速转发技术，能够高效处理数据包的路由和转发。它可以进行流量控制、负载均衡和快速转发等功能，以提供更快的数据传输速度和更高的性能。</li>
-<li>动态路由协议支持：三层交换机一般支持主要的动态路由协议，如OSPF、BGP和RIP等，能够与其他路由器进行动态路由协议的交互和学习，以实现更智能的网络路径选择和故障恢复能力。</li>
-</ol>
-<p>通过三层交换技术，可以在较大的网络中实现更高效、可靠和有灵活性的数据转发和路由功能，并提供更好的网络性能和管理能力。这对于大型企业、数据中心和服务提供商等具有重要意义。</p>
-<h1 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h1><p>交换机两台（其中不与pc相连的交换机必须为三层交换机）、pc若干</p>
-<img src="/images/%E4%B8%89%E5%B1%82%E4%BA%A4%E6%8D%A2%E6%8A%80%E6%9C%AF%E5%AE%9E%E9%AA%8C%E5%87%86%E5%A4%87.png" class="center" width="500">
-
-
-
-<h1 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h1><ol>
-<li>近端交换机为两台pc划分不同的vlan，并为vlan放行</li>
-<li>在远端交换机的逻辑接口上添加两台pc的网关ip，即远端交换机在此处起到了网关的作用</li>
-</ol>
-<h1 id="实操"><a href="#实操" class="headerlink" title="实操"></a>实操</h1><ol>
-<li><p>近端交换机划分vlan，并放行</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[Huawei]vlan batch 10 20</span><br><span class="line">[Huawei]int g0/0/1</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]port link-type access 	</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]port de vlan 10</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]int g0/0/2</span><br><span class="line">[Huawei-GigabitEthernet0/0/2]port link-type access</span><br><span class="line">[Huawei-GigabitEthernet0/0/2]port de vlan 20</span><br><span class="line">[Huawei-GigabitEthernet0/0/2]int g0/0/3</span><br><span class="line">[Huawei-GigabitEthernet0/0/3]port link-type trunk </span><br><span class="line">[Huawei-GigabitEthernet0/0/3]port trunk allow-pass vlan all </span><br></pre></td></tr></table></figure>
+<h1 id="操作记录及步骤"><a href="#操作记录及步骤" class="headerlink" title="操作记录及步骤"></a>操作记录及步骤</h1><ol>
+<li><p>所有路由接口配上ip，如AR1的g0&#x2F;0&#x2F;0为10.1.12.1</p>
 </li>
-<li><p>远端交换机配置vlan，并在vlan逻辑接口添加ip</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[Huawei]int g0/0/1</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]port link-type trunk //此处居然不用放行</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]q</span><br><span class="line">[Huawei]int Vlanif 10</span><br><span class="line">[Huawei-Vlanif10]ip address 1.1.1.1 255.255.255.0</span><br><span class="line">[Huawei-Vlanif10]int Vlanif 20</span><br><span class="line">[Huawei-Vlanif20]ip address 2.2.2.1 255.255.255.0</span><br><span class="line"></span><br></pre></td></tr></table></figure></li>
+<li><p>配置好ISIS内部通信</p>
+<ul>
+<li><p>Level-1，以AR1为例：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#</span><br><span class="line">isis 100</span><br><span class="line"> is-level level-1</span><br><span class="line"> network-entity 49.0002.0000.0000.0001.00</span><br><span class="line"> import-route bgp level-1                            //在level-1区域导入bgp的路由</span><br><span class="line">#</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Level-1-2，以AR2为例：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#</span><br><span class="line">isis 100</span><br><span class="line"> network-entity 49.0002.0000.0000.0002.00</span><br><span class="line"> import-route isis level-2 into level-1              //将level-2路由渗透至level-1</span><br><span class="line">#</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Level-2，以AR5为例：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#</span><br><span class="line">isis 100</span><br><span class="line"> is-level level-2</span><br><span class="line"> network-entity 49.0004.0000.0000.0005.00</span><br><span class="line">#</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>做好以上配置还需在接口上启用ISIS</p>
+</li>
+</ul>
+</li>
+<li><p>配置好OSPF内部通信</p>
+<ul>
+<li><p>实验中只设一个区域，以AR8为例：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#</span><br><span class="line">ospf 1 </span><br><span class="line"> import-route bgp                                       //导入BGP路由</span><br><span class="line"> area 0.0.0.0 </span><br><span class="line">  network 10.1.0.0 0.0.255.255 </span><br><span class="line">#</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>在两个系统边界配置EBGP，由于是直连，所以不用配置最大跳数</p>
+<ul>
+<li><p>AR1：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#</span><br><span class="line">bgp 100</span><br><span class="line"> peer 10.1.18.8 as-number 800 </span><br><span class="line"> #</span><br><span class="line"> ipv4-family unicast</span><br><span class="line">  undo synchronization</span><br><span class="line">  import-route isis 100                                 //导入ISIS的路由</span><br><span class="line">  peer 10.1.18.8 enable</span><br><span class="line">#</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>AR8：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#</span><br><span class="line">bgp 800</span><br><span class="line"> peer 10.1.18.1 as-number 100 </span><br><span class="line"> #</span><br><span class="line"> ipv4-family unicast</span><br><span class="line">  undo synchronization</span><br><span class="line">  import-route ospf 1                                   //导入OSPF路由</span><br><span class="line">  peer 10.1.18.1 enable</span><br><span class="line">#</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
 </ol>
-<h1 id="检验"><a href="#检验" class="headerlink" title="检验"></a>检验</h1><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 1.1.1.254</span></span><br><span class="line"></span><br><span class="line">Ping 1.1.1.254: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 1.1.1.254: bytes=32 seq=1 ttl=127 time=109 ms</span><br><span class="line">From 1.1.1.254: bytes=32 seq=2 ttl=127 time=63 ms</span><br><span class="line">From 1.1.1.254: bytes=32 seq=3 ttl=127 time=93 ms</span><br><span class="line">From 1.1.1.254: bytes=32 seq=4 ttl=127 time=94 ms</span><br><span class="line">From 1.1.1.254: bytes=32 seq=5 ttl=127 time=78 ms</span><br><span class="line"></span><br><span class="line">--- 1.1.1.254 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 63/87/109 ms</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 2.2.2.254</span></span><br><span class="line"></span><br><span class="line">Ping 2.2.2.254: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 2.2.2.254: bytes=32 seq=1 ttl=127 time=156 ms</span><br><span class="line">From 2.2.2.254: bytes=32 seq=2 ttl=127 time=94 ms</span><br><span class="line">From 2.2.2.254: bytes=32 seq=3 ttl=127 time=78 ms</span><br><span class="line">From 2.2.2.254: bytes=32 seq=4 ttl=127 time=62 ms</span><br><span class="line">From 2.2.2.254: bytes=32 seq=5 ttl=127 time=94 ms</span><br><span class="line"></span><br><span class="line">--- 2.2.2.254 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 62/96/156 ms</span><br></pre></td></tr></table></figure>
-
+<h1 id="检验"><a href="#检验" class="headerlink" title="检验"></a>检验</h1><p>在AR10中pingAR7</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;AR7&gt;ping 10.1.67.7</span><br><span class="line">  PING 10.1.67.7: 56  data bytes, press CTRL_C to break</span><br><span class="line">    Reply from 10.1.67.7: bytes=56 Sequence=1 ttl=249 time=70 ms</span><br><span class="line">    Reply from 10.1.67.7: bytes=56 Sequence=2 ttl=249 time=50 ms</span><br><span class="line">    Reply from 10.1.67.7: bytes=56 Sequence=3 ttl=249 time=70 ms</span><br><span class="line">    Reply from 10.1.67.7: bytes=56 Sequence=4 ttl=249 time=60 ms</span><br><span class="line">    Reply from 10.1.67.7: bytes=56 Sequence=5 ttl=249 time=70 ms</span><br><span class="line"></span><br><span class="line">  --- 10.1.67.7 ping statistics ---</span><br><span class="line">    5 packet(s) transmitted</span><br><span class="line">    5 packet(s) received</span><br><span class="line">    0.00% packet loss</span><br><span class="line">    round-trip min/avg/max = 50/64/70 ms</span><br></pre></td></tr></table></figure>
 ]]></content>
       <tags>
         <tag>网络-Ensp</tag>
@@ -505,6 +483,51 @@
       </tags>
   </entry>
   <entry>
+    <title>篇4 静态路由</title>
+    <url>/2023/07/17/%E7%BD%91%E7%BB%9C-Ensp/%E7%AF%874-%E9%9D%99%E6%80%81%E8%B7%AF%E7%94%B1/</url>
+    <content><![CDATA[<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>静态路由是网络中使用静态路由表来确定数据包的传输路径的一种路由方式。它是通过手动配置路由器上的路由表来指定目标网络和下一跳路由器的关系，以确定数据包的传输路径。</p>
+<p>在静态路由中，网络管理员手动配置路由器上的路由表，将目标网络的 IP 地址和对应的下一跳路由器的 IP 地址进行映射。当路由器收到一个数据包时，它会根据数据包的目标 IP 地址查找路由表，找到与目标 IP 地址匹配的条目，并将数据包发送到相应的下一跳路由器。下一跳路由器将继续根据路由表将数据包转发到下一个路由器，直到数据包到达目标网络。</p>
+<p>静态路由的主要特点包括：</p>
+<ol>
+<li>静态路由是手动配置的，不会自动适应网络变化。如果网络拓扑发生变化，管理员需要手动更新路由表。</li>
+<li>静态路由是固定的，不会根据网络负载或链路状态进行动态调整。所有数据包都将按照路由表中的配置进行转发。</li>
+<li>静态路由的配置相对简单，适用于小型网络或网络拓扑不经常变化的情况。</li>
+<li>静态路由的优点是稳定性高，因为路由表不会频繁变化，不会产生额外的路由协议开销。</li>
+</ol>
+<p>静态路由适用于简单的网络环境或需要精确控制数据包传输路径的情况。对于复杂的网络环境或需要自动适应网络变化的情况，通常会使用动态路由协议来实现路由功能。</p>
+<h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><p>AR2220 路由两台、交换机一台、PC 机若干</p>
+<img src="/images/%E9%9D%99%E6%80%81%E8%B7%AF%E7%94%B1%E5%AE%9E%E9%AA%8C%E5%87%86%E5%A4%87.png" class="center" width="500">
+
+
+
+<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><p>在路由上输入指令，告诉路由去往目的ip网段应该走的下一跳，<u>下一跳指的是下一个经过的路由的接口所对应的ip</u></p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">ip route-static [目标ip（通常是网段）] [子网掩码] [下一跳ip]</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="实操"><a href="#实操" class="headerlink" title="实操"></a>实操</h2><h3 id="基础路由配置"><a href="#基础路由配置" class="headerlink" title="基础路由配置"></a>基础路由配置</h3><h4 id="第一台路由"><a href="#第一台路由" class="headerlink" title="第一台路由"></a>第一台路由</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[Huawei]interface GigabitEthernet 0/0/0</span><br><span class="line">[Huawei-GigabitEthernet0/0/0]ip address 192.168.1.1 255.255.255.0</span><br><span class="line"></span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/1</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]ip address 192.168.2.1 255.255.255.0</span><br></pre></td></tr></table></figure>
+
+<h4 id="第二台"><a href="#第二台" class="headerlink" title="第二台"></a>第二台</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[Huawei]interface GigabitEthernet 0/0/0</span><br><span class="line">[Huawei-GigabitEthernet0/0/0]ip address 192.168.2.10 255.255.255.0</span><br><span class="line"></span><br><span class="line">[Huawei]interface GigabitEthernet 0/0/1</span><br><span class="line">[Huawei-GigabitEthernet0/0/0]ip address 192.168.3.1 255.255.255.0</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="配置静态路由"><a href="#配置静态路由" class="headerlink" title="配置静态路由"></a>配置静态路由</h3><h4 id="第一台"><a href="#第一台" class="headerlink" title="第一台"></a>第一台</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[Huawei]ip route-static 192.168.3.0 255.255.255.0 192.168.2.10</span><br></pre></td></tr></table></figure>
+
+<h4 id="第二台-1"><a href="#第二台-1" class="headerlink" title="第二台"></a>第二台</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[Huawei]ip route-static 192.168.1.0 255.255.255.0 192.168.2.1</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="检验"><a href="#检验" class="headerlink" title="检验"></a>检验</h2><h3 id="pc1-ping-服务器和pc2"><a href="#pc1-ping-服务器和pc2" class="headerlink" title="pc1 ping 服务器和pc2"></a>pc1 ping 服务器和pc2</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 192.168.3.100</span></span><br><span class="line"></span><br><span class="line">Ping 192.168.3.100: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 192.168.3.100: bytes=32 seq=1 ttl=126 time=47 ms</span><br><span class="line">From 192.168.3.100: bytes=32 seq=2 ttl=126 time=47 ms</span><br><span class="line">From 192.168.3.100: bytes=32 seq=3 ttl=126 time=47 ms</span><br><span class="line">From 192.168.3.100: bytes=32 seq=4 ttl=126 time=31 ms</span><br><span class="line">From 192.168.3.100: bytes=32 seq=5 ttl=126 time=63 ms</span><br><span class="line"></span><br><span class="line">--- 192.168.3.100 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 31/47/63 ms</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 192.168.3.10</span></span><br><span class="line"></span><br><span class="line">Ping 192.168.3.10: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 192.168.3.10: bytes=32 seq=1 ttl=253 time=31 ms</span><br><span class="line">From 192.168.3.10: bytes=32 seq=2 ttl=253 time=32 ms</span><br><span class="line">From 192.168.3.10: bytes=32 seq=3 ttl=253 time=31 ms</span><br><span class="line">From 192.168.3.10: bytes=32 seq=4 ttl=253 time=31 ms</span><br><span class="line">From 192.168.3.10: bytes=32 seq=5 ttl=253 time=31 ms</span><br><span class="line"></span><br><span class="line">--- 192.168.3.10 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 31/31/32 ms</span><br></pre></td></tr></table></figure>
+
+<h3 id="pc2-ping-pc1"><a href="#pc2-ping-pc1" class="headerlink" title="pc2 ping pc1"></a>pc2 ping pc1</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 192.168.1.10</span></span><br><span class="line"></span><br><span class="line">Ping 192.168.1.10: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">Request timeout!</span><br><span class="line">From 192.168.1.10: bytes=32 seq=2 ttl=126 time=31 ms</span><br><span class="line">From 192.168.1.10: bytes=32 seq=3 ttl=126 time=31 ms</span><br><span class="line">From 192.168.1.10: bytes=32 seq=4 ttl=126 time=47 ms</span><br><span class="line">From 192.168.1.10: bytes=32 seq=5 ttl=126 time=16 ms</span><br><span class="line"></span><br><span class="line">--- 192.168.1.10 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  4 packet(s) received</span><br><span class="line">  20.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 0/31/47 ms</span><br></pre></td></tr></table></figure>
+
+<p>注：配置好静态路由后，首次ping操作出现timeout是正常的</p>
+]]></content>
+      <tags>
+        <tag>网络-Ensp</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>篇5 vlan</title>
     <url>/2023/07/20/%E7%BD%91%E7%BB%9C-Ensp/%E7%AF%875-vlan/</url>
     <content><![CDATA[<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>VLAN（Virtual Local Area Network）是一种虚拟局域网技术，用于将一个物理网络划分为多个逻辑上独立的虚拟网络。VLAN可以提供更好的网络管理和安全性。</p>
@@ -546,6 +569,43 @@
 
 <p><strong>相同vlan下互ping不影响</strong></p>
 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">//pc1 ping pc4</span><br><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 1.1.1.4</span></span><br><span class="line"></span><br><span class="line">Ping 1.1.1.4: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 1.1.1.4: bytes=32 seq=1 ttl=128 time=47 ms</span><br><span class="line">From 1.1.1.4: bytes=32 seq=2 ttl=128 time=78 ms</span><br><span class="line">From 1.1.1.4: bytes=32 seq=3 ttl=128 time=78 ms</span><br><span class="line">From 1.1.1.4: bytes=32 seq=4 ttl=128 time=79 ms</span><br><span class="line">From 1.1.1.4: bytes=32 seq=5 ttl=128 time=63 ms</span><br><span class="line"></span><br><span class="line">--- 1.1.1.4 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 47/69/79 ms</span><br><span class="line">  </span><br><span class="line">//pc4 ping pc1</span><br><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 1.1.1.1</span></span><br><span class="line"></span><br><span class="line">Ping 1.1.1.1: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 1.1.1.1: bytes=32 seq=1 ttl=128 time=63 ms</span><br><span class="line">From 1.1.1.1: bytes=32 seq=2 ttl=128 time=62 ms</span><br><span class="line">From 1.1.1.1: bytes=32 seq=3 ttl=128 time=78 ms</span><br><span class="line">From 1.1.1.1: bytes=32 seq=4 ttl=128 time=62 ms</span><br><span class="line">From 1.1.1.1: bytes=32 seq=5 ttl=128 time=63 ms</span><br><span class="line"></span><br><span class="line">--- 1.1.1.1 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 62/65/78 ms</span><br><span class="line">  </span><br><span class="line">//pc2 ping pc5</span><br><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 1.1.1.5</span></span><br><span class="line"></span><br><span class="line">Ping 1.1.1.5: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 1.1.1.5: bytes=32 seq=1 ttl=128 time=94 ms</span><br><span class="line">From 1.1.1.5: bytes=32 seq=2 ttl=128 time=78 ms</span><br><span class="line">From 1.1.1.5: bytes=32 seq=3 ttl=128 time=79 ms</span><br><span class="line">From 1.1.1.5: bytes=32 seq=4 ttl=128 time=78 ms</span><br><span class="line">From 1.1.1.5: bytes=32 seq=5 ttl=128 time=78 ms</span><br><span class="line"></span><br><span class="line">--- 1.1.1.5 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 78/81/94 ms</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <tags>
+        <tag>网络-Ensp</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>篇6 三层交换技术</title>
+    <url>/2023/07/21/%E7%BD%91%E7%BB%9C-Ensp/%E7%AF%876-%E4%B8%89%E5%B1%82%E4%BA%A4%E6%8D%A2%E6%8A%80%E6%9C%AF/</url>
+    <content><![CDATA[<h1 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h1><p>三层交换技术是指将网络交换机与路由器的功能结合起来，使交换机能够进行基于网络层（第三层）的转发和路由功能。它在传统二层交换机的基础上增加了路由功能，从而能够更高效地处理大规模网络中的数据流量和转发需求。</p>
+<p>三层交换技术的主要特点如下：</p>
+<ol>
+<li>路由能力：<u>三层交换机具备路由器的基本功能，能够在不同的子网之间进行数据包的转发和路由决策</u>。它能够识别目标IP地址，并根据路由表进行转发决策，使数据能够跨越不同的子网进行传输。</li>
+<li>VLAN支持：三层交换机支持虚拟局域网（VLAN）技术，可以将物理网络划分为多个逻辑上独立的虚拟网络。通过VLAN的配置，可以实现更好的网络隔离和安全性。</li>
+<li>高性能转发：三层交换机采用硬件加速和快速转发技术，能够高效处理数据包的路由和转发。它可以进行流量控制、负载均衡和快速转发等功能，以提供更快的数据传输速度和更高的性能。</li>
+<li>动态路由协议支持：三层交换机一般支持主要的动态路由协议，如OSPF、BGP和RIP等，能够与其他路由器进行动态路由协议的交互和学习，以实现更智能的网络路径选择和故障恢复能力。</li>
+</ol>
+<p>通过三层交换技术，可以在较大的网络中实现更高效、可靠和有灵活性的数据转发和路由功能，并提供更好的网络性能和管理能力。这对于大型企业、数据中心和服务提供商等具有重要意义。</p>
+<h1 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h1><p>交换机两台（其中不与pc相连的交换机必须为三层交换机）、pc若干</p>
+<img src="/images/%E4%B8%89%E5%B1%82%E4%BA%A4%E6%8D%A2%E6%8A%80%E6%9C%AF%E5%AE%9E%E9%AA%8C%E5%87%86%E5%A4%87.png" class="center" width="500">
+
+
+
+<h1 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h1><ol>
+<li>近端交换机为两台pc划分不同的vlan，并为vlan放行</li>
+<li>在远端交换机的逻辑接口上添加两台pc的网关ip，即远端交换机在此处起到了网关的作用</li>
+</ol>
+<h1 id="实操"><a href="#实操" class="headerlink" title="实操"></a>实操</h1><ol>
+<li><p>近端交换机划分vlan，并放行</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[Huawei]vlan batch 10 20</span><br><span class="line">[Huawei]int g0/0/1</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]port link-type access 	</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]port de vlan 10</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]int g0/0/2</span><br><span class="line">[Huawei-GigabitEthernet0/0/2]port link-type access</span><br><span class="line">[Huawei-GigabitEthernet0/0/2]port de vlan 20</span><br><span class="line">[Huawei-GigabitEthernet0/0/2]int g0/0/3</span><br><span class="line">[Huawei-GigabitEthernet0/0/3]port link-type trunk </span><br><span class="line">[Huawei-GigabitEthernet0/0/3]port trunk allow-pass vlan all </span><br></pre></td></tr></table></figure>
+</li>
+<li><p>远端交换机配置vlan，并在vlan逻辑接口添加ip</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">[Huawei]int g0/0/1</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]port link-type trunk //此处居然不用放行</span><br><span class="line">[Huawei-GigabitEthernet0/0/1]q</span><br><span class="line">[Huawei]int Vlanif 10</span><br><span class="line">[Huawei-Vlanif10]ip address 1.1.1.1 255.255.255.0</span><br><span class="line">[Huawei-Vlanif10]int Vlanif 20</span><br><span class="line">[Huawei-Vlanif20]ip address 2.2.2.1 255.255.255.0</span><br><span class="line"></span><br></pre></td></tr></table></figure></li>
+</ol>
+<h1 id="检验"><a href="#检验" class="headerlink" title="检验"></a>检验</h1><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 1.1.1.254</span></span><br><span class="line"></span><br><span class="line">Ping 1.1.1.254: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 1.1.1.254: bytes=32 seq=1 ttl=127 time=109 ms</span><br><span class="line">From 1.1.1.254: bytes=32 seq=2 ttl=127 time=63 ms</span><br><span class="line">From 1.1.1.254: bytes=32 seq=3 ttl=127 time=93 ms</span><br><span class="line">From 1.1.1.254: bytes=32 seq=4 ttl=127 time=94 ms</span><br><span class="line">From 1.1.1.254: bytes=32 seq=5 ttl=127 time=78 ms</span><br><span class="line"></span><br><span class="line">--- 1.1.1.254 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 63/87/109 ms</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">PC&gt;</span><span class="language-bash">ping 2.2.2.254</span></span><br><span class="line"></span><br><span class="line">Ping 2.2.2.254: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 2.2.2.254: bytes=32 seq=1 ttl=127 time=156 ms</span><br><span class="line">From 2.2.2.254: bytes=32 seq=2 ttl=127 time=94 ms</span><br><span class="line">From 2.2.2.254: bytes=32 seq=3 ttl=127 time=78 ms</span><br><span class="line">From 2.2.2.254: bytes=32 seq=4 ttl=127 time=62 ms</span><br><span class="line">From 2.2.2.254: bytes=32 seq=5 ttl=127 time=94 ms</span><br><span class="line"></span><br><span class="line">--- 2.2.2.254 ping statistics ---</span><br><span class="line">  5 packet(s) transmitted</span><br><span class="line">  5 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 62/96/156 ms</span><br></pre></td></tr></table></figure>
 
 ]]></content>
       <tags>
@@ -869,445 +929,6 @@
 ]]></content>
       <tags>
         <tag>网络-Ensp</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>篇2-ISIS</title>
-    <url>/2023/09/20/%E7%BD%91%E7%BB%9C-%E7%90%86%E8%AE%BA/%E7%AF%872-ISIS/</url>
-    <content><![CDATA[<h1 id="ISIS协议基本原理"><a href="#ISIS协议基本原理" class="headerlink" title="ISIS协议基本原理"></a>ISIS协议基本原理</h1><h2 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h2><table>
-<thead>
-<tr>
-<th align="center">园区网</th>
-<th align="center">骨干网</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="center">应用型网络，主要面向企业网用户</td>
-<td align="center">服务型网络，由ISP（网络服务提供商）组建，并为终端用户提供互联网服务</td>
-</tr>
-<tr>
-<td align="center">路由器数量偏少，动态路由的LSDB库容量偏少，三层路由域相对偏少</td>
-<td align="center">路由调度占绝对统治地位，路由数量庞大</td>
-</tr>
-<tr>
-<td align="center">有出口路由概念，对内外部路由划分敏感</td>
-<td align="center">结构层面扁平化，要求IGP作为基础路由为上层BGP协议服务</td>
-</tr>
-<tr>
-<td align="center">地域性跨度不大，带宽充足，链路状态协议开销对带宽占用偏少</td>
-<td align="center">LSDB规模宏大，对链路收敛极度敏感，线路费用高昂</td>
-</tr>
-<tr>
-<td align="center">路由策略和策略路由应用频繁多变，需要精细化的路由操作</td>
-<td align="center">最求简单高效，扩展性高，满足各种客户业务需求（IPv6&#x2F;IPX)</td>
-</tr>
-<tr>
-<td align="center">OSPF的多路由类型(内部&#x2F;外部)，多区域类型(骨干&#x2F;通&#x2F;特殊)，开销规则优良(根据带宽设定)，网络类型多样( 最多五种类型)的特点在园区网得到了极大的发挥。</td>
-<td align="center">IS-IS的快速算法( PRC得到加强 )，简便报文结构( TLV )，快速居关系建立，大容量路由传递(基于二层开销低)等一系列特点在骨千网有着天然的优势。</td>
-</tr>
-</tbody></table>
-<h2 id="历史起源"><a href="#历史起源" class="headerlink" title="历史起源"></a>历史起源</h2><p>IS-IS最初是国际标准化组织ISO ( the International Organization for Standardization为它的无连接网络协议CLNP ( ConnectionLess Network Protocol) 设计的一种动态路由协议。</p>
-<p>为了提供对IP的路由支持，IETF在RFC1195中对IS-IS进行了扩充和修改，使它能够同时应用在TCP&#x2F;IP和OSI环境中，称为集成化IS-IS (Integrated IS-IS )，后面如果没有特别说明提到的IS-IS都是指集成IS-IS。</p>
-<p>IS-IS属于内部网关协议，用于自治系统内部。IS-IS是一种链路状态协议，使用最短路径优先算法进行路由计算。</p>
-<h2 id="路由计算过程"><a href="#路由计算过程" class="headerlink" title="路由计算过程"></a>路由计算过程</h2><ul>
-<li><p>邻居关系建立</p>
-<p>邻居关系建立主要是通过HELLO包交互并协商各种参数，包括电路类型(level-1&#x2F;level-2 )，Hold time，网络类型，支持协议，区域号，系统ID，PDU长度，接口IP等。</p>
-</li>
-<li><p>链路信息交换</p>
-<p>与OSPF不同，ISIS交互链路状态的基本载体不是LSA ( link state advertisement ) 而是LSP ( link state PDU)；交互的过程没有OSPF协议那样经历了多个阶段，主要是<u>通过CSNP（Complete Sequence Number PDU）和PSNP（Partial Sequence Number PDU）两种协议报文来同步</u>，请求以及确认链路状态信息(承载的是链路状态信息摘要 )，而链路状态信息的详细拓扑和路由信息是由LSP报文传递。</p>
-</li>
-<li><p>路由计算</p>
-<p>SPF计算和OSPF基本一样的，但ISIS算法分离了拓扑结构和IP网段，加快了网络收敛速度。</p>
-</li>
-</ul>
-<h2 id="地址结构"><a href="#地址结构" class="headerlink" title="地址结构"></a>地址结构</h2><p><img src="/../../images/ISIS/%E5%9C%B0%E5%9D%80%E7%BB%93%E6%9E%84.png"></p>
-<p>CLNP（Connectionless Network Protocol），OSI中的网络层协议，类似于TCP&#x2F;IP中的IP协议</p>
-<p>CLNS（Connectionless Network Service，无连接网络服务），类似于IP所提供的“尽力而为”的服务，通过CLNP来完成CLNS</p>
-<ol>
-<li>NPDU（Network protocol Data Unit，网络协议数据单元），是OSI中的网络层协议报文，相当于TCP&#x2F;IP中的IP报文 </li>
-<li>NSAP（Network Service Access Point，网络服务接入点），即OSI中的网络层地址，用于多个抽象的网络服务访问点，描述OSI模型的网络地址结构</li>
-</ol>
-<p>NSAP地址:</p>
-<ul>
-<li><u>IDP相当于IP地址中的主网络号</u>。它是由ISO规定,并由AF与IDI两部分组成。AFI表示地址分配机构和地址格式，IDI用来标识域。IDP部分是ISO规定的，由AFI (Authority and Format Identifler) 与IDI (Initial Domain Indentifler) 组成，AFI<br>表示地址分配机构和地址格式，<u>IDI 用来标识域。AFI设置为49表示私有。设置为47表示全球。</u></li>
-<li><u>DSP相当于IP地址中的子网号和主机地址</u>。它由High Order DSP、System ID和SEL三个部分组成。High Order DSP用来分割区域，System ID用来区分主机, SEL用来指示服务类型。</li>
-<li>IDP 和 DSP 都是可变的，NSAP总长最多20个字节，最少8字节</li>
-<li>Area Address ( Area ID )，由IDP和DSP中的High Order DSP组成，<u>既能够标识路由域，也能够标识路由域中的区域</u>。因此，它们一起被称为区域地址，相当于OSPF中的区域编号。同一 Level-1 区域的路由器必须具有系统的区域地址，Level-2 区域内的路由可以具有不同的区域地址。区域地址长度是可变的，为1-13字节</li>
-<li>System ID，用来在区域内唯一标识主机或路由器，类似OSPF的RID， 在设备的实现中，它的长度固定为48bit( 6字节)，可用MAC地址作为System ID </li>
-<li>SEL的作用类似IP中的”协议标识符”， 不同的传输协议对应不同的SEL。在IP上SEL均为00</li>
-</ul>
-<p>NET :</p>
-<ul>
-<li>网络实体名称NET指的是设备本身的网络层信息，可以看作是一类特殊的NSAP( SEL&#x3D;00），NET的长度与NSAP的相同，最多为20个字节，最少为8个字节。在路由器上配置IS-IS时,只需要考虑NET即可, NSAP可不必去关注。</li>
-<li>在配置IS-IS过程中，NET最多也只能配3个。在配置多个NET时，必须保证它们的System ID都相同。</li>
-</ul>
-<h2 id="路由器分类"><a href="#路由器分类" class="headerlink" title="路由器分类"></a>路由器分类</h2><p>Level-1路由器:</p>
-<ul>
-<li>Level-1只能与属于同一区域的Level-1和Level-1-2路由器形成邻居关系，只负责维护Level-1的链路状态数据库，该LSDB包含本区域内的路由信息，到本区域外的报文转发给最近的Level-1-2路由器。Level-1路由器只可能建立Level-1的邻接关系。</li>
-</ul>
-<p>Level-2路由器:</p>
-<ul>
-<li>Level-2路由器负责区域间的路由，它可以与相同或者不同区域的Level-2路由器或者不同区域的Level-1-2路由器形成邻居关系。Level-2路由器维护一 个Level-2的LSDB，该LSDB包含区域间的路由信息。Level-2路由器只可能建 立Level-2的邻接关系。</li>
-</ul>
-<p>Level-1-2路由器:</p>
-<ul>
-<li>同时属于Level-1和Level-2的路由器称为Level-1-2路由器。Level-1-2路由器维护两个LSDB , Level-1的LSDB用于<strong>区域内</strong>路由，Level-2的LSDB用于<strong>区域间</strong>路由。</li>
-<li>Level-1-2路由器可以与同一区域的Level-1形成Level-1邻居关系，也可以与其他区域的 Level-2 和 Level-1-2 路由器形成Level-2的邻居关系。</li>
-</ul>
-<p>不同区域间，只能建立 Level-2 的邻接关系:</p>
-<ul>
-<li>Level-2路由器可以与Level-2路由器建立邻接关系。</li>
-<li>Level-1-2路由器可以与Level-2路由器建立邻接关系。</li>
-<li>Level-1-2路由器可以与Level-1-2路由器建立邻接关系。</li>
-</ul>
-<p>	</p>
-<h2 id="邻居Hello报文"><a href="#邻居Hello报文" class="headerlink" title="邻居Hello报文"></a>邻居Hello报文</h2><p>HELLO PDU ( Hello protocol data unit ) ：</p>
-<ul>
-<li>HELLO报文的作用是邻居发现，协商参数并建立邻居关系，后期充当保活报文。</li>
-<li>IS-IS建立邻居关系和OSPF一样，通过hello报文的交互来完成。但是会根据场景分为三种类型的hello报文。</li>
-<li>广播网中的Level-1 IS-IS使用 Level-1 LAN IIH ( Level-1 LAN IS-IS Hello) ，目的组播MAC为: 0180-c200-0014</li>
-<li>广播网中的Level-2 IS-IS使用 Level-2 LAN IIH ( Level-2 LAN IS-IS Hello) ，目的组播MAC为: 0180-c200-0015</li>
-<li>非广播网络中则使用P2P IIH ( point to point IS-IS Hello)。但是其没有表示DIS （虚节点）的相关字段。</li>
-<li>非 IIH 报文需要通过填充字段用于邻居两端协商发送报文的大小。</li>
-</ul>
-<p>IS-IS支持的网络类型：</p>
-<ul>
-<li>对点网络类型(P2P)。</li>
-<li>广播多路访问网络类型( Broadcast Multiple Access )。</li>
-<li>在帧中继等特殊环境下,可以通过创建子接口支持P2P的网络类型。</li>
-</ul>
-<h2 id="邻居关系建立"><a href="#邻居关系建立" class="headerlink" title="邻居关系建立"></a>邻居关系建立</h2><p><img src="/../../images/ISIS/%E9%82%BB%E5%B1%85%E5%85%B3%E7%B3%BB%E5%BB%BA%E7%AB%8B.png"></p>
-<p>在P2P链路上,分为两次握手机制和三次握手机制。</p>
-<ul>
-<li>两次握手只要路由器收到对端发来的Hello报文，就单方面宣布邻居为up状态，建立邻居关系，不过容易存在单通风险。</li>
-<li>通过三次发送P2P的IS-IS Hello PDU最终建立起邻居关系，与广播链路邻居关系的建立情况相同。</li>
-</ul>
-<p>在广播链路上，用LAN IH报文执行3三次握手建立邻居关系。</p>
-<ul>
-<li>当收到邻居发送的Hello PDU报文里面没有自己的system ID的时候，状态机进入initialized。</li>
-<li>只有收到邻居发过来的Hello PDU有自己的system ID才会up，排除了链路单通的风险。</li>
-<li>广播网络中邻居up后会选举DIS(虚节点) ，DIS的功能类似OSPF的DR（指定路由器）。</li>
-</ul>
-<h2 id="DIS、DIS与DR的类比"><a href="#DIS、DIS与DR的类比" class="headerlink" title="DIS、DIS与DR的类比"></a>DIS、DIS与DR的类比</h2><p><img src="/../../images/ISIS/DIS%E5%92%8CDR%E7%9A%84%E7%B1%BB%E6%AF%94.png"></p>
-<p>DIS与伪节点:</p>
-<ul>
-<li>DIS是指定中间系统 （Designated IS）。</li>
-<li>伪节点是指在广播网络中由DIS创建的虚拟路由器。</li>
-</ul>
-<p>DIS的特点:</p>
-<ul>
-<li>在广播网络，需要选举DIS ，所以在邻居关系建立后，路由器会<u>等待两个Hello报文间隔</u>再进行DIS的选举。Hello报文中包含Priority 字段，Priority值最大的将被选举为该广播网的DIS。若优先级相同，接口MAC地址较大的被选举为DIS。IS-IS中DIS发送Hello时间间隔默认为10&#x2F;3秒，而其他非DIS路由器发送Hello间隔为10秒。</li>
-</ul>
-<p>DIS与DR的类比</p>
-<ul>
-<li>选举时优选级的比较，<u>DIS的优先级为0也可以参与选举</u>。OSPF中优先级为0不参与选举DR。</li>
-<li>选举的过程需要一定的时间，OSPF选举DR&#x2F;BDR需要waiting time达40秒，过程也较为复杂，而ISIS选举DIS等待两个Hello报文间隔就可以，简单快捷。</li>
-<li>选举结果ISIS只有一个DIS，但是OSPF除了有DR，还有一个BDR用做备份。</li>
-<li>选举结束后，后期有新的Router加入到链路进来，如果<u>优先级比DIS高是可抢占的</u>，但是DR是不可抢占的。</li>
-<li>选举完成后， ISIS网络链路内所有的路由器之间都建立的是邻接关系。OSPF中<br>DRothers只与 DR&#x2F;BDR 形成 full 邻接关系，DRothers之间只有2-way的关系。</li>
-<li>关于DIS和DR的作用:<ol>
-<li>进行SPF计算时，都把它当成虚节点，简化MA网络的逻辑拓扑(相同点)。</li>
-<li>都是为了减少LSP&#x2F;LSA的泛洪(相同点)。</li>
-<li>在ISIS中还可以由DIS发送CSNP来同步链路的LSDB ( ISIS扩展作用)。</li>
-</ol>
-</li>
-</ul>
-<h2 id="链路状态信息的载体"><a href="#链路状态信息的载体" class="headerlink" title="链路状态信息的载体"></a>链路状态信息的载体</h2><p><img src="/../../images/ISIS/%E9%93%BE%E8%B7%AF%E7%8A%B6%E6%80%81%E4%BF%A1%E6%81%AF%E7%9A%84%E8%BD%BD%E4%BD%93.png"></p>
-<p>ISIS TLV :</p>
-<ul>
-<li>TLV的含义是：类型(TYPE) ，长度( LENGTH) ，值( VALUE)。实际上是一个数据结构，这个结构包含了这三个字段。</li>
-<li>使用TLV结构构建报文的好处是灵活性和扩展性好。采用TLV使得报文的整体结构固定，增加新特点只需要增加新TLV即可。不需要改变整个报文的整体结构。</li>
-<li>网络拓扑结构和路由信息用TLV结构表现使得报文的灵活性和扩展性得到了极大的发挥。</li>
-</ul>
-<p>LSP PDU ( Link State Protocol PDU ) :</p>
-<ul>
-<li>LSP类似于OSPF的LSA ,承载的是链路状态信息,包含了拓扑结构和网络号。</li>
-<li>Level-1 LSP由Level-1路由器传送。</li>
-<li>Level-2 LSP由Level-2路由器传送。</li>
-<li>Level-1-2路由器则可传送以上两种LSP。</li>
-<li>LSP报文中包含了两个重要字段是ATT字段、IS-Type字段。 其中ATT字段用于标识该路由是L1&#x2F;L2路由器发送的, IS-Type用来指明生成此LSP的IS-IS类型是Level-1还是Level-2 IS-IS。</li>
-<li>LSP的刷新间隔为15分钟，老化时间为20分钟。但是一条LSP的老化除 了要等待20分</li>
-<li>钟外,还要等待60秒的零老化时延; LSP重传时间为5秒。</li>
-</ul>
-<p>SNP PDU ( Sequence Number PDU ) ：</p>
-<ul>
-<li>CSNP ( Complete Sequence Number PDU )包括<u>LSDB中所有LSP的摘要</u>信息，从而可以在相邻路由器间保持LSD的同步。</li>
-<li>PSNP ( Partial Sequence Number PDU )包含<u>部分LSDB中的LSP摘要</u>信息，能够对LSP进行请求和确认。</li>
-<li><u>CSNP类似于OSPF的DD报文传递的是LSDB里所有链路信息摘要。PSNP类似于OSPF的LSR或LSAck报文用于请求和确认部分链路信息。</u></li>
-</ul>
-<h2 id="链路状态信息的交互"><a href="#链路状态信息的交互" class="headerlink" title="链路状态信息的交互"></a>链路状态信息的交互</h2><p><img src="/../../images/ISIS/%E9%93%BE%E8%B7%AF%E7%8A%B6%E6%80%81%E4%BF%A1%E6%81%AF%E7%9A%84%E4%BA%A4%E4%BA%92.png"></p>
-<p>P2P网络LSDB同步过程:</p>
-<ul>
-<li>建立邻居关系之后，RTA与RTB会先发送CSNP给对端设备。如果对端的LSDB与CSNP没有同步，则发送PSNP请求索取相应的LSP。</li>
-<li>假定RTB向RTA索取相应的LSP ，此时向RTA发送PSNP。RTA发送RTB请求的LSP的同时启动LSP重传定时器，并等待RTB发送PSNP作为收到LSP的确认。</li>
-<li>如果在接口LSP重传定时器超时后, RTA还没有收到RTB发送的PSNP报文作为应答，则重新发送该LSP直至收到RTB的PSNP报文作为确认。</li>
-</ul>
-<p>MA网络中新加入的路由器与DIS的LSDB同步交互过程：</p>
-<ul>
-<li>假设新加入的路由器RTC已经与RTB ( DIS )和RTA建立了邻居关系。</li>
-<li>建立邻居关系之后， RTC将自己的LSP发往组播地址( Level-1 : 01-80-C2-00-00-14 ; Level-2 : 01-80-C2-00-00-15 )。这样网络上所有的邻居都将收到该LSP。</li>
-<li>该网段中的DIS会把收到RTC的LSP加入到LSDB中,并等待CSNP报文定时器超时( DIS每隔10秒发送CSNP报文）并发送CSNP报文，进行该网络内的LSDB同步。</li>
-<li>RTC收到DIS发来的CSNP报文，对比自己的LSDB数据库，然后向DIS发送PSNP报文请求自己没有的LSP (如RTA和RTB的LSP就没有)。</li>
-<li>RTB作为DIS收到该PSNP报文请求后向RTC发送对应的LSP进行LSDB的同步。</li>
-</ul>
-<h2 id="路由算法"><a href="#路由算法" class="headerlink" title="路由算法"></a>路由算法</h2><p><img src="/../../images/ISIS/%E8%B7%AF%E7%94%B1%E7%AE%97%E6%B3%95.png"></p>
-<h3 id="IS-IS的计算特点"><a href="#IS-IS的计算特点" class="headerlink" title="IS -IS的计算特点"></a>IS -IS的计算特点</h3><ul>
-<li>在本区域内路由器第一次启动的时候执行的是Full-SPF算法。</li>
-<li>后续收到的L SP更新，如果是部分拓扑的变化执行的iSPF计算。</li>
-<li>如果只是路由信息的变化，执行的就是PRC计算。</li>
-<li>由于采用拓扑与网络分离的算法，路由收敛速度得到了加强。</li>
-</ul>
-<h3 id="ISIS路由计算的开销方式"><a href="#ISIS路由计算的开销方式" class="headerlink" title="ISIS路由计算的开销方式"></a>ISIS路由计算的开销方式</h3><ul>
-<li>Narrow模式(设备默认模式开销都是10 ，手工配置接口开销取值范围为1 ~63)。</li>
-<li>Wide模式(设备默认模式开销都是10 ，手工配置接口开销取值范围是1~16777215 )。</li>
-<li>进程下加入auto-cost enable命令， Narrow模式和Wide模式都会参考接口带宽大小计算开销值，只是参考准则有少许差异。</li>
-</ul>
-<h2 id="网络分层路由域"><a href="#网络分层路由域" class="headerlink" title="网络分层路由域"></a>网络分层路由域</h2><p><img src="/../../images/ISIS/%E7%BD%91%E7%BB%9C%E5%88%86%E5%B1%82%E8%B7%AF%E7%94%B1%E5%9F%9F.png"></p>
-<h3 id="IS-IS整体拓扑"><a href="#IS-IS整体拓扑" class="headerlink" title="IS-IS整体拓扑"></a>IS-IS整体拓扑</h3><ul>
-<li>为了支持大规模的路由网络， IS-IS在自治系统内采用骨干区域与非骨干区域两级的分层结构。一般来说，将Level-1路由器部署在非骨干区域，Level-2路由器和Level-1-2路由器部署在骨干区域。每一个非骨干区域都通过Level-1-2路由器与骨干区域相连。</li>
-<li>拓扑中为一个运行IS-IS协议的网络，它与OSPF的多区域网络拓扑结构非常相似。整个骨干区域不仅包括Level-2的所有路由器，还包括Level-1-2路由器。</li>
-<li>Level-1-2级别的路由器可以属于不同的区域,在Level-1区域，维护Level-1的LSDB ，在Level-2区域,维护Level-2的LSDB。</li>
-</ul>
-<h3 id="拓扑所体现的IS-IS与OSPF不同点"><a href="#拓扑所体现的IS-IS与OSPF不同点" class="headerlink" title="拓扑所体现的IS-IS与OSPF不同点"></a>拓扑所体现的IS-IS与OSPF不同点</h3><ul>
-<li>在OSPF中，每个链路只属于一个区域；而在IS-IS中，每个链路可以属于不同的区域;</li>
-<li>在IS-IS中，单个区域没有物理的骨干与非骨干区域的概念；而在OSPF中， Area0被定义为骨干区域;</li>
-<li><u>在IS IS中，Level-1和Level-2级别的路由器分别采用SPF算法，分别生成最短路径树SPT</u>；<u>在OSPF中，只有在同一个区域内才使用SPF算法，区域之间的路由需要通过骨干区域来转发。</u></li>
-</ul>
-<h2 id="区域间路由"><a href="#区域间路由" class="headerlink" title="区域间路由"></a>区域间路由</h2><p><img src="/../../images/ISIS/%E5%8C%BA%E5%9F%9F%E9%97%B4%E8%B7%AF%E7%94%B1.png"></p>
-<h3 id="Level-1路由器的路由特点"><a href="#Level-1路由器的路由特点" class="headerlink" title="Level-1路由器的路由特点"></a>Level-1路由器的路由特点</h3><ul>
-<li>只拥有Level-1的链路状态数据库。</li>
-<li>其链路状态数据库中只有本区域路由器LSP。</li>
-<li>其路由表里没有其他区域的路由信息。</li>
-<li>其路由表里都有一条默认路由，下一条是指向到Level-1 -2路由器。</li>
-</ul>
-<h3 id="Level-2路由器的路由特点"><a href="#Level-2路由器的路由特点" class="headerlink" title="Level-2路由器的路由特点"></a>Level-2路由器的路由特点</h3><ul>
-<li>Level-2路由器只有Level-2的链路状态数据库。</li>
-<li>其LSDB中有骨干区域路由器的LSP，但是没有Level-1路由器产生的LSP。</li>
-<li>路由表里面有整个网络的路由信息。</li>
-</ul>
-<h3 id="Level-1-2路由器的路由特点"><a href="#Level-1-2路由器的路由特点" class="headerlink" title="Level-1-2路由器的路由特点"></a>Level-1-2路由器的路由特点</h3><ul>
-<li>Level-1-2路由器同时拥有Level-2和L evel-1的链路状态数据库。Level-1数据库包含本区域的LSP , Level-2数据库包含骨干区域LSP。</li>
-<li>在自己产生的Level-1的LSP中设置 了ATT比特位为1。</li>
-<li>路由表里面有整个网络的路由信息。</li>
-</ul>
-<h1 id="ISIS与OSPF的区别"><a href="#ISIS与OSPF的区别" class="headerlink" title="ISIS与OSPF的区别"></a>ISIS与OSPF的区别</h1><h2 id="ISIS与OSPF的差异性"><a href="#ISIS与OSPF的差异性" class="headerlink" title="ISIS与OSPF的差异性"></a>ISIS与OSPF的差异性</h2><table>
-<thead>
-<tr>
-<th align="center">差异性</th>
-<th align="center">IS-IS</th>
-<th align="center">OSPF</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="center">网络类型</td>
-<td align="center">少</td>
-<td align="center">多</td>
-</tr>
-<tr>
-<td align="center">开销方式</td>
-<td align="center">复杂</td>
-<td align="center">简便</td>
-</tr>
-<tr>
-<td align="center">区域类型</td>
-<td align="center">少</td>
-<td align="center">多</td>
-</tr>
-<tr>
-<td align="center">路由报文类型</td>
-<td align="center">简单</td>
-<td align="center">多样</td>
-</tr>
-<tr>
-<td align="center">路由收敛速度</td>
-<td align="center">很快</td>
-<td align="center">快</td>
-</tr>
-<tr>
-<td align="center">扩展性</td>
-<td align="center">强</td>
-<td align="center">一般</td>
-</tr>
-<tr>
-<td align="center">路由负载能力</td>
-<td align="center">超强</td>
-<td align="center">强</td>
-</tr>
-</tbody></table>
-<h3 id="网络类型和开销方式"><a href="#网络类型和开销方式" class="headerlink" title="网络类型和开销方式"></a>网络类型和开销方式</h3><p>IS-IS协议只支持两种网络类型，且所有带宽默认开销值都是-样的，OSPF协议支持四种网络类型，且会根据不同的带宽设定相应的开销值， 对帧中继，按需链路等网络类型有很好的支持。</p>
-<h3 id="区域类型"><a href="#区域类型" class="headerlink" title="区域类型"></a>区域类型</h3><p>IS-IS协议分L1&#x2F;L2区域，L2区域是骨干区域有全部明细路由。L1去往L2只有默认路由。OSPF协议分骨干区域，普通区域，特殊区域。普通区域和特殊区域跨区域访问需要经过骨干区域。</p>
-<h3 id="报文类型"><a href="#报文类型" class="headerlink" title="报文类型"></a>报文类型</h3><p>IS-IS协议路由承载报文类型只有LSP报文且里面路由信息是不区分内部与外部的，简单高效，无需递归计算。OSPF协议路由承载报文LSA类型多样，有1&#x2F;2&#x2F;3&#x2F;4&#x2F;5&#x2F;7类等。路由级别等级森严，且需要递归计算,适合精细化调度计算。</p>
-<h3 id="路由算法-1"><a href="#路由算法-1" class="headerlink" title="路由算法"></a>路由算法</h3><p>ISIS协议区域内某个节点上的网段发生变化时，触发的是PRC算法，收敛比较快，计算路由的报文开销也比较小。OSPF协议由于网络地址参与了拓扑的构建，在区域内当网段地址改变触发的是i-spf算法，相对来说过程繁琐复杂些。</p>
-<h3 id="扩展性"><a href="#扩展性" class="headerlink" title="扩展性"></a>扩展性</h3><p>ISIS协议任何路由信息都使用TLV传递,结构简单，易于扩展，如对IPv6的支持只增加2个TLV就解决了。且ISIS本身对IPX等协议是支持的。OSPF协议本身是为IP特定开发的，支持IPv4和IPv6的OSPF协议是两个独立的版本( OSPFv2和OSPFv3 )。</p>
-<h2 id="术语对照"><a href="#术语对照" class="headerlink" title="术语对照"></a>术语对照</h2><p><img src="/../../images/ISIS/%E6%9C%AF%E8%AF%AD%E5%AF%B9%E7%85%A7.png"></p>
-<h1 id="ISIS应用场景配置"><a href="#ISIS应用场景配置" class="headerlink" title="ISIS应用场景配置"></a>ISIS应用场景配置</h1><p><img src="/../../images/ISIS/%E6%95%99%E6%9D%90%E5%AE%9E%E9%AA%8C%E6%8B%93%E6%89%91.png"></p>
-<h2 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h2><ul>
-<li>所有路由启用IS-IS，进程号为100，全网路由可达</li>
-<li>AR1 在 Area 49.0001 区域为DIS</li>
-<li>AR4 与 AR5 之间采用P2P网络类型</li>
-<li>AR5 引入直连路由192.168.x.x</li>
-<li>AR1 访问 Area 49.0002 走最优路径</li>
-</ul>
-<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><ul>
-<li><p>所有接口配置ip</p>
-</li>
-<li><p>AR1</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">[AR1-isis-100]dis this</span><br><span class="line">[V200R003C00]</span><br><span class="line">#</span><br><span class="line">isis 100</span><br><span class="line"> is-level level-1</span><br><span class="line"> network-entity 49.0001.0000.0000.0001.00</span><br><span class="line">#</span><br><span class="line"></span><br><span class="line">//接口配置</span><br><span class="line">[AR1-GigabitEthernet0/0/0]dis this</span><br><span class="line">[V200R003C00]</span><br><span class="line">#</span><br><span class="line">interface GigabitEthernet0/0/0</span><br><span class="line"> ip address 10.1.123.1 255.255.255.0 </span><br><span class="line"> isis enable 100</span><br><span class="line"> isis dis-priority 120 level-1      //配置高优先级，成为DIS</span><br><span class="line">#</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>AR2</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">[AR2-isis-100]dis this</span><br><span class="line">[V200R003C00]</span><br><span class="line">#</span><br><span class="line">isis 100</span><br><span class="line"> network-entity 49.0001.0000.0000.0002.00</span><br><span class="line"> import-route isis level-2 into level-1       //路由渗透</span><br><span class="line">#</span><br><span class="line">//默认为level-1-2</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>AR3</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">[AR3-isis-100]dis this</span><br><span class="line">[V200R003C00]</span><br><span class="line">#</span><br><span class="line">isis 100</span><br><span class="line"> network-entity 49.0001.0000.0000.0003.00</span><br><span class="line"> import-route isis level-2 into level-1      //路由渗透</span><br><span class="line">#</span><br><span class="line">//默认为level-1-2</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>AR4</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">[AR4-isis-100]dis this</span><br><span class="line">[V200R003C00]</span><br><span class="line">#</span><br><span class="line">isis 100</span><br><span class="line"> is-level level-2</span><br><span class="line"> network-entity 49.0002.0000.0000.0004.00</span><br><span class="line">#</span><br><span class="line"></span><br><span class="line">//特殊接口配置</span><br><span class="line">[AR4-GigabitEthernet0/0/0]dis this</span><br><span class="line">[V200R003C00]</span><br><span class="line">#</span><br><span class="line">interface GigabitEthernet0/0/0</span><br><span class="line"> ip address 10.1.45.4 255.255.255.0 </span><br><span class="line"> isis enable 100</span><br><span class="line"> isis circuit-type p2p               //接口网络类型修改为P2P</span><br><span class="line">#</span><br><span class="line">return</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>AR5</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">[AR5-isis-100]dis this</span><br><span class="line">[V200R003C00]</span><br><span class="line">#</span><br><span class="line">isis 100</span><br><span class="line"> is-level level-2</span><br><span class="line"> network-entity 49.0002.0000.0000.0005.00</span><br><span class="line"> import-route direct                  //引入直连路由</span><br><span class="line">#</span><br><span class="line"></span><br><span class="line">[AR5-GigabitEthernet0/0/0]dis this</span><br><span class="line">[V200R003C00]</span><br><span class="line">#</span><br><span class="line">interface GigabitEthernet0/0/0</span><br><span class="line"> ip address 10.1.45.5 255.255.255.0 </span><br><span class="line"> isis enable 100</span><br><span class="line"> isis circuit-type p2p               //接口网络类型修改为P2P</span><br><span class="line">#</span><br><span class="line">return</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>所有接口开启ISIS</p>
-</li>
-</ul>
-<h2 id="路由渗透"><a href="#路由渗透" class="headerlink" title="路由渗透"></a>路由渗透</h2><ul>
-<li><u>如果一个level-1区域有两个以上Level-1-2路由器，则区域内Level-1路由器访问其他区域会选择最近的Level-1-2路由器，但是计算的开销值只计算本区域内的，如果最近的Level-1-2路由器在Level-2区域到达目的网络的开销相对比较大，实际会造成业务次优路径。</u>在这种场景下需要做路由渗透操作，把Level-2区域的明细路由(包括开销)引入到Level-1区域，由Level-1路由器自行计算选择最优的路径访问跨区域网络</li>
-<li>本实例要求走最优的路径到达区域49.0002，由于RTB连接RTD的链路带宽相对比较大，作用最好让数据流走RTB。可分别在RTB和RTC的ISIS进程下引入level-2的路由到level-1。由RTA的LSDB里面掌握level-2所有的明细路由，就可以选择最优的路径到达区域49.0002。</li>
-</ul>
-]]></content>
-      <tags>
-        <tag>网络-理论</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>后端工程师职业规划参考</title>
-    <url>/2023/07/02/%E8%81%8C%E4%B8%9A%E8%A7%84%E5%88%92/%E5%90%8E%E7%AB%AF%E5%B7%A5%E7%A8%8B%E5%B8%88%E8%81%8C%E4%B8%9A%E8%A7%84%E5%88%92%E5%8F%82%E8%80%83/</url>
-    <content><![CDATA[<h3 id="1-初级后端工程师（1-3年）："><a href="#1-初级后端工程师（1-3年）：" class="headerlink" title="1. 初级后端工程师（1-3年）："></a>1. 初级后端工程师（1-3年）：</h3><ul>
-<li>掌握一门主流后端开发语言，如Java、Python或Node.js。</li>
-<li>学习并应用常见的后端开发框架和技术，如Spring、Django或Express.js。</li>
-<li>参与项目开发，负责后端功能的实现和数据库设计。</li>
-<li>学习和应用基本的软件工程原则和最佳实践。</li>
-<li>持续学习和提升编程和问题解决能力。</li>
-</ul>
-<h3 id="2-中级后端工程师（3-5年）："><a href="#2-中级后端工程师（3-5年）：" class="headerlink" title="2. 中级后端工程师（3-5年）："></a>2. 中级后端工程师（3-5年）：</h3><ul>
-<li>深入研究和应用后端开发技术栈，如数据库优化、性能调优、缓存等。</li>
-<li>参与设计和开发复杂的后端系统，包括分布式系统和微服务架构。</li>
-<li>学习和应用设计模式和架构原则，提高系统的可扩展性和可维护性。</li>
-<li>参与团队的技术选型和架构设计，负责解决技术难题和挑战。</li>
-<li>培养团队合作和沟通能力，开始指导和培养初级工程师。</li>
-</ul>
-<h3 id="3-高级后端工程师（5年以上）："><a href="#3-高级后端工程师（5年以上）：" class="headerlink" title="3. 高级后端工程师（5年以上）："></a>3. 高级后端工程师（5年以上）：</h3><ul>
-<li>深入研究和应用领域专有的后端技术，如金融领域的支付系统、电子商务领域的订单处理系统等。</li>
-<li>参与大型项目的架构设计和技术规划，负责解决复杂的技术挑战。</li>
-<li>深入理解和应用云计算和容器化技术，如Docker和Kubernetes。</li>
-<li>参与行业内的研究和交流，提升自己在该领域的专业影响力。</li>
-<li>培养和指导团队成员的技术能力和职业发展。</li>
-</ul>
-<h3 id="4-技术管理者："><a href="#4-技术管理者：" class="headerlink" title="4. 技术管理者："></a>4. 技术管理者：</h3><ul>
-<li>学习项目管理和团队管理知识，培养领导力和沟通能力。</li>
-<li>担任技术团队的领导角色，负责项目的规划和执行。</li>
-<li>帮助团队成员制定个人的职业规划，并提供指导和支持。</li>
-<li>参与公司的技术战略规划和决策，推动团队的技术创新和发展。</li>
-</ul>
-]]></content>
-      <tags>
-        <tag>职业规划</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>前端工程师职业规划参考</title>
-    <url>/2023/07/02/%E8%81%8C%E4%B8%9A%E8%A7%84%E5%88%92/%E5%89%8D%E7%AB%AF%E5%B7%A5%E7%A8%8B%E5%B8%88%E8%81%8C%E4%B8%9A%E8%A7%84%E5%88%92%E5%8F%82%E8%80%83/</url>
-    <content><![CDATA[<h3 id="1-初级前端工程师（1-2年）："><a href="#1-初级前端工程师（1-2年）：" class="headerlink" title="1. 初级前端工程师（1-2年）："></a>1. 初级前端工程师（1-2年）：</h3><ul>
-<li>学习HTML、CSS和JavaScript等基础知识，并熟练运用它们进行网页开发。</li>
-<li>参与项目团队，积累实际项目经验。</li>
-<li>学习和掌握常用的前端框架和工具，如React、Vue.js、Webpack等。</li>
-<li>参与培训课程和技术社区，不断学习和提升技能。</li>
-</ul>
-<h3 id="2-中级前端工程师（3-5年）："><a href="#2-中级前端工程师（3-5年）：" class="headerlink" title="2. 中级前端工程师（3-5年）："></a>2. 中级前端工程师（3-5年）：</h3><ul>
-<li>在项目中承担更复杂的前端开发任务，如开发响应式网站、移动端应用等。</li>
-<li>深入学习和掌握前端框架和库的原理和使用技巧。</li>
-<li>学习和应用前端最佳实践，如性能优化、代码规范等。</li>
-<li>参与团队协作和项目管理，提升沟通和领导能力。</li>
-</ul>
-<h3 id="3-高级前端工程师（5年以上）："><a href="#3-高级前端工程师（5年以上）：" class="headerlink" title="3. 高级前端工程师（5年以上）："></a>3. 高级前端工程师（5年以上）：</h3><ul>
-<li>在复杂项目中担任技术负责人或架构师角色，负责前端架构设计和技术选型。</li>
-<li>深入研究前端领域的新技术和趋势，并引领团队进行技术创新和实践。</li>
-<li>参与开源项目和技术社区，分享经验和贡献代码。</li>
-<li>建立自己的技术品牌和影响力，如通过博客、演讲等方式分享经验和见解。</li>
-</ul>
-<h3 id="4-职业发展方向："><a href="#4-职业发展方向：" class="headerlink" title="4. 职业发展方向："></a>4. 职业发展方向：</h3><ul>
-<li>前端架构师：专注于前端架构设计和技术选型，负责复杂项目的技术规划和架构设计。</li>
-<li>前端团队管理：发展管理和领导能力，负责前端团队的招聘、培训和项目管理。</li>
-<li>UX&#x2F;UI设计师：学习和掌握用户体验和界面设计的知识，负责前端界面设计和交互优化。</li>
-<li>技术顾问：通过积累丰富的经验和知识，为企业提供前端技术咨询和解决方案。</li>
-</ul>
-<p>这只是一个参考，可以根据自己的兴趣和职业目标进行调整和补充。重要的是制定一个明确的职业规划，并不断学习和发展自己的技能，以实现职业的持续成长和发展。</p>
-]]></content>
-      <tags>
-        <tag>职业规划</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>软件测试工程师职业规划参考</title>
-    <url>/2023/07/02/%E8%81%8C%E4%B8%9A%E8%A7%84%E5%88%92/%E8%BD%AF%E4%BB%B6%E5%B7%A5%E7%A8%8B%E5%B8%88%E8%81%8C%E4%B8%9A%E8%A7%84%E5%88%92/</url>
-    <content><![CDATA[<h3 id="1-初级软件测试工程师（1-2年）："><a href="#1-初级软件测试工程师（1-2年）：" class="headerlink" title="1. 初级软件测试工程师（1-2年）："></a>1. 初级软件测试工程师（1-2年）：</h3><ul>
-<li>学习和掌握软件测试的基础知识，如测试方法、测试文档编写等。</li>
-<li>熟悉常用的测试工具和技术，如自动化测试工具、性能测试工具等。</li>
-<li>参与软件测试项目，执行测试计划、编写测试用例、执行测试并记录缺陷。</li>
-</ul>
-<h3 id="2-中级软件测试工程师（3-5年）："><a href="#2-中级软件测试工程师（3-5年）：" class="headerlink" title="2. 中级软件测试工程师（3-5年）："></a>2. 中级软件测试工程师（3-5年）：</h3><ul>
-<li>深入学习和掌握软件测试的高级知识，如测试策略、测试环境配置等。</li>
-<li>参与复杂软件项目的测试规划和设计，提出测试方案和策略。</li>
-<li>掌握自动化测试技术，编写和执行自动化测试脚本，提高测试效率和质量。</li>
-<li>学习和应用性能测试和安全测试的技术，提高软件的性能和安全性。</li>
-</ul>
-<h3 id="3-高级软件测试工程师（5年以上）："><a href="#3-高级软件测试工程师（5年以上）：" class="headerlink" title="3. 高级软件测试工程师（5年以上）："></a>3. 高级软件测试工程师（5年以上）：</h3><ul>
-<li>在复杂项目中担任测试团队的技术负责人或测试架构师角色。</li>
-<li>深入研究软件测试领域的新技术和趋势，并引领团队进行技术创新和实践。</li>
-<li>参与软件质量管理方面的工作，如质量度量、过程改进等。</li>
-<li>建立自己的技术品牌和影响力，如通过博客、演讲等方式分享经验和见解。</li>
-</ul>
-<h3 id="4-职业发展方向："><a href="#4-职业发展方向：" class="headerlink" title="4. 职业发展方向："></a>4. 职业发展方向：</h3><ul>
-<li>质量保证经理：发展管理和领导能力，负责整个软件质量保证流程的管理和改进。</li>
-<li>自动化测试专家：深入研究自动化测试技术和工具，负责团队的自动化测试实施。</li>
-<li>安全测试专家：学习和掌握安全测试的知识和技术，负责软件安全测试和漏洞修复。</li>
-<li>敏捷测试专家：学习和掌握敏捷开发和测试方法，负责敏捷团队的测试工作。</li>
-</ul>
-]]></content>
-      <tags>
-        <tag>职业规划</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>网络工程师职业规划参考</title>
-    <url>/2023/07/02/%E8%81%8C%E4%B8%9A%E8%A7%84%E5%88%92/%E7%BD%91%E7%BB%9C%E5%B7%A5%E7%A8%8B%E5%B8%88%E8%81%8C%E4%B8%9A%E8%A7%84%E5%88%92%E5%8F%82%E8%80%83/</url>
-    <content><![CDATA[<h3 id="1-初级网络工程师（1-2年）："><a href="#1-初级网络工程师（1-2年）：" class="headerlink" title="1. 初级网络工程师（1-2年）："></a>1. 初级网络工程师（1-2年）：</h3><ul>
-<li>学习和掌握计算机网络的基础知识，如TCP&#x2F;IP协议、网络拓扑等。</li>
-<li>熟悉常用的网络设备和工具，如交换机、路由器、网络监控软件等。</li>
-<li>参与网络设备的配置和维护工作，解决常见的网络故障和问题。</li>
-<li>学习和掌握网络安全的基础知识，如防火墙、VPN等。</li>
-</ul>
-<h3 id="2-中级网络工程师（3-5年）："><a href="#2-中级网络工程师（3-5年）：" class="headerlink" title="2. 中级网络工程师（3-5年）："></a>2. 中级网络工程师（3-5年）：</h3><ul>
-<li>参与大型网络项目的规划和实施，如企业网络升级、数据中心建设等。</li>
-<li>深入学习和掌握网络技术的高级知识，如VLAN、路由协议、负载均衡等。</li>
-<li>学习和应用网络性能优化的技术和方法，提高网络的稳定性和响应速度。</li>
-<li>参与网络安全方面的工作，如网络漏洞扫描、入侵检测等。</li>
-</ul>
-<h3 id="3-高级网络工程师（5年以上）："><a href="#3-高级网络工程师（5年以上）：" class="headerlink" title="3. 高级网络工程师（5年以上）："></a>3. 高级网络工程师（5年以上）：</h3><ul>
-<li>在复杂网络环境下担任技术负责人或架构师角色，负责网络架构设计和规划。</li>
-<li>深入研究网络领域的新技术和趋势，并引领团队进行技术创新和实践。</li>
-<li>参与网络安全的高级工作，如安全策略制定、事件响应等。</li>
-<li>建立自己的技术品牌和影响力，如通过博客、演讲等方式分享经验和见解。</li>
-</ul>
-<h3 id="4-职业发展方向："><a href="#4-职业发展方向：" class="headerlink" title="4. 职业发展方向："></a>4. 职业发展方向：</h3><ul>
-<li>网络架构师：专注于网络架构设计和规划，负责复杂网络项目的技术规划和架构设计。</li>
-<li>网络安全专家：深入研究网络安全领域，负责企业的网络安全策略和漏洞修复。</li>
-<li>云计算工程师：学习和掌握云计算和虚拟化技术，负责企业的云平台建设和管理。</li>
-<li>网络运维经理：发展管理和领导能力，负责网络团队的招聘、培训和运维管理。</li>
-</ul>
-<p>这只是一个参考，可以根据自己的兴趣和职业目标进行调整和补充。重要的是制定一个明确的职业规划，并不断学习和发展自己的技能，以实现职业的持续成长和发展。</p>
-]]></content>
-      <tags>
-        <tag>职业规划</tag>
       </tags>
   </entry>
   <entry>
@@ -2027,6 +1648,445 @@
 ]]></content>
       <tags>
         <tag>网络-理论</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>篇2-ISIS</title>
+    <url>/2023/09/20/%E7%BD%91%E7%BB%9C-%E7%90%86%E8%AE%BA/%E7%AF%872-ISIS/</url>
+    <content><![CDATA[<h1 id="ISIS协议基本原理"><a href="#ISIS协议基本原理" class="headerlink" title="ISIS协议基本原理"></a>ISIS协议基本原理</h1><h2 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h2><table>
+<thead>
+<tr>
+<th align="center">园区网</th>
+<th align="center">骨干网</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">应用型网络，主要面向企业网用户</td>
+<td align="center">服务型网络，由ISP（网络服务提供商）组建，并为终端用户提供互联网服务</td>
+</tr>
+<tr>
+<td align="center">路由器数量偏少，动态路由的LSDB库容量偏少，三层路由域相对偏少</td>
+<td align="center">路由调度占绝对统治地位，路由数量庞大</td>
+</tr>
+<tr>
+<td align="center">有出口路由概念，对内外部路由划分敏感</td>
+<td align="center">结构层面扁平化，要求IGP作为基础路由为上层BGP协议服务</td>
+</tr>
+<tr>
+<td align="center">地域性跨度不大，带宽充足，链路状态协议开销对带宽占用偏少</td>
+<td align="center">LSDB规模宏大，对链路收敛极度敏感，线路费用高昂</td>
+</tr>
+<tr>
+<td align="center">路由策略和策略路由应用频繁多变，需要精细化的路由操作</td>
+<td align="center">最求简单高效，扩展性高，满足各种客户业务需求（IPv6&#x2F;IPX)</td>
+</tr>
+<tr>
+<td align="center">OSPF的多路由类型(内部&#x2F;外部)，多区域类型(骨干&#x2F;通&#x2F;特殊)，开销规则优良(根据带宽设定)，网络类型多样( 最多五种类型)的特点在园区网得到了极大的发挥。</td>
+<td align="center">IS-IS的快速算法( PRC得到加强 )，简便报文结构( TLV )，快速居关系建立，大容量路由传递(基于二层开销低)等一系列特点在骨千网有着天然的优势。</td>
+</tr>
+</tbody></table>
+<h2 id="历史起源"><a href="#历史起源" class="headerlink" title="历史起源"></a>历史起源</h2><p>IS-IS最初是国际标准化组织ISO ( the International Organization for Standardization为它的无连接网络协议CLNP ( ConnectionLess Network Protocol) 设计的一种动态路由协议。</p>
+<p>为了提供对IP的路由支持，IETF在RFC1195中对IS-IS进行了扩充和修改，使它能够同时应用在TCP&#x2F;IP和OSI环境中，称为集成化IS-IS (Integrated IS-IS )，后面如果没有特别说明提到的IS-IS都是指集成IS-IS。</p>
+<p>IS-IS属于内部网关协议，用于自治系统内部。IS-IS是一种链路状态协议，使用最短路径优先算法进行路由计算。</p>
+<h2 id="路由计算过程"><a href="#路由计算过程" class="headerlink" title="路由计算过程"></a>路由计算过程</h2><ul>
+<li><p>邻居关系建立</p>
+<p>邻居关系建立主要是通过HELLO包交互并协商各种参数，包括电路类型(level-1&#x2F;level-2 )，Hold time，网络类型，支持协议，区域号，系统ID，PDU长度，接口IP等。</p>
+</li>
+<li><p>链路信息交换</p>
+<p>与OSPF不同，ISIS交互链路状态的基本载体不是LSA ( link state advertisement ) 而是LSP ( link state PDU)；交互的过程没有OSPF协议那样经历了多个阶段，主要是<u>通过CSNP（Complete Sequence Number PDU）和PSNP（Partial Sequence Number PDU）两种协议报文来同步</u>，请求以及确认链路状态信息(承载的是链路状态信息摘要 )，而链路状态信息的详细拓扑和路由信息是由LSP报文传递。</p>
+</li>
+<li><p>路由计算</p>
+<p>SPF计算和OSPF基本一样的，但ISIS算法分离了拓扑结构和IP网段，加快了网络收敛速度。</p>
+</li>
+</ul>
+<h2 id="地址结构"><a href="#地址结构" class="headerlink" title="地址结构"></a>地址结构</h2><p><img src="/../../images/ISIS/%E5%9C%B0%E5%9D%80%E7%BB%93%E6%9E%84.png"></p>
+<p>CLNP（Connectionless Network Protocol），OSI中的网络层协议，类似于TCP&#x2F;IP中的IP协议</p>
+<p>CLNS（Connectionless Network Service，无连接网络服务），类似于IP所提供的“尽力而为”的服务，通过CLNP来完成CLNS</p>
+<ol>
+<li>NPDU（Network protocol Data Unit，网络协议数据单元），是OSI中的网络层协议报文，相当于TCP&#x2F;IP中的IP报文 </li>
+<li>NSAP（Network Service Access Point，网络服务接入点），即OSI中的网络层地址，用于多个抽象的网络服务访问点，描述OSI模型的网络地址结构</li>
+</ol>
+<p>NSAP地址:</p>
+<ul>
+<li><u>IDP相当于IP地址中的主网络号</u>。它是由ISO规定,并由AF与IDI两部分组成。AFI表示地址分配机构和地址格式，IDI用来标识域。IDP部分是ISO规定的，由AFI (Authority and Format Identifler) 与IDI (Initial Domain Indentifler) 组成，AFI<br>表示地址分配机构和地址格式，<u>IDI 用来标识域。AFI设置为49表示私有。设置为47表示全球。</u></li>
+<li><u>DSP相当于IP地址中的子网号和主机地址</u>。它由High Order DSP、System ID和SEL三个部分组成。High Order DSP用来分割区域，System ID用来区分主机, SEL用来指示服务类型。</li>
+<li>IDP 和 DSP 都是可变的，NSAP总长最多20个字节，最少8字节</li>
+<li>Area Address ( Area ID )，由IDP和DSP中的High Order DSP组成，<u>既能够标识路由域，也能够标识路由域中的区域</u>。因此，它们一起被称为区域地址，相当于OSPF中的区域编号。同一 Level-1 区域的路由器必须具有系统的区域地址，Level-2 区域内的路由可以具有不同的区域地址。区域地址长度是可变的，为1-13字节</li>
+<li>System ID，用来在区域内唯一标识主机或路由器，类似OSPF的RID， 在设备的实现中，它的长度固定为48bit( 6字节)，可用MAC地址作为System ID </li>
+<li>SEL的作用类似IP中的”协议标识符”， 不同的传输协议对应不同的SEL。在IP上SEL均为00</li>
+</ul>
+<p>NET :</p>
+<ul>
+<li>网络实体名称NET指的是设备本身的网络层信息，可以看作是一类特殊的NSAP( SEL&#x3D;00），NET的长度与NSAP的相同，最多为20个字节，最少为8个字节。在路由器上配置IS-IS时,只需要考虑NET即可, NSAP可不必去关注。</li>
+<li>在配置IS-IS过程中，NET最多也只能配3个。在配置多个NET时，必须保证它们的System ID都相同。</li>
+</ul>
+<h2 id="路由器分类"><a href="#路由器分类" class="headerlink" title="路由器分类"></a>路由器分类</h2><p>Level-1路由器:</p>
+<ul>
+<li>Level-1只能与属于同一区域的Level-1和Level-1-2路由器形成邻居关系，只负责维护Level-1的链路状态数据库，该LSDB包含本区域内的路由信息，到本区域外的报文转发给最近的Level-1-2路由器。Level-1路由器只可能建立Level-1的邻接关系。</li>
+</ul>
+<p>Level-2路由器:</p>
+<ul>
+<li>Level-2路由器负责区域间的路由，它可以与相同或者不同区域的Level-2路由器或者不同区域的Level-1-2路由器形成邻居关系。Level-2路由器维护一 个Level-2的LSDB，该LSDB包含区域间的路由信息。Level-2路由器只可能建 立Level-2的邻接关系。</li>
+</ul>
+<p>Level-1-2路由器:</p>
+<ul>
+<li>同时属于Level-1和Level-2的路由器称为Level-1-2路由器。Level-1-2路由器维护两个LSDB , Level-1的LSDB用于<strong>区域内</strong>路由，Level-2的LSDB用于<strong>区域间</strong>路由。</li>
+<li>Level-1-2路由器可以与同一区域的Level-1形成Level-1邻居关系，也可以与其他区域的 Level-2 和 Level-1-2 路由器形成Level-2的邻居关系。</li>
+</ul>
+<p>不同区域间，只能建立 Level-2 的邻接关系:</p>
+<ul>
+<li>Level-2路由器可以与Level-2路由器建立邻接关系。</li>
+<li>Level-1-2路由器可以与Level-2路由器建立邻接关系。</li>
+<li>Level-1-2路由器可以与Level-1-2路由器建立邻接关系。</li>
+</ul>
+<p>	</p>
+<h2 id="邻居Hello报文"><a href="#邻居Hello报文" class="headerlink" title="邻居Hello报文"></a>邻居Hello报文</h2><p>HELLO PDU ( Hello protocol data unit ) ：</p>
+<ul>
+<li>HELLO报文的作用是邻居发现，协商参数并建立邻居关系，后期充当保活报文。</li>
+<li>IS-IS建立邻居关系和OSPF一样，通过hello报文的交互来完成。但是会根据场景分为三种类型的hello报文。</li>
+<li>广播网中的Level-1 IS-IS使用 Level-1 LAN IIH ( Level-1 LAN IS-IS Hello) ，目的组播MAC为: 0180-c200-0014</li>
+<li>广播网中的Level-2 IS-IS使用 Level-2 LAN IIH ( Level-2 LAN IS-IS Hello) ，目的组播MAC为: 0180-c200-0015</li>
+<li>非广播网络中则使用P2P IIH ( point to point IS-IS Hello)。但是其没有表示DIS （虚节点）的相关字段。</li>
+<li>非 IIH 报文需要通过填充字段用于邻居两端协商发送报文的大小。</li>
+</ul>
+<p>IS-IS支持的网络类型：</p>
+<ul>
+<li>对点网络类型(P2P)。</li>
+<li>广播多路访问网络类型( Broadcast Multiple Access )。</li>
+<li>在帧中继等特殊环境下,可以通过创建子接口支持P2P的网络类型。</li>
+</ul>
+<h2 id="邻居关系建立"><a href="#邻居关系建立" class="headerlink" title="邻居关系建立"></a>邻居关系建立</h2><p><img src="/../../images/ISIS/%E9%82%BB%E5%B1%85%E5%85%B3%E7%B3%BB%E5%BB%BA%E7%AB%8B.png"></p>
+<p>在P2P链路上,分为两次握手机制和三次握手机制。</p>
+<ul>
+<li>两次握手只要路由器收到对端发来的Hello报文，就单方面宣布邻居为up状态，建立邻居关系，不过容易存在单通风险。</li>
+<li>通过三次发送P2P的IS-IS Hello PDU最终建立起邻居关系，与广播链路邻居关系的建立情况相同。</li>
+</ul>
+<p>在广播链路上，用LAN IH报文执行3三次握手建立邻居关系。</p>
+<ul>
+<li>当收到邻居发送的Hello PDU报文里面没有自己的system ID的时候，状态机进入initialized。</li>
+<li>只有收到邻居发过来的Hello PDU有自己的system ID才会up，排除了链路单通的风险。</li>
+<li>广播网络中邻居up后会选举DIS(虚节点) ，DIS的功能类似OSPF的DR（指定路由器）。</li>
+</ul>
+<h2 id="DIS、DIS与DR的类比"><a href="#DIS、DIS与DR的类比" class="headerlink" title="DIS、DIS与DR的类比"></a>DIS、DIS与DR的类比</h2><p><img src="/../../images/ISIS/DIS%E5%92%8CDR%E7%9A%84%E7%B1%BB%E6%AF%94.png"></p>
+<p>DIS与伪节点:</p>
+<ul>
+<li>DIS是指定中间系统 （Designated IS）。</li>
+<li>伪节点是指在广播网络中由DIS创建的虚拟路由器。</li>
+</ul>
+<p>DIS的特点:</p>
+<ul>
+<li>在广播网络，需要选举DIS ，所以在邻居关系建立后，路由器会<u>等待两个Hello报文间隔</u>再进行DIS的选举。Hello报文中包含Priority 字段，Priority值最大的将被选举为该广播网的DIS。若优先级相同，接口MAC地址较大的被选举为DIS。IS-IS中DIS发送Hello时间间隔默认为10&#x2F;3秒，而其他非DIS路由器发送Hello间隔为10秒。</li>
+</ul>
+<p>DIS与DR的类比</p>
+<ul>
+<li>选举时优选级的比较，<u>DIS的优先级为0也可以参与选举</u>。OSPF中优先级为0不参与选举DR。</li>
+<li>选举的过程需要一定的时间，OSPF选举DR&#x2F;BDR需要waiting time达40秒，过程也较为复杂，而ISIS选举DIS等待两个Hello报文间隔就可以，简单快捷。</li>
+<li>选举结果ISIS只有一个DIS，但是OSPF除了有DR，还有一个BDR用做备份。</li>
+<li>选举结束后，后期有新的Router加入到链路进来，如果<u>优先级比DIS高是可抢占的</u>，但是DR是不可抢占的。</li>
+<li>选举完成后， ISIS网络链路内所有的路由器之间都建立的是邻接关系。OSPF中<br>DRothers只与 DR&#x2F;BDR 形成 full 邻接关系，DRothers之间只有2-way的关系。</li>
+<li>关于DIS和DR的作用:<ol>
+<li>进行SPF计算时，都把它当成虚节点，简化MA网络的逻辑拓扑(相同点)。</li>
+<li>都是为了减少LSP&#x2F;LSA的泛洪(相同点)。</li>
+<li>在ISIS中还可以由DIS发送CSNP来同步链路的LSDB ( ISIS扩展作用)。</li>
+</ol>
+</li>
+</ul>
+<h2 id="链路状态信息的载体"><a href="#链路状态信息的载体" class="headerlink" title="链路状态信息的载体"></a>链路状态信息的载体</h2><p><img src="/../../images/ISIS/%E9%93%BE%E8%B7%AF%E7%8A%B6%E6%80%81%E4%BF%A1%E6%81%AF%E7%9A%84%E8%BD%BD%E4%BD%93.png"></p>
+<p>ISIS TLV :</p>
+<ul>
+<li>TLV的含义是：类型(TYPE) ，长度( LENGTH) ，值( VALUE)。实际上是一个数据结构，这个结构包含了这三个字段。</li>
+<li>使用TLV结构构建报文的好处是灵活性和扩展性好。采用TLV使得报文的整体结构固定，增加新特点只需要增加新TLV即可。不需要改变整个报文的整体结构。</li>
+<li>网络拓扑结构和路由信息用TLV结构表现使得报文的灵活性和扩展性得到了极大的发挥。</li>
+</ul>
+<p>LSP PDU ( Link State Protocol PDU ) :</p>
+<ul>
+<li>LSP类似于OSPF的LSA ,承载的是链路状态信息,包含了拓扑结构和网络号。</li>
+<li>Level-1 LSP由Level-1路由器传送。</li>
+<li>Level-2 LSP由Level-2路由器传送。</li>
+<li>Level-1-2路由器则可传送以上两种LSP。</li>
+<li>LSP报文中包含了两个重要字段是ATT字段、IS-Type字段。 其中ATT字段用于标识该路由是L1&#x2F;L2路由器发送的, IS-Type用来指明生成此LSP的IS-IS类型是Level-1还是Level-2 IS-IS。</li>
+<li>LSP的刷新间隔为15分钟，老化时间为20分钟。但是一条LSP的老化除 了要等待20分</li>
+<li>钟外,还要等待60秒的零老化时延; LSP重传时间为5秒。</li>
+</ul>
+<p>SNP PDU ( Sequence Number PDU ) ：</p>
+<ul>
+<li>CSNP ( Complete Sequence Number PDU )包括<u>LSDB中所有LSP的摘要</u>信息，从而可以在相邻路由器间保持LSD的同步。</li>
+<li>PSNP ( Partial Sequence Number PDU )包含<u>部分LSDB中的LSP摘要</u>信息，能够对LSP进行请求和确认。</li>
+<li><u>CSNP类似于OSPF的DD报文传递的是LSDB里所有链路信息摘要。PSNP类似于OSPF的LSR或LSAck报文用于请求和确认部分链路信息。</u></li>
+</ul>
+<h2 id="链路状态信息的交互"><a href="#链路状态信息的交互" class="headerlink" title="链路状态信息的交互"></a>链路状态信息的交互</h2><p><img src="/../../images/ISIS/%E9%93%BE%E8%B7%AF%E7%8A%B6%E6%80%81%E4%BF%A1%E6%81%AF%E7%9A%84%E4%BA%A4%E4%BA%92.png"></p>
+<p>P2P网络LSDB同步过程:</p>
+<ul>
+<li>建立邻居关系之后，RTA与RTB会先发送CSNP给对端设备。如果对端的LSDB与CSNP没有同步，则发送PSNP请求索取相应的LSP。</li>
+<li>假定RTB向RTA索取相应的LSP ，此时向RTA发送PSNP。RTA发送RTB请求的LSP的同时启动LSP重传定时器，并等待RTB发送PSNP作为收到LSP的确认。</li>
+<li>如果在接口LSP重传定时器超时后, RTA还没有收到RTB发送的PSNP报文作为应答，则重新发送该LSP直至收到RTB的PSNP报文作为确认。</li>
+</ul>
+<p>MA网络中新加入的路由器与DIS的LSDB同步交互过程：</p>
+<ul>
+<li>假设新加入的路由器RTC已经与RTB ( DIS )和RTA建立了邻居关系。</li>
+<li>建立邻居关系之后， RTC将自己的LSP发往组播地址( Level-1 : 01-80-C2-00-00-14 ; Level-2 : 01-80-C2-00-00-15 )。这样网络上所有的邻居都将收到该LSP。</li>
+<li>该网段中的DIS会把收到RTC的LSP加入到LSDB中,并等待CSNP报文定时器超时( DIS每隔10秒发送CSNP报文）并发送CSNP报文，进行该网络内的LSDB同步。</li>
+<li>RTC收到DIS发来的CSNP报文，对比自己的LSDB数据库，然后向DIS发送PSNP报文请求自己没有的LSP (如RTA和RTB的LSP就没有)。</li>
+<li>RTB作为DIS收到该PSNP报文请求后向RTC发送对应的LSP进行LSDB的同步。</li>
+</ul>
+<h2 id="路由算法"><a href="#路由算法" class="headerlink" title="路由算法"></a>路由算法</h2><p><img src="/../../images/ISIS/%E8%B7%AF%E7%94%B1%E7%AE%97%E6%B3%95.png"></p>
+<h3 id="IS-IS的计算特点"><a href="#IS-IS的计算特点" class="headerlink" title="IS -IS的计算特点"></a>IS -IS的计算特点</h3><ul>
+<li>在本区域内路由器第一次启动的时候执行的是Full-SPF算法。</li>
+<li>后续收到的L SP更新，如果是部分拓扑的变化执行的iSPF计算。</li>
+<li>如果只是路由信息的变化，执行的就是PRC计算。</li>
+<li>由于采用拓扑与网络分离的算法，路由收敛速度得到了加强。</li>
+</ul>
+<h3 id="ISIS路由计算的开销方式"><a href="#ISIS路由计算的开销方式" class="headerlink" title="ISIS路由计算的开销方式"></a>ISIS路由计算的开销方式</h3><ul>
+<li>Narrow模式(设备默认模式开销都是10 ，手工配置接口开销取值范围为1 ~63)。</li>
+<li>Wide模式(设备默认模式开销都是10 ，手工配置接口开销取值范围是1~16777215 )。</li>
+<li>进程下加入auto-cost enable命令， Narrow模式和Wide模式都会参考接口带宽大小计算开销值，只是参考准则有少许差异。</li>
+</ul>
+<h2 id="网络分层路由域"><a href="#网络分层路由域" class="headerlink" title="网络分层路由域"></a>网络分层路由域</h2><p><img src="/../../images/ISIS/%E7%BD%91%E7%BB%9C%E5%88%86%E5%B1%82%E8%B7%AF%E7%94%B1%E5%9F%9F.png"></p>
+<h3 id="IS-IS整体拓扑"><a href="#IS-IS整体拓扑" class="headerlink" title="IS-IS整体拓扑"></a>IS-IS整体拓扑</h3><ul>
+<li>为了支持大规模的路由网络， IS-IS在自治系统内采用骨干区域与非骨干区域两级的分层结构。一般来说，将Level-1路由器部署在非骨干区域，Level-2路由器和Level-1-2路由器部署在骨干区域。每一个非骨干区域都通过Level-1-2路由器与骨干区域相连。</li>
+<li>拓扑中为一个运行IS-IS协议的网络，它与OSPF的多区域网络拓扑结构非常相似。整个骨干区域不仅包括Level-2的所有路由器，还包括Level-1-2路由器。</li>
+<li>Level-1-2级别的路由器可以属于不同的区域,在Level-1区域，维护Level-1的LSDB ，在Level-2区域,维护Level-2的LSDB。</li>
+</ul>
+<h3 id="拓扑所体现的IS-IS与OSPF不同点"><a href="#拓扑所体现的IS-IS与OSPF不同点" class="headerlink" title="拓扑所体现的IS-IS与OSPF不同点"></a>拓扑所体现的IS-IS与OSPF不同点</h3><ul>
+<li>在OSPF中，每个链路只属于一个区域；而在IS-IS中，每个链路可以属于不同的区域;</li>
+<li>在IS-IS中，单个区域没有物理的骨干与非骨干区域的概念；而在OSPF中， Area0被定义为骨干区域;</li>
+<li><u>在IS IS中，Level-1和Level-2级别的路由器分别采用SPF算法，分别生成最短路径树SPT</u>；<u>在OSPF中，只有在同一个区域内才使用SPF算法，区域之间的路由需要通过骨干区域来转发。</u></li>
+</ul>
+<h2 id="区域间路由"><a href="#区域间路由" class="headerlink" title="区域间路由"></a>区域间路由</h2><p><img src="/../../images/ISIS/%E5%8C%BA%E5%9F%9F%E9%97%B4%E8%B7%AF%E7%94%B1.png"></p>
+<h3 id="Level-1路由器的路由特点"><a href="#Level-1路由器的路由特点" class="headerlink" title="Level-1路由器的路由特点"></a>Level-1路由器的路由特点</h3><ul>
+<li>只拥有Level-1的链路状态数据库。</li>
+<li>其链路状态数据库中只有本区域路由器LSP。</li>
+<li>其路由表里没有其他区域的路由信息。</li>
+<li>其路由表里都有一条默认路由，下一条是指向到Level-1 -2路由器。</li>
+</ul>
+<h3 id="Level-2路由器的路由特点"><a href="#Level-2路由器的路由特点" class="headerlink" title="Level-2路由器的路由特点"></a>Level-2路由器的路由特点</h3><ul>
+<li>Level-2路由器只有Level-2的链路状态数据库。</li>
+<li>其LSDB中有骨干区域路由器的LSP，但是没有Level-1路由器产生的LSP。</li>
+<li>路由表里面有整个网络的路由信息。</li>
+</ul>
+<h3 id="Level-1-2路由器的路由特点"><a href="#Level-1-2路由器的路由特点" class="headerlink" title="Level-1-2路由器的路由特点"></a>Level-1-2路由器的路由特点</h3><ul>
+<li>Level-1-2路由器同时拥有Level-2和L evel-1的链路状态数据库。Level-1数据库包含本区域的LSP , Level-2数据库包含骨干区域LSP。</li>
+<li>在自己产生的Level-1的LSP中设置 了ATT比特位为1。</li>
+<li>路由表里面有整个网络的路由信息。</li>
+</ul>
+<h1 id="ISIS与OSPF的区别"><a href="#ISIS与OSPF的区别" class="headerlink" title="ISIS与OSPF的区别"></a>ISIS与OSPF的区别</h1><h2 id="ISIS与OSPF的差异性"><a href="#ISIS与OSPF的差异性" class="headerlink" title="ISIS与OSPF的差异性"></a>ISIS与OSPF的差异性</h2><table>
+<thead>
+<tr>
+<th align="center">差异性</th>
+<th align="center">IS-IS</th>
+<th align="center">OSPF</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">网络类型</td>
+<td align="center">少</td>
+<td align="center">多</td>
+</tr>
+<tr>
+<td align="center">开销方式</td>
+<td align="center">复杂</td>
+<td align="center">简便</td>
+</tr>
+<tr>
+<td align="center">区域类型</td>
+<td align="center">少</td>
+<td align="center">多</td>
+</tr>
+<tr>
+<td align="center">路由报文类型</td>
+<td align="center">简单</td>
+<td align="center">多样</td>
+</tr>
+<tr>
+<td align="center">路由收敛速度</td>
+<td align="center">很快</td>
+<td align="center">快</td>
+</tr>
+<tr>
+<td align="center">扩展性</td>
+<td align="center">强</td>
+<td align="center">一般</td>
+</tr>
+<tr>
+<td align="center">路由负载能力</td>
+<td align="center">超强</td>
+<td align="center">强</td>
+</tr>
+</tbody></table>
+<h3 id="网络类型和开销方式"><a href="#网络类型和开销方式" class="headerlink" title="网络类型和开销方式"></a>网络类型和开销方式</h3><p>IS-IS协议只支持两种网络类型，且所有带宽默认开销值都是-样的，OSPF协议支持四种网络类型，且会根据不同的带宽设定相应的开销值， 对帧中继，按需链路等网络类型有很好的支持。</p>
+<h3 id="区域类型"><a href="#区域类型" class="headerlink" title="区域类型"></a>区域类型</h3><p>IS-IS协议分L1&#x2F;L2区域，L2区域是骨干区域有全部明细路由。L1去往L2只有默认路由。OSPF协议分骨干区域，普通区域，特殊区域。普通区域和特殊区域跨区域访问需要经过骨干区域。</p>
+<h3 id="报文类型"><a href="#报文类型" class="headerlink" title="报文类型"></a>报文类型</h3><p>IS-IS协议路由承载报文类型只有LSP报文且里面路由信息是不区分内部与外部的，简单高效，无需递归计算。OSPF协议路由承载报文LSA类型多样，有1&#x2F;2&#x2F;3&#x2F;4&#x2F;5&#x2F;7类等。路由级别等级森严，且需要递归计算,适合精细化调度计算。</p>
+<h3 id="路由算法-1"><a href="#路由算法-1" class="headerlink" title="路由算法"></a>路由算法</h3><p>ISIS协议区域内某个节点上的网段发生变化时，触发的是PRC算法，收敛比较快，计算路由的报文开销也比较小。OSPF协议由于网络地址参与了拓扑的构建，在区域内当网段地址改变触发的是i-spf算法，相对来说过程繁琐复杂些。</p>
+<h3 id="扩展性"><a href="#扩展性" class="headerlink" title="扩展性"></a>扩展性</h3><p>ISIS协议任何路由信息都使用TLV传递,结构简单，易于扩展，如对IPv6的支持只增加2个TLV就解决了。且ISIS本身对IPX等协议是支持的。OSPF协议本身是为IP特定开发的，支持IPv4和IPv6的OSPF协议是两个独立的版本( OSPFv2和OSPFv3 )。</p>
+<h2 id="术语对照"><a href="#术语对照" class="headerlink" title="术语对照"></a>术语对照</h2><p><img src="/../../images/ISIS/%E6%9C%AF%E8%AF%AD%E5%AF%B9%E7%85%A7.png"></p>
+<h1 id="ISIS应用场景配置"><a href="#ISIS应用场景配置" class="headerlink" title="ISIS应用场景配置"></a>ISIS应用场景配置</h1><p><img src="/../../images/ISIS/%E6%95%99%E6%9D%90%E5%AE%9E%E9%AA%8C%E6%8B%93%E6%89%91.png"></p>
+<h2 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h2><ul>
+<li>所有路由启用IS-IS，进程号为100，全网路由可达</li>
+<li>AR1 在 Area 49.0001 区域为DIS</li>
+<li>AR4 与 AR5 之间采用P2P网络类型</li>
+<li>AR5 引入直连路由192.168.x.x</li>
+<li>AR1 访问 Area 49.0002 走最优路径</li>
+</ul>
+<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><ul>
+<li><p>所有接口配置ip</p>
+</li>
+<li><p>AR1</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">[AR1-isis-100]dis this</span><br><span class="line">[V200R003C00]</span><br><span class="line">#</span><br><span class="line">isis 100</span><br><span class="line"> is-level level-1</span><br><span class="line"> network-entity 49.0001.0000.0000.0001.00</span><br><span class="line">#</span><br><span class="line"></span><br><span class="line">//接口配置</span><br><span class="line">[AR1-GigabitEthernet0/0/0]dis this</span><br><span class="line">[V200R003C00]</span><br><span class="line">#</span><br><span class="line">interface GigabitEthernet0/0/0</span><br><span class="line"> ip address 10.1.123.1 255.255.255.0 </span><br><span class="line"> isis enable 100</span><br><span class="line"> isis dis-priority 120 level-1      //配置高优先级，成为DIS</span><br><span class="line">#</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>AR2</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">[AR2-isis-100]dis this</span><br><span class="line">[V200R003C00]</span><br><span class="line">#</span><br><span class="line">isis 100</span><br><span class="line"> network-entity 49.0001.0000.0000.0002.00</span><br><span class="line"> import-route isis level-2 into level-1       //路由渗透</span><br><span class="line">#</span><br><span class="line">//默认为level-1-2</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>AR3</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">[AR3-isis-100]dis this</span><br><span class="line">[V200R003C00]</span><br><span class="line">#</span><br><span class="line">isis 100</span><br><span class="line"> network-entity 49.0001.0000.0000.0003.00</span><br><span class="line"> import-route isis level-2 into level-1      //路由渗透</span><br><span class="line">#</span><br><span class="line">//默认为level-1-2</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>AR4</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">[AR4-isis-100]dis this</span><br><span class="line">[V200R003C00]</span><br><span class="line">#</span><br><span class="line">isis 100</span><br><span class="line"> is-level level-2</span><br><span class="line"> network-entity 49.0002.0000.0000.0004.00</span><br><span class="line">#</span><br><span class="line"></span><br><span class="line">//特殊接口配置</span><br><span class="line">[AR4-GigabitEthernet0/0/0]dis this</span><br><span class="line">[V200R003C00]</span><br><span class="line">#</span><br><span class="line">interface GigabitEthernet0/0/0</span><br><span class="line"> ip address 10.1.45.4 255.255.255.0 </span><br><span class="line"> isis enable 100</span><br><span class="line"> isis circuit-type p2p               //接口网络类型修改为P2P</span><br><span class="line">#</span><br><span class="line">return</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>AR5</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">[AR5-isis-100]dis this</span><br><span class="line">[V200R003C00]</span><br><span class="line">#</span><br><span class="line">isis 100</span><br><span class="line"> is-level level-2</span><br><span class="line"> network-entity 49.0002.0000.0000.0005.00</span><br><span class="line"> import-route direct                  //引入直连路由</span><br><span class="line">#</span><br><span class="line"></span><br><span class="line">[AR5-GigabitEthernet0/0/0]dis this</span><br><span class="line">[V200R003C00]</span><br><span class="line">#</span><br><span class="line">interface GigabitEthernet0/0/0</span><br><span class="line"> ip address 10.1.45.5 255.255.255.0 </span><br><span class="line"> isis enable 100</span><br><span class="line"> isis circuit-type p2p               //接口网络类型修改为P2P</span><br><span class="line">#</span><br><span class="line">return</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>所有接口开启ISIS</p>
+</li>
+</ul>
+<h2 id="路由渗透"><a href="#路由渗透" class="headerlink" title="路由渗透"></a>路由渗透</h2><ul>
+<li><u>如果一个level-1区域有两个以上Level-1-2路由器，则区域内Level-1路由器访问其他区域会选择最近的Level-1-2路由器，但是计算的开销值只计算本区域内的，如果最近的Level-1-2路由器在Level-2区域到达目的网络的开销相对比较大，实际会造成业务次优路径。</u>在这种场景下需要做路由渗透操作，把Level-2区域的明细路由(包括开销)引入到Level-1区域，由Level-1路由器自行计算选择最优的路径访问跨区域网络</li>
+<li>本实例要求走最优的路径到达区域49.0002，由于RTB连接RTD的链路带宽相对比较大，作用最好让数据流走RTB。可分别在RTB和RTC的ISIS进程下引入level-2的路由到level-1。由RTA的LSDB里面掌握level-2所有的明细路由，就可以选择最优的路径到达区域49.0002。</li>
+</ul>
+]]></content>
+      <tags>
+        <tag>网络-理论</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>前端工程师职业规划参考</title>
+    <url>/2023/07/02/%E8%81%8C%E4%B8%9A%E8%A7%84%E5%88%92/%E5%89%8D%E7%AB%AF%E5%B7%A5%E7%A8%8B%E5%B8%88%E8%81%8C%E4%B8%9A%E8%A7%84%E5%88%92%E5%8F%82%E8%80%83/</url>
+    <content><![CDATA[<h3 id="1-初级前端工程师（1-2年）："><a href="#1-初级前端工程师（1-2年）：" class="headerlink" title="1. 初级前端工程师（1-2年）："></a>1. 初级前端工程师（1-2年）：</h3><ul>
+<li>学习HTML、CSS和JavaScript等基础知识，并熟练运用它们进行网页开发。</li>
+<li>参与项目团队，积累实际项目经验。</li>
+<li>学习和掌握常用的前端框架和工具，如React、Vue.js、Webpack等。</li>
+<li>参与培训课程和技术社区，不断学习和提升技能。</li>
+</ul>
+<h3 id="2-中级前端工程师（3-5年）："><a href="#2-中级前端工程师（3-5年）：" class="headerlink" title="2. 中级前端工程师（3-5年）："></a>2. 中级前端工程师（3-5年）：</h3><ul>
+<li>在项目中承担更复杂的前端开发任务，如开发响应式网站、移动端应用等。</li>
+<li>深入学习和掌握前端框架和库的原理和使用技巧。</li>
+<li>学习和应用前端最佳实践，如性能优化、代码规范等。</li>
+<li>参与团队协作和项目管理，提升沟通和领导能力。</li>
+</ul>
+<h3 id="3-高级前端工程师（5年以上）："><a href="#3-高级前端工程师（5年以上）：" class="headerlink" title="3. 高级前端工程师（5年以上）："></a>3. 高级前端工程师（5年以上）：</h3><ul>
+<li>在复杂项目中担任技术负责人或架构师角色，负责前端架构设计和技术选型。</li>
+<li>深入研究前端领域的新技术和趋势，并引领团队进行技术创新和实践。</li>
+<li>参与开源项目和技术社区，分享经验和贡献代码。</li>
+<li>建立自己的技术品牌和影响力，如通过博客、演讲等方式分享经验和见解。</li>
+</ul>
+<h3 id="4-职业发展方向："><a href="#4-职业发展方向：" class="headerlink" title="4. 职业发展方向："></a>4. 职业发展方向：</h3><ul>
+<li>前端架构师：专注于前端架构设计和技术选型，负责复杂项目的技术规划和架构设计。</li>
+<li>前端团队管理：发展管理和领导能力，负责前端团队的招聘、培训和项目管理。</li>
+<li>UX&#x2F;UI设计师：学习和掌握用户体验和界面设计的知识，负责前端界面设计和交互优化。</li>
+<li>技术顾问：通过积累丰富的经验和知识，为企业提供前端技术咨询和解决方案。</li>
+</ul>
+<p>这只是一个参考，可以根据自己的兴趣和职业目标进行调整和补充。重要的是制定一个明确的职业规划，并不断学习和发展自己的技能，以实现职业的持续成长和发展。</p>
+]]></content>
+      <tags>
+        <tag>职业规划</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>后端工程师职业规划参考</title>
+    <url>/2023/07/02/%E8%81%8C%E4%B8%9A%E8%A7%84%E5%88%92/%E5%90%8E%E7%AB%AF%E5%B7%A5%E7%A8%8B%E5%B8%88%E8%81%8C%E4%B8%9A%E8%A7%84%E5%88%92%E5%8F%82%E8%80%83/</url>
+    <content><![CDATA[<h3 id="1-初级后端工程师（1-3年）："><a href="#1-初级后端工程师（1-3年）：" class="headerlink" title="1. 初级后端工程师（1-3年）："></a>1. 初级后端工程师（1-3年）：</h3><ul>
+<li>掌握一门主流后端开发语言，如Java、Python或Node.js。</li>
+<li>学习并应用常见的后端开发框架和技术，如Spring、Django或Express.js。</li>
+<li>参与项目开发，负责后端功能的实现和数据库设计。</li>
+<li>学习和应用基本的软件工程原则和最佳实践。</li>
+<li>持续学习和提升编程和问题解决能力。</li>
+</ul>
+<h3 id="2-中级后端工程师（3-5年）："><a href="#2-中级后端工程师（3-5年）：" class="headerlink" title="2. 中级后端工程师（3-5年）："></a>2. 中级后端工程师（3-5年）：</h3><ul>
+<li>深入研究和应用后端开发技术栈，如数据库优化、性能调优、缓存等。</li>
+<li>参与设计和开发复杂的后端系统，包括分布式系统和微服务架构。</li>
+<li>学习和应用设计模式和架构原则，提高系统的可扩展性和可维护性。</li>
+<li>参与团队的技术选型和架构设计，负责解决技术难题和挑战。</li>
+<li>培养团队合作和沟通能力，开始指导和培养初级工程师。</li>
+</ul>
+<h3 id="3-高级后端工程师（5年以上）："><a href="#3-高级后端工程师（5年以上）：" class="headerlink" title="3. 高级后端工程师（5年以上）："></a>3. 高级后端工程师（5年以上）：</h3><ul>
+<li>深入研究和应用领域专有的后端技术，如金融领域的支付系统、电子商务领域的订单处理系统等。</li>
+<li>参与大型项目的架构设计和技术规划，负责解决复杂的技术挑战。</li>
+<li>深入理解和应用云计算和容器化技术，如Docker和Kubernetes。</li>
+<li>参与行业内的研究和交流，提升自己在该领域的专业影响力。</li>
+<li>培养和指导团队成员的技术能力和职业发展。</li>
+</ul>
+<h3 id="4-技术管理者："><a href="#4-技术管理者：" class="headerlink" title="4. 技术管理者："></a>4. 技术管理者：</h3><ul>
+<li>学习项目管理和团队管理知识，培养领导力和沟通能力。</li>
+<li>担任技术团队的领导角色，负责项目的规划和执行。</li>
+<li>帮助团队成员制定个人的职业规划，并提供指导和支持。</li>
+<li>参与公司的技术战略规划和决策，推动团队的技术创新和发展。</li>
+</ul>
+]]></content>
+      <tags>
+        <tag>职业规划</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>网络工程师职业规划参考</title>
+    <url>/2023/07/02/%E8%81%8C%E4%B8%9A%E8%A7%84%E5%88%92/%E7%BD%91%E7%BB%9C%E5%B7%A5%E7%A8%8B%E5%B8%88%E8%81%8C%E4%B8%9A%E8%A7%84%E5%88%92%E5%8F%82%E8%80%83/</url>
+    <content><![CDATA[<h3 id="1-初级网络工程师（1-2年）："><a href="#1-初级网络工程师（1-2年）：" class="headerlink" title="1. 初级网络工程师（1-2年）："></a>1. 初级网络工程师（1-2年）：</h3><ul>
+<li>学习和掌握计算机网络的基础知识，如TCP&#x2F;IP协议、网络拓扑等。</li>
+<li>熟悉常用的网络设备和工具，如交换机、路由器、网络监控软件等。</li>
+<li>参与网络设备的配置和维护工作，解决常见的网络故障和问题。</li>
+<li>学习和掌握网络安全的基础知识，如防火墙、VPN等。</li>
+</ul>
+<h3 id="2-中级网络工程师（3-5年）："><a href="#2-中级网络工程师（3-5年）：" class="headerlink" title="2. 中级网络工程师（3-5年）："></a>2. 中级网络工程师（3-5年）：</h3><ul>
+<li>参与大型网络项目的规划和实施，如企业网络升级、数据中心建设等。</li>
+<li>深入学习和掌握网络技术的高级知识，如VLAN、路由协议、负载均衡等。</li>
+<li>学习和应用网络性能优化的技术和方法，提高网络的稳定性和响应速度。</li>
+<li>参与网络安全方面的工作，如网络漏洞扫描、入侵检测等。</li>
+</ul>
+<h3 id="3-高级网络工程师（5年以上）："><a href="#3-高级网络工程师（5年以上）：" class="headerlink" title="3. 高级网络工程师（5年以上）："></a>3. 高级网络工程师（5年以上）：</h3><ul>
+<li>在复杂网络环境下担任技术负责人或架构师角色，负责网络架构设计和规划。</li>
+<li>深入研究网络领域的新技术和趋势，并引领团队进行技术创新和实践。</li>
+<li>参与网络安全的高级工作，如安全策略制定、事件响应等。</li>
+<li>建立自己的技术品牌和影响力，如通过博客、演讲等方式分享经验和见解。</li>
+</ul>
+<h3 id="4-职业发展方向："><a href="#4-职业发展方向：" class="headerlink" title="4. 职业发展方向："></a>4. 职业发展方向：</h3><ul>
+<li>网络架构师：专注于网络架构设计和规划，负责复杂网络项目的技术规划和架构设计。</li>
+<li>网络安全专家：深入研究网络安全领域，负责企业的网络安全策略和漏洞修复。</li>
+<li>云计算工程师：学习和掌握云计算和虚拟化技术，负责企业的云平台建设和管理。</li>
+<li>网络运维经理：发展管理和领导能力，负责网络团队的招聘、培训和运维管理。</li>
+</ul>
+<p>这只是一个参考，可以根据自己的兴趣和职业目标进行调整和补充。重要的是制定一个明确的职业规划，并不断学习和发展自己的技能，以实现职业的持续成长和发展。</p>
+]]></content>
+      <tags>
+        <tag>职业规划</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>软件测试工程师职业规划参考</title>
+    <url>/2023/07/02/%E8%81%8C%E4%B8%9A%E8%A7%84%E5%88%92/%E8%BD%AF%E4%BB%B6%E5%B7%A5%E7%A8%8B%E5%B8%88%E8%81%8C%E4%B8%9A%E8%A7%84%E5%88%92/</url>
+    <content><![CDATA[<h3 id="1-初级软件测试工程师（1-2年）："><a href="#1-初级软件测试工程师（1-2年）：" class="headerlink" title="1. 初级软件测试工程师（1-2年）："></a>1. 初级软件测试工程师（1-2年）：</h3><ul>
+<li>学习和掌握软件测试的基础知识，如测试方法、测试文档编写等。</li>
+<li>熟悉常用的测试工具和技术，如自动化测试工具、性能测试工具等。</li>
+<li>参与软件测试项目，执行测试计划、编写测试用例、执行测试并记录缺陷。</li>
+</ul>
+<h3 id="2-中级软件测试工程师（3-5年）："><a href="#2-中级软件测试工程师（3-5年）：" class="headerlink" title="2. 中级软件测试工程师（3-5年）："></a>2. 中级软件测试工程师（3-5年）：</h3><ul>
+<li>深入学习和掌握软件测试的高级知识，如测试策略、测试环境配置等。</li>
+<li>参与复杂软件项目的测试规划和设计，提出测试方案和策略。</li>
+<li>掌握自动化测试技术，编写和执行自动化测试脚本，提高测试效率和质量。</li>
+<li>学习和应用性能测试和安全测试的技术，提高软件的性能和安全性。</li>
+</ul>
+<h3 id="3-高级软件测试工程师（5年以上）："><a href="#3-高级软件测试工程师（5年以上）：" class="headerlink" title="3. 高级软件测试工程师（5年以上）："></a>3. 高级软件测试工程师（5年以上）：</h3><ul>
+<li>在复杂项目中担任测试团队的技术负责人或测试架构师角色。</li>
+<li>深入研究软件测试领域的新技术和趋势，并引领团队进行技术创新和实践。</li>
+<li>参与软件质量管理方面的工作，如质量度量、过程改进等。</li>
+<li>建立自己的技术品牌和影响力，如通过博客、演讲等方式分享经验和见解。</li>
+</ul>
+<h3 id="4-职业发展方向："><a href="#4-职业发展方向：" class="headerlink" title="4. 职业发展方向："></a>4. 职业发展方向：</h3><ul>
+<li>质量保证经理：发展管理和领导能力，负责整个软件质量保证流程的管理和改进。</li>
+<li>自动化测试专家：深入研究自动化测试技术和工具，负责团队的自动化测试实施。</li>
+<li>安全测试专家：学习和掌握安全测试的知识和技术，负责软件安全测试和漏洞修复。</li>
+<li>敏捷测试专家：学习和掌握敏捷开发和测试方法，负责敏捷团队的测试工作。</li>
+</ul>
+]]></content>
+      <tags>
+        <tag>职业规划</tag>
       </tags>
   </entry>
 </search>
